@@ -1,0 +1,23 @@
+services:
+  pgvector:
+    image: pgvector/pgvector:pg16
+    container_name: document_rag_pgvector
+    restart: unless-stopped
+    ports:
+      # Bound to localhost for development security
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_DB: document_rag
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d document_rag"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgvector_data:
+    driver: local

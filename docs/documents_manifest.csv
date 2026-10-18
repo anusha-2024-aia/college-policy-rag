@@ -1,0 +1,5 @@
+file,title,effective_date,supersedes,allowed_roles
+data/raw_pdfs/employee_handbook_v1.pdf,Employee Handbook 2024,2024-01-01,,employee;hr;admin
+data/raw_pdfs/employee_handbook_v2.pdf,Employee Handbook 2025,2025-01-01,Employee Handbook 2024,employee;hr;admin
+data/raw_pdfs/security_compliance_policy.pdf,Security and Data Compliance Policy,2025-06-01,,security;compliance;admin
+data/raw_pdfs/financial_disclosure_q3.pdf,Q3 Financial Performance Summary,2025-09-30,,finance;executive;board

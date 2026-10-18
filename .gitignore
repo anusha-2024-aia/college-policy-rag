@@ -1,0 +1,50 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment variables & secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.cert
+
+# Application Data & Private Documents
+data/raw_pdfs/*
+!data/raw_pdfs/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/backup_*.json
+*.pdf
+
+# Databases & local state
+*.db
+*.sqlite
+*.sqlite3
+pgvector_data/
+
+# IDE & OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+__MACOSX/
+Thumbs.db
+Desktop.ini

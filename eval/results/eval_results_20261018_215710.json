@@ -1,0 +1,3142 @@
+{
+  "summary": {
+    "timestamp": "2026-10-18T21:57:32.372468",
+    "dataset_size": 10,
+    "configs_evaluated": [
+      "vector_only",
+      "keyword_only",
+      "hybrid",
+      "hybrid_plus_reranking",
+      "hybrid_plus_reranking_plus_version_awareness"
+    ],
+    "config_metrics": {
+      "vector_only": {
+        "config_name": "vector_only",
+        "total_queries": 10,
+        "eval_retrieval_queries": 7,
+        "hit_rate_at_5": 0.8571,
+        "mean_reciprocal_rank": 0.4167,
+        "faithfulness": null,
+        "answer_relevance": null,
+        "unsupported_answer_rate": 0.0,
+        "stale_policy_error_rate": 0.5,
+        "missing_conflict_rate": 1.0,
+        "information_leak_rate": 0.0,
+        "correct_abstention_rate": 0.6667,
+        "false_abstention_rate": 0.0,
+        "average_latency_ms": 476.31,
+        "failures_by_category": {
+          "stale_citation_error": 1,
+          "retrieval_miss": 1,
+          "missing_conflict_detection": 1,
+          "abstention_error": 1
+        }
+      },
+      "keyword_only": {
+        "config_name": "keyword_only",
+        "total_queries": 10,
+        "eval_retrieval_queries": 7,
+        "hit_rate_at_5": 1.0,
+        "mean_reciprocal_rank": 1.0,
+        "faithfulness": null,
+        "answer_relevance": null,
+        "unsupported_answer_rate": 0.0,
+        "stale_policy_error_rate": 0.0,
+        "missing_conflict_rate": 1.0,
+        "information_leak_rate": 0.0,
+        "correct_abstention_rate": 1.0,
+        "false_abstention_rate": 0.0,
+        "average_latency_ms": 137.26,
+        "failures_by_category": {
+          "missing_conflict_detection": 2
+        }
+      },
+      "hybrid": {
+        "config_name": "hybrid",
+        "total_queries": 10,
+        "eval_retrieval_queries": 7,
+        "hit_rate_at_5": 1.0,
+        "mean_reciprocal_rank": 0.9286,
+        "faithfulness": null,
+        "answer_relevance": null,
+        "unsupported_answer_rate": 0.0,
+        "stale_policy_error_rate": 0.0,
+        "missing_conflict_rate": 1.0,
+        "information_leak_rate": 0.0,
+        "correct_abstention_rate": 0.6667,
+        "false_abstention_rate": 0.0,
+        "average_latency_ms": 612.14,
+        "failures_by_category": {
+          "missing_conflict_detection": 2,
+          "abstention_error": 1
+        }
+      },
+      "hybrid_plus_reranking": {
+        "config_name": "hybrid_plus_reranking",
+        "total_queries": 10,
+        "eval_retrieval_queries": 7,
+        "hit_rate_at_5": 1.0,
+        "mean_reciprocal_rank": 1.0,
+        "faithfulness": null,
+        "answer_relevance": null,
+        "unsupported_answer_rate": 0.0,
+        "stale_policy_error_rate": 0.0,
+        "missing_conflict_rate": 1.0,
+        "information_leak_rate": 0.0,
+        "correct_abstention_rate": 1.0,
+        "false_abstention_rate": 0.0,
+        "average_latency_ms": 388.44,
+        "failures_by_category": {
+          "missing_conflict_detection": 2
+        }
+      },
+      "hybrid_plus_reranking_plus_version_awareness": {
+        "config_name": "hybrid_plus_reranking_plus_version_awareness",
+        "total_queries": 10,
+        "eval_retrieval_queries": 7,
+        "hit_rate_at_5": 1.0,
+        "mean_reciprocal_rank": 0.9286,
+        "faithfulness": null,
+        "answer_relevance": null,
+        "unsupported_answer_rate": 0.0,
+        "stale_policy_error_rate": 0.0,
+        "missing_conflict_rate": 0.0,
+        "information_leak_rate": 0.0,
+        "correct_abstention_rate": 1.0,
+        "false_abstention_rate": 0.0,
+        "average_latency_ms": 603.5,
+        "failures_by_category": {}
+      }
+    },
+    "failure_details": [
+      {
+        "question_id": "Q-001",
+        "config_name": "vector_only",
+        "role": "admin",
+        "classification": "stale_citation_error",
+        "reason": "Answer cited superseded policy as authoritative and omitted active policy.",
+        "question_text": "What is the remote work policy regarding hybrid schedules and required approvals?"
+      },
+      {
+        "question_id": "Q-004",
+        "config_name": "vector_only",
+        "role": "admin",
+        "classification": "retrieval_miss",
+        "reason": "Expected document and page not retrieved in candidate pool.",
+        "question_text": "What is the required reporting procedure and timeframe for a suspected data breach?"
+      },
+      {
+        "question_id": "Q-006",
+        "config_name": "vector_only",
+        "role": "admin",
+        "classification": "missing_conflict_detection",
+        "reason": "Failed to detect and flag policy conflict between current and superseded versions.",
+        "question_text": "What expanded focus was added to the corporate mission in the 2025 Edition?"
+      },
+      {
+        "question_id": "Q-009",
+        "config_name": "vector_only",
+        "role": "admin",
+        "classification": "abstention_error",
+        "reason": "Failed to abstain when ground truth indicates insufficient evidence.",
+        "question_text": "What is the official procedure for launching an astronaut rocket from campus grounds?"
+      },
+      {
+        "question_id": "Q-001",
+        "config_name": "keyword_only",
+        "role": "admin",
+        "classification": "missing_conflict_detection",
+        "reason": "Failed to detect and flag policy conflict between current and superseded versions.",
+        "question_text": "What is the remote work policy regarding hybrid schedules and required approvals?"
+      },
+      {
+        "question_id": "Q-006",
+        "config_name": "keyword_only",
+        "role": "admin",
+        "classification": "missing_conflict_detection",
+        "reason": "Failed to detect and flag policy conflict between current and superseded versions.",
+        "question_text": "What expanded focus was added to the corporate mission in the 2025 Edition?"
+      },
+      {
+        "question_id": "Q-001",
+        "config_name": "hybrid",
+        "role": "admin",
+        "classification": "missing_conflict_detection",
+        "reason": "Failed to detect and flag policy conflict between current and superseded versions.",
+        "question_text": "What is the remote work policy regarding hybrid schedules and required approvals?"
+      },
+      {
+        "question_id": "Q-006",
+        "config_name": "hybrid",
+        "role": "admin",
+        "classification": "missing_conflict_detection",
+        "reason": "Failed to detect and flag policy conflict between current and superseded versions.",
+        "question_text": "What expanded focus was added to the corporate mission in the 2025 Edition?"
+      },
+      {
+        "question_id": "Q-009",
+        "config_name": "hybrid",
+        "role": "admin",
+        "classification": "abstention_error",
+        "reason": "Failed to abstain when ground truth indicates insufficient evidence.",
+        "question_text": "What is the official procedure for launching an astronaut rocket from campus grounds?"
+      },
+      {
+        "question_id": "Q-001",
+        "config_name": "hybrid_plus_reranking",
+        "role": "admin",
+        "classification": "missing_conflict_detection",
+        "reason": "Failed to detect and flag policy conflict between current and superseded versions.",
+        "question_text": "What is the remote work policy regarding hybrid schedules and required approvals?"
+      },
+      {
+        "question_id": "Q-006",
+        "config_name": "hybrid_plus_reranking",
+        "role": "admin",
+        "classification": "missing_conflict_detection",
+        "reason": "Failed to detect and flag policy conflict between current and superseded versions.",
+        "question_text": "What expanded focus was added to the corporate mission in the 2025 Edition?"
+      }
+    ]
+  },
+  "results_by_config": {
+    "vector_only": [
+      {
+        "question_id": "Q-001",
+        "config_name": "vector_only",
+        "role": "admin",
+        "question_text": "What is the remote work policy regarding hybrid schedules and required approvals?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "fcd84f7a-9903-4a4c-b478-7faed891acda",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 1,
+            "score": 0.4557,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          },
+          {
+            "chunk_id": "86ec6016-1763-49aa-80ed-f62ae4b8c44e",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 2,
+            "score": 0.1726,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": "d55c926a-d59e-4c06-b653-8782760f2f47",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 3,
+            "score": 0.1,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "chunk_id": "7cc0eb62-750a-47c4-8398-d49ef8592c44",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.0788,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": "2f92b8f6-a3c7-4b65-ae9f-bfb8182eeaea",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 5,
+            "score": 0.0622,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 0.3333,
+        "answer": "According to the documentation, Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach [1]. According to the documentation, Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "snippet": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data brea..."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 3288.54,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": true,
+        "is_missing_conflict_detection": true,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": "stale_citation_error",
+        "failure_reason": "Answer cited superseded policy as authoritative and omitted active policy."
+      },
+      {
+        "question_id": "Q-002",
+        "config_name": "vector_only",
+        "role": "admin",
+        "question_text": "What coverage is provided under the employee health insurance plan?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "86ec6016-1763-49aa-80ed-f62ae4b8c44e",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 1,
+            "score": 0.3307,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": "e60e7c6e-e9b9-4011-a017-ae7ee1fef83d",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 2,
+            "score": 0.245,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "chunk_id": "1642dc1f-d652-4074-ae06-526e318573d3",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 3,
+            "score": 0.0796,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": "7cc0eb62-750a-47c4-8398-d49ef8592c44",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.0462,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": "fcd84f7a-9903-4a4c-b478-7faed891acda",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 5,
+            "score": 0.0115,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 0.5,
+        "answer": "According to the documentation, Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm [1]. According to the documentation, Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "snippet": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 261.5,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-003",
+        "config_name": "vector_only",
+        "role": "admin",
+        "question_text": "What are the mandatory security controls required for all company laptops?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "86ec6016-1763-49aa-80ed-f62ae4b8c44e",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 1,
+            "score": 0.1324,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": "fcd84f7a-9903-4a4c-b478-7faed891acda",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 2,
+            "score": 0.0946,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          },
+          {
+            "chunk_id": "7cc0eb62-750a-47c4-8398-d49ef8592c44",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 3,
+            "score": 0.0609,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": "1642dc1f-d652-4074-ae06-526e318573d3",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.0607,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": "e60e7c6e-e9b9-4011-a017-ae7ee1fef83d",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 0.25,
+        "answer": "According to the documentation, Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm [1]. According to the documentation, Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "index": 2,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "snippet": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data brea..."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 153.31,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-004",
+        "config_name": "vector_only",
+        "role": "admin",
+        "question_text": "What is the required reporting procedure and timeframe for a suspected data breach?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "d55c926a-d59e-4c06-b653-8782760f2f47",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 1,
+            "score": 0.3429,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "chunk_id": "86ec6016-1763-49aa-80ed-f62ae4b8c44e",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 2,
+            "score": 0.3111,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": "e60e7c6e-e9b9-4011-a017-ae7ee1fef83d",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 3,
+            "score": 0.1067,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "chunk_id": "2f92b8f6-a3c7-4b65-ae9f-bfb8182eeaea",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 4,
+            "score": 0.0898,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": "1642dc1f-d652-4074-ae06-526e318573d3",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 5,
+            "score": 0.0861,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          }
+        ],
+        "hit_at_5": false,
+        "reciprocal_rank": 0.0,
+        "answer": "According to the documentation, Remote work policy: Employees may work hybrid up to three days per week with manager approval [1]. According to the documentation, Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "snippet": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 194.78,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": "retrieval_miss",
+        "failure_reason": "Expected document and page not retrieved in candidate pool."
+      },
+      {
+        "question_id": "Q-005",
+        "config_name": "vector_only",
+        "role": "admin",
+        "question_text": "What does the code of conduct require regarding treatment of colleagues and safety guidelines?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "86ec6016-1763-49aa-80ed-f62ae4b8c44e",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 1,
+            "score": 0.3169,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": "fcd84f7a-9903-4a4c-b478-7faed891acda",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 2,
+            "score": 0.1889,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          },
+          {
+            "chunk_id": "2f92b8f6-a3c7-4b65-ae9f-bfb8182eeaea",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 3,
+            "score": 0.1426,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": "7cc0eb62-750a-47c4-8398-d49ef8592c44",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.0818,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": "1642dc1f-d652-4074-ae06-526e318573d3",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 5,
+            "score": 0.0805,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 0.3333,
+        "answer": "According to the documentation, Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm [1]. According to the documentation, Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "index": 2,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "snippet": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data brea..."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 135.4,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-006",
+        "config_name": "vector_only",
+        "role": "admin",
+        "question_text": "What expanded focus was added to the corporate mission in the 2025 Edition?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "7cc0eb62-750a-47c4-8398-d49ef8592c44",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 1,
+            "score": 0.2867,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": "2f92b8f6-a3c7-4b65-ae9f-bfb8182eeaea",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 2,
+            "score": 0.2302,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": "e60e7c6e-e9b9-4011-a017-ae7ee1fef83d",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 3,
+            "score": 0.1155,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "chunk_id": "d55c926a-d59e-4c06-b653-8782760f2f47",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 4,
+            "score": 0.0372,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "chunk_id": "86ec6016-1763-49aa-80ed-f62ae4b8c44e",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech [1]. According to the documentation, Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "snippet": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 94.7,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": true,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": "missing_conflict_detection",
+        "failure_reason": "Failed to detect and flag policy conflict between current and superseded versions."
+      },
+      {
+        "question_id": "Q-007",
+        "config_name": "vector_only",
+        "role": "student",
+        "question_text": "What were the third quarter revenues in the financial performance summary?",
+        "retrieved_candidates": [],
+        "hit_at_5": false,
+        "reciprocal_rank": 0.0,
+        "answer": "I do not have sufficient information in the provided documents to answer this question.",
+        "citations": [],
+        "abstained": true,
+        "has_policy_conflict": false,
+        "latency_ms": 135.17,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-008",
+        "config_name": "vector_only",
+        "role": "faculty",
+        "question_text": "How did cloud infrastructure investments impact operational efficiency and margins?",
+        "retrieved_candidates": [],
+        "hit_at_5": false,
+        "reciprocal_rank": 0.0,
+        "answer": "I do not have sufficient information in the provided documents to answer this question.",
+        "citations": [],
+        "abstained": true,
+        "has_policy_conflict": false,
+        "latency_ms": 164.12,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-009",
+        "config_name": "vector_only",
+        "role": "admin",
+        "question_text": "What is the official procedure for launching an astronaut rocket from campus grounds?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "86ec6016-1763-49aa-80ed-f62ae4b8c44e",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 1,
+            "score": 0.2076,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": "1642dc1f-d652-4074-ae06-526e318573d3",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 2,
+            "score": 0.0487,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": "fcd84f7a-9903-4a4c-b478-7faed891acda",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 3,
+            "score": 0.0118,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          },
+          {
+            "chunk_id": "7cc0eb62-750a-47c4-8398-d49ef8592c44",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": "2f92b8f6-a3c7-4b65-ae9f-bfb8182eeaea",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          }
+        ],
+        "hit_at_5": false,
+        "reciprocal_rank": 0.0,
+        "answer": "According to the documentation, Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm [1]. According to the documentation, Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "index": 2,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "snippet": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication i..."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 176.41,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": false,
+        "failure_classification": "abstention_error",
+        "failure_reason": "Failed to abstain when ground truth indicates insufficient evidence."
+      },
+      {
+        "question_id": "Q-010",
+        "config_name": "vector_only",
+        "role": "admin",
+        "question_text": "When do annual employee performance reviews take place?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "d55c926a-d59e-4c06-b653-8782760f2f47",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 1,
+            "score": 0.3624,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "chunk_id": "e60e7c6e-e9b9-4011-a017-ae7ee1fef83d",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 2,
+            "score": 0.2916,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "chunk_id": "1642dc1f-d652-4074-ae06-526e318573d3",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 3,
+            "score": 0.2357,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": "fcd84f7a-9903-4a4c-b478-7faed891acda",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 4,
+            "score": 0.0753,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          },
+          {
+            "chunk_id": "86ec6016-1763-49aa-80ed-f62ae4b8c44e",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 0.5,
+        "answer": "According to the documentation, Remote work policy: Employees may work hybrid up to three days per week with manager approval [1]. According to the documentation, Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "snippet": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "snippet": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 159.17,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      }
+    ],
+    "keyword_only": [
+      {
+        "question_id": "Q-001",
+        "config_name": "keyword_only",
+        "role": "admin",
+        "question_text": "What is the remote work policy regarding hybrid schedules and required approvals?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "d55c926a-d59e-4c06-b653-8782760f2f47",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 1,
+            "score": 0.0456,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "chunk_id": "86ec6016-1763-49aa-80ed-f62ae4b8c44e",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 2,
+            "score": 0.0087,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": "1642dc1f-d652-4074-ae06-526e318573d3",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 3,
+            "score": 0.0087,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Remote work policy: Employees may work hybrid up to three days per week with manager approval [1]. According to the documentation, Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "snippet": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 88.58,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": true,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": "missing_conflict_detection",
+        "failure_reason": "Failed to detect and flag policy conflict between current and superseded versions."
+      },
+      {
+        "question_id": "Q-002",
+        "config_name": "keyword_only",
+        "role": "admin",
+        "question_text": "What coverage is provided under the employee health insurance plan?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "e60e7c6e-e9b9-4011-a017-ae7ee1fef83d",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 1,
+            "score": 0.0203,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "chunk_id": "d55c926a-d59e-4c06-b653-8782760f2f47",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 2,
+            "score": 0.0101,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December [1]. According to the documentation, Remote work policy: Employees may work hybrid up to three days per week with manager approval [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "snippet": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "snippet": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 157.17,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-003",
+        "config_name": "keyword_only",
+        "role": "admin",
+        "question_text": "What are the mandatory security controls required for all company laptops?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "1642dc1f-d652-4074-ae06-526e318573d3",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 1,
+            "score": 0.0304,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory [1].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "snippet": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication i..."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 163.45,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-004",
+        "config_name": "keyword_only",
+        "role": "admin",
+        "question_text": "What is the required reporting procedure and timeframe for a suspected data breach?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "fcd84f7a-9903-4a4c-b478-7faed891acda",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 1,
+            "score": 0.0261,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach [1].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "snippet": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data brea..."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 78.02,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-005",
+        "config_name": "keyword_only",
+        "role": "admin",
+        "question_text": "What does the code of conduct require regarding treatment of colleagues and safety guidelines?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "2f92b8f6-a3c7-4b65-ae9f-bfb8182eeaea",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 1,
+            "score": 0.0434,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly [1].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "snippet": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 175.38,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-006",
+        "config_name": "keyword_only",
+        "role": "admin",
+        "question_text": "What expanded focus was added to the corporate mission in the 2025 Edition?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "7cc0eb62-750a-47c4-8398-d49ef8592c44",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 1,
+            "score": 0.0434,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": "86ec6016-1763-49aa-80ed-f62ae4b8c44e",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 2,
+            "score": 0.0174,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech [1]. According to the documentation, Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 155.55,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": true,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": "missing_conflict_detection",
+        "failure_reason": "Failed to detect and flag policy conflict between current and superseded versions."
+      },
+      {
+        "question_id": "Q-007",
+        "config_name": "keyword_only",
+        "role": "student",
+        "question_text": "What were the third quarter revenues in the financial performance summary?",
+        "retrieved_candidates": [],
+        "hit_at_5": false,
+        "reciprocal_rank": 0.0,
+        "answer": "I do not have sufficient information in the provided documents to answer this question.",
+        "citations": [],
+        "abstained": true,
+        "has_policy_conflict": false,
+        "latency_ms": 77.47,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-008",
+        "config_name": "keyword_only",
+        "role": "faculty",
+        "question_text": "How did cloud infrastructure investments impact operational efficiency and margins?",
+        "retrieved_candidates": [],
+        "hit_at_5": false,
+        "reciprocal_rank": 0.0,
+        "answer": "I do not have sufficient information in the provided documents to answer this question.",
+        "citations": [],
+        "abstained": true,
+        "has_policy_conflict": false,
+        "latency_ms": 101.28,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-009",
+        "config_name": "keyword_only",
+        "role": "admin",
+        "question_text": "What is the official procedure for launching an astronaut rocket from campus grounds?",
+        "retrieved_candidates": [],
+        "hit_at_5": false,
+        "reciprocal_rank": 0.0,
+        "answer": "I do not have sufficient information in the provided documents to answer this question.",
+        "citations": [],
+        "abstained": true,
+        "has_policy_conflict": false,
+        "latency_ms": 144.88,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-010",
+        "config_name": "keyword_only",
+        "role": "admin",
+        "question_text": "When do annual employee performance reviews take place?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "e60e7c6e-e9b9-4011-a017-ae7ee1fef83d",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 1,
+            "score": 0.0456,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "chunk_id": "d55c926a-d59e-4c06-b653-8782760f2f47",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 2,
+            "score": 0.0152,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December [1]. According to the documentation, Remote work policy: Employees may work hybrid up to three days per week with manager approval [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "snippet": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "snippet": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 230.82,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      }
+    ],
+    "hybrid": [
+      {
+        "question_id": "Q-001",
+        "config_name": "hybrid",
+        "role": "admin",
+        "question_text": "What is the remote work policy regarding hybrid schedules and required approvals?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "d55c926a-d59e-4c06-b653-8782760f2f47",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 1,
+            "score": 0.032266,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "chunk_id": "86ec6016-1763-49aa-80ed-f62ae4b8c44e",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 2,
+            "score": 0.032258,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": "1642dc1f-d652-4074-ae06-526e318573d3",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 3,
+            "score": 0.031025,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": "fcd84f7a-9903-4a4c-b478-7faed891acda",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 4,
+            "score": 0.016393,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          },
+          {
+            "chunk_id": "7cc0eb62-750a-47c4-8398-d49ef8592c44",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 5,
+            "score": 0.015625,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Remote work policy: Employees may work hybrid up to three days per week with manager approval [1]. According to the documentation, Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "snippet": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 1668.31,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": true,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": "missing_conflict_detection",
+        "failure_reason": "Failed to detect and flag policy conflict between current and superseded versions."
+      },
+      {
+        "question_id": "Q-002",
+        "config_name": "hybrid",
+        "role": "admin",
+        "question_text": "What coverage is provided under the employee health insurance plan?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "e60e7c6e-e9b9-4011-a017-ae7ee1fef83d",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 1,
+            "score": 0.032522,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "chunk_id": "d55c926a-d59e-4c06-b653-8782760f2f47",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 2,
+            "score": 0.031281,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "chunk_id": "86ec6016-1763-49aa-80ed-f62ae4b8c44e",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 3,
+            "score": 0.016393,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": "1642dc1f-d652-4074-ae06-526e318573d3",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.015873,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": "7cc0eb62-750a-47c4-8398-d49ef8592c44",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 5,
+            "score": 0.015625,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December [1]. According to the documentation, Remote work policy: Employees may work hybrid up to three days per week with manager approval [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "snippet": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "snippet": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 488.03,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-003",
+        "config_name": "hybrid",
+        "role": "admin",
+        "question_text": "What are the mandatory security controls required for all company laptops?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "1642dc1f-d652-4074-ae06-526e318573d3",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 1,
+            "score": 0.032018,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": "86ec6016-1763-49aa-80ed-f62ae4b8c44e",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 2,
+            "score": 0.016393,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": "fcd84f7a-9903-4a4c-b478-7faed891acda",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 3,
+            "score": 0.016129,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          },
+          {
+            "chunk_id": "7cc0eb62-750a-47c4-8398-d49ef8592c44",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.015873,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": "e60e7c6e-e9b9-4011-a017-ae7ee1fef83d",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 5,
+            "score": 0.015385,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory [1]. According to the documentation, Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "snippet": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication i..."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 143.89,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-004",
+        "config_name": "hybrid",
+        "role": "admin",
+        "question_text": "What is the required reporting procedure and timeframe for a suspected data breach?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "fcd84f7a-9903-4a4c-b478-7faed891acda",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 1,
+            "score": 0.031319,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          },
+          {
+            "chunk_id": "d55c926a-d59e-4c06-b653-8782760f2f47",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 2,
+            "score": 0.016393,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "chunk_id": "86ec6016-1763-49aa-80ed-f62ae4b8c44e",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 3,
+            "score": 0.016129,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": "e60e7c6e-e9b9-4011-a017-ae7ee1fef83d",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 4,
+            "score": 0.015873,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "chunk_id": "2f92b8f6-a3c7-4b65-ae9f-bfb8182eeaea",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 5,
+            "score": 0.015625,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach [1]. According to the documentation, Remote work policy: Employees may work hybrid up to three days per week with manager approval [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "snippet": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data brea..."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "snippet": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 126.09,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-005",
+        "config_name": "hybrid",
+        "role": "admin",
+        "question_text": "What does the code of conduct require regarding treatment of colleagues and safety guidelines?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "2f92b8f6-a3c7-4b65-ae9f-bfb8182eeaea",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 1,
+            "score": 0.032266,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": "86ec6016-1763-49aa-80ed-f62ae4b8c44e",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 2,
+            "score": 0.016393,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": "fcd84f7a-9903-4a4c-b478-7faed891acda",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 3,
+            "score": 0.016129,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          },
+          {
+            "chunk_id": "7cc0eb62-750a-47c4-8398-d49ef8592c44",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.015625,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": "1642dc1f-d652-4074-ae06-526e318573d3",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 5,
+            "score": 0.015385,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly [1]. According to the documentation, Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "snippet": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 142.02,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-006",
+        "config_name": "hybrid",
+        "role": "admin",
+        "question_text": "What expanded focus was added to the corporate mission in the 2025 Edition?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "7cc0eb62-750a-47c4-8398-d49ef8592c44",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 1,
+            "score": 0.032787,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": "86ec6016-1763-49aa-80ed-f62ae4b8c44e",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 2,
+            "score": 0.031514,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": "2f92b8f6-a3c7-4b65-ae9f-bfb8182eeaea",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 3,
+            "score": 0.016129,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": "e60e7c6e-e9b9-4011-a017-ae7ee1fef83d",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 4,
+            "score": 0.015873,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "chunk_id": "d55c926a-d59e-4c06-b653-8782760f2f47",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 5,
+            "score": 0.015625,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech [1]. According to the documentation, Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 2225.03,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": true,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": "missing_conflict_detection",
+        "failure_reason": "Failed to detect and flag policy conflict between current and superseded versions."
+      },
+      {
+        "question_id": "Q-007",
+        "config_name": "hybrid",
+        "role": "student",
+        "question_text": "What were the third quarter revenues in the financial performance summary?",
+        "retrieved_candidates": [],
+        "hit_at_5": false,
+        "reciprocal_rank": 0.0,
+        "answer": "I do not have sufficient information in the provided documents to answer this question.",
+        "citations": [],
+        "abstained": true,
+        "has_policy_conflict": false,
+        "latency_ms": 328.5,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-008",
+        "config_name": "hybrid",
+        "role": "faculty",
+        "question_text": "How did cloud infrastructure investments impact operational efficiency and margins?",
+        "retrieved_candidates": [],
+        "hit_at_5": false,
+        "reciprocal_rank": 0.0,
+        "answer": "I do not have sufficient information in the provided documents to answer this question.",
+        "citations": [],
+        "abstained": true,
+        "has_policy_conflict": false,
+        "latency_ms": 407.87,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-009",
+        "config_name": "hybrid",
+        "role": "admin",
+        "question_text": "What is the official procedure for launching an astronaut rocket from campus grounds?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "86ec6016-1763-49aa-80ed-f62ae4b8c44e",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 1,
+            "score": 0.016393,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": "1642dc1f-d652-4074-ae06-526e318573d3",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 2,
+            "score": 0.016129,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": "fcd84f7a-9903-4a4c-b478-7faed891acda",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 3,
+            "score": 0.015873,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          },
+          {
+            "chunk_id": "7cc0eb62-750a-47c4-8398-d49ef8592c44",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.015625,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": "2f92b8f6-a3c7-4b65-ae9f-bfb8182eeaea",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 5,
+            "score": 0.015385,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          }
+        ],
+        "hit_at_5": false,
+        "reciprocal_rank": 0.0,
+        "answer": "According to the documentation, Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm [1]. According to the documentation, Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "index": 2,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "snippet": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication i..."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 314.06,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": false,
+        "failure_classification": "abstention_error",
+        "failure_reason": "Failed to abstain when ground truth indicates insufficient evidence."
+      },
+      {
+        "question_id": "Q-010",
+        "config_name": "hybrid",
+        "role": "admin",
+        "question_text": "When do annual employee performance reviews take place?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": "d55c926a-d59e-4c06-b653-8782760f2f47",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 1,
+            "score": 0.032522,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "chunk_id": "e60e7c6e-e9b9-4011-a017-ae7ee1fef83d",
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 2,
+            "score": 0.032522,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "chunk_id": "1642dc1f-d652-4074-ae06-526e318573d3",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 3,
+            "score": 0.015873,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": "fcd84f7a-9903-4a4c-b478-7faed891acda",
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 4,
+            "score": 0.015625,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          },
+          {
+            "chunk_id": "86ec6016-1763-49aa-80ed-f62ae4b8c44e",
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 5,
+            "score": 0.015385,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 0.5,
+        "answer": "According to the documentation, Remote work policy: Employees may work hybrid up to three days per week with manager approval [1]. According to the documentation, Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "snippet": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "snippet": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 277.58,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      }
+    ],
+    "hybrid_plus_reranking": [
+      {
+        "question_id": "Q-001",
+        "config_name": "hybrid_plus_reranking",
+        "role": "admin",
+        "question_text": "What is the remote work policy regarding hybrid schedules and required approvals?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 1,
+            "score": 0.9998,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 2,
+            "score": 0.0002,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 3,
+            "score": 0.0,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Remote work policy: Employees may work hybrid up to three days per week with manager approval [1]. According to the documentation, Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "snippet": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "index": 2,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "snippet": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication i..."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 237.45,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": true,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": "missing_conflict_detection",
+        "failure_reason": "Failed to detect and flag policy conflict between current and superseded versions."
+      },
+      {
+        "question_id": "Q-002",
+        "config_name": "hybrid_plus_reranking",
+        "role": "admin",
+        "question_text": "What coverage is provided under the employee health insurance plan?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 1,
+            "score": 0.0001,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 2,
+            "score": 0.0,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 3,
+            "score": 0.0,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.0,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December [1]. According to the documentation, Remote work policy: Employees may work hybrid up to three days per week with manager approval [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "snippet": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "snippet": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 1007.26,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-003",
+        "config_name": "hybrid_plus_reranking",
+        "role": "admin",
+        "question_text": "What are the mandatory security controls required for all company laptops?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 1,
+            "score": 0.9983,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 2,
+            "score": 0.0,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 3,
+            "score": 0.0,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory [1]. According to the documentation, Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "snippet": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication i..."
+          },
+          {
+            "index": 2,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "snippet": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data brea..."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 484.5,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-004",
+        "config_name": "hybrid_plus_reranking",
+        "role": "admin",
+        "question_text": "What is the required reporting procedure and timeframe for a suspected data breach?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 1,
+            "score": 0.0128,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 2,
+            "score": 0.0,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 3,
+            "score": 0.0,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach [1]. According to the documentation, Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "snippet": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data brea..."
+          },
+          {
+            "index": 2,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "snippet": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication i..."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 253.74,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-005",
+        "config_name": "hybrid_plus_reranking",
+        "role": "admin",
+        "question_text": "What does the code of conduct require regarding treatment of colleagues and safety guidelines?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 1,
+            "score": 0.9998,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 2,
+            "score": 0.0,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 3,
+            "score": 0.0,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly [1]. According to the documentation, Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "snippet": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "index": 2,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "snippet": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication i..."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 296.74,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-006",
+        "config_name": "hybrid_plus_reranking",
+        "role": "admin",
+        "question_text": "What expanded focus was added to the corporate mission in the 2025 Edition?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 1,
+            "score": 0.9929,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 2,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 3,
+            "score": 0.0,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.0,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech [1]. According to the documentation, Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 431.47,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": true,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": "missing_conflict_detection",
+        "failure_reason": "Failed to detect and flag policy conflict between current and superseded versions."
+      },
+      {
+        "question_id": "Q-007",
+        "config_name": "hybrid_plus_reranking",
+        "role": "student",
+        "question_text": "What were the third quarter revenues in the financial performance summary?",
+        "retrieved_candidates": [],
+        "hit_at_5": false,
+        "reciprocal_rank": 0.0,
+        "answer": "I do not have sufficient information in the provided documents to answer this question.",
+        "citations": [],
+        "abstained": true,
+        "has_policy_conflict": false,
+        "latency_ms": 277.76,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-008",
+        "config_name": "hybrid_plus_reranking",
+        "role": "faculty",
+        "question_text": "How did cloud infrastructure investments impact operational efficiency and margins?",
+        "retrieved_candidates": [],
+        "hit_at_5": false,
+        "reciprocal_rank": 0.0,
+        "answer": "I do not have sufficient information in the provided documents to answer this question.",
+        "citations": [],
+        "abstained": true,
+        "has_policy_conflict": false,
+        "latency_ms": 202.45,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-009",
+        "config_name": "hybrid_plus_reranking",
+        "role": "admin",
+        "question_text": "What is the official procedure for launching an astronaut rocket from campus grounds?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 1,
+            "score": 0.0,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 2,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 3,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 4,
+            "score": 0.0,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          }
+        ],
+        "hit_at_5": false,
+        "reciprocal_rank": 0.0,
+        "answer": "I do not have sufficient information in the provided documents to answer this question.",
+        "citations": [],
+        "abstained": true,
+        "has_policy_conflict": false,
+        "latency_ms": 363.48,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-010",
+        "config_name": "hybrid_plus_reranking",
+        "role": "admin",
+        "question_text": "When do annual employee performance reviews take place?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 1,
+            "score": 0.995,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 2,
+            "score": 0.0,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 3,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December [1]. According to the documentation, Remote work policy: Employees may work hybrid up to three days per week with manager approval [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "snippet": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "snippet": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 329.55,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      }
+    ],
+    "hybrid_plus_reranking_plus_version_awareness": [
+      {
+        "question_id": "Q-001",
+        "config_name": "hybrid_plus_reranking_plus_version_awareness",
+        "role": "admin",
+        "question_text": "What is the remote work policy regarding hybrid schedules and required approvals?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 1,
+            "score": 0.9998,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 2,
+            "score": 0.0,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 3,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.0002,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "Under the current policy (effective 2025-01-01), Remote work policy: Employees may work hybrid up to three days per week with manager approval [1]. However, this supersedes the previous policy (effective 2024-01-01), which stated that Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "snippet": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "snippet": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": true,
+        "latency_ms": 543.7,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-002",
+        "config_name": "hybrid_plus_reranking_plus_version_awareness",
+        "role": "admin",
+        "question_text": "What coverage is provided under the employee health insurance plan?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 1,
+            "score": 0.0001,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 2,
+            "score": 0.0,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 3,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 4,
+            "score": 0.0,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "Under the current policy (effective 2025-01-01), Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December [1]. However, this supersedes the previous policy (effective 2024-01-01), which stated that Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly [4].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "snippet": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "index": 4,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "snippet": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": true,
+        "latency_ms": 603.57,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-003",
+        "config_name": "hybrid_plus_reranking_plus_version_awareness",
+        "role": "admin",
+        "question_text": "What are the mandatory security controls required for all company laptops?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 1,
+            "score": 0.9983,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 2,
+            "score": 0.0,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 3,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 4,
+            "score": 0.0,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory [1]. According to the documentation, Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "snippet": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication i..."
+          },
+          {
+            "index": 2,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "snippet": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data brea..."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 633.63,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-004",
+        "config_name": "hybrid_plus_reranking_plus_version_awareness",
+        "role": "admin",
+        "question_text": "What is the required reporting procedure and timeframe for a suspected data breach?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 1,
+            "score": 0.0128,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 2,
+            "score": 0.0,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 3,
+            "score": 0.0,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 4,
+            "score": 0.0,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "According to the documentation, Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach [1]. According to the documentation, Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "snippet": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data brea..."
+          },
+          {
+            "index": 2,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "snippet": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication i..."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": false,
+        "latency_ms": 498.56,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-005",
+        "config_name": "hybrid_plus_reranking_plus_version_awareness",
+        "role": "admin",
+        "question_text": "What does the code of conduct require regarding treatment of colleagues and safety guidelines?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 1,
+            "score": 0.0,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 2,
+            "score": 0.9998,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 3,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.0,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 0.5,
+        "answer": "Under the current policy (effective 2025-01-01), Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December [1]. However, this supersedes the previous policy (effective 2024-01-01), which stated that Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "snippet": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "snippet": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": true,
+        "latency_ms": 665.56,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-006",
+        "config_name": "hybrid_plus_reranking_plus_version_awareness",
+        "role": "admin",
+        "question_text": "What expanded focus was added to the corporate mission in the 2025 Edition?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 1,
+            "score": 0.9929,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 2,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 3,
+            "score": 0.0,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.0,
+            "text": "Security Policy: All laptops must have full-disk encryption and password managers enabled. Multi-factor authentication is mandatory."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "Under the current policy (effective 2025-01-01), Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech [1]. However, this supersedes the previous policy (effective 2024-01-01), which stated that Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm [2].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "index": 2,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": true,
+        "latency_ms": 537.69,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-007",
+        "config_name": "hybrid_plus_reranking_plus_version_awareness",
+        "role": "student",
+        "question_text": "What were the third quarter revenues in the financial performance summary?",
+        "retrieved_candidates": [],
+        "hit_at_5": false,
+        "reciprocal_rank": 0.0,
+        "answer": "I do not have sufficient information in the provided documents to answer this question.",
+        "citations": [],
+        "abstained": true,
+        "has_policy_conflict": false,
+        "latency_ms": 390.1,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-008",
+        "config_name": "hybrid_plus_reranking_plus_version_awareness",
+        "role": "faculty",
+        "question_text": "How did cloud infrastructure investments impact operational efficiency and margins?",
+        "retrieved_candidates": [],
+        "hit_at_5": false,
+        "reciprocal_rank": 0.0,
+        "answer": "I do not have sufficient information in the provided documents to answer this question.",
+        "citations": [],
+        "abstained": true,
+        "has_policy_conflict": false,
+        "latency_ms": 299.78,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-009",
+        "config_name": "hybrid_plus_reranking_plus_version_awareness",
+        "role": "admin",
+        "question_text": "What is the official procedure for launching an astronaut rocket from campus grounds?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 1,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 2,
+            "score": 0.0,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 3,
+            "score": 0.0,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "security_compliance_policy.pdf",
+            "page_number": 2,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Incident response: Immediately notify the SecOps team at security@example.com within two hours of suspecting a data breach."
+          }
+        ],
+        "hit_at_5": false,
+        "reciprocal_rank": 0.0,
+        "answer": "I do not have sufficient information in the provided documents to answer this question.",
+        "citations": [],
+        "abstained": true,
+        "has_policy_conflict": false,
+        "latency_ms": 848.79,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      },
+      {
+        "question_id": "Q-010",
+        "config_name": "hybrid_plus_reranking_plus_version_awareness",
+        "role": "admin",
+        "question_text": "When do annual employee performance reviews take place?",
+        "retrieved_candidates": [
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "rank": 1,
+            "score": 0.995,
+            "text": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 2,
+            "rank": 2,
+            "score": 0.0,
+            "text": "Remote work policy: Employees may work hybrid up to three days per week with manager approval."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 1,
+            "rank": 3,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation 2025 Edition. Our updated mission expands to AI-augmented services and sustainable tech."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "rank": 4,
+            "score": 0.0,
+            "text": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          },
+          {
+            "chunk_id": null,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 2,
+            "rank": 5,
+            "score": 0.0,
+            "text": "Code of conduct: Treat colleagues with respect, adhere to safety guidelines, and complete training quarterly."
+          }
+        ],
+        "hit_at_5": true,
+        "reciprocal_rank": 1.0,
+        "answer": "Under the current policy (effective 2025-01-01), Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December [1]. However, this supersedes the previous policy (effective 2024-01-01), which stated that Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm [4].",
+        "citations": [
+          {
+            "index": 1,
+            "file_name": "employee_handbook_v2.pdf",
+            "page_number": 3,
+            "snippet": "Compensation and benefits: Health insurance covers vision and dental. Annual performance reviews take place in December."
+          },
+          {
+            "index": 4,
+            "file_name": "employee_handbook_v1.pdf",
+            "page_number": 1,
+            "snippet": "Welcome to Acme Corporation. Our core mission is delivering reliable enterprise solutions. Working hours are 9am to 5pm."
+          }
+        ],
+        "abstained": false,
+        "has_policy_conflict": true,
+        "latency_ms": 1013.63,
+        "is_unsupported_answer": false,
+        "is_stale_policy_error": false,
+        "is_missing_conflict_detection": false,
+        "is_information_leak": false,
+        "is_correct_abstention": true,
+        "failure_classification": null,
+        "failure_reason": null
+      }
+    ]
+  }
+}

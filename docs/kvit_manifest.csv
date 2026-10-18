@@ -1,0 +1,17 @@
+file,title,effective_date,supersedes,allowed_roles
+data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/academic_regulations_2024.pdf,Academic Regulations for Undergraduate Programmes,2024-07-01,,student;faculty;admin
+data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/student_handbook_2025.pdf,Student Handbook,2025-07-01,,student;faculty;admin
+data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/attendance_leave_policy_2023.pdf,Attendance and Leave Policy,2023-08-01,,student;faculty;admin
+data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/attendance_leave_policy_2025.pdf,Attendance and Leave Policy,2025-07-01,attendance_leave_policy_2023.pdf,student;faculty;admin
+data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/examination_assessment_rules_2023.pdf,Examination and Assessment Rules,2023-08-01,,student;faculty;admin
+data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/exam_rules_amendment_circular_2025.pdf,Circular No. KVIT/ACAD/2025/014: Amendment to Examination and Assessment Rules,2025-07-01,partial: Clause 4.2 and Clause 6.1 only:examination_assessment_rules_2023.pdf,student;faculty;admin
+data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/library_rules_2025.pdf,Library Rules,2025-07-01,,student;faculty;admin
+data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/hostel_rules_2024.pdf,Hostel Rules,2024-07-01,,student;faculty;admin
+data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/hostel_rules_2025.pdf,Hostel Rules,2025-07-01,hostel_rules_2024.pdf,student;faculty;admin
+data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/scholarship_guidelines_2025.pdf,Scholarship Guidelines,2025-07-01,,student;faculty;admin
+data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/faculty_service_rules_2025.pdf,Faculty Service Rules,2025-07-01,,faculty;admin
+data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/question_paper_confidentiality_protocol_2025.pdf,Question Paper Confidentiality Protocol,2025-07-01,,faculty;admin
+data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/marks_moderation_guidelines_2025.pdf,Marks Moderation Guidelines,2025-07-01,,faculty;admin
+data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/disciplinary_committee_case_summaries_2025.pdf,Disciplinary Committee Case Summaries (Pseudonymised),2025-07-01,,admin
+data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/admin_fee_waiver_internal_criteria_2025.pdf,Discretionary Fee Waiver: Internal Criteria,2025-07-01,,admin
+data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/admin_salary_bands_and_budget_2025.pdf,Salary Bands and Operating Budget,2025-07-01,,admin
