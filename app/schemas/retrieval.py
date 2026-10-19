@@ -57,6 +57,7 @@ class RetrievalDiagnostics(BaseModel):
     keyword_count: int
     fused_count: int
     reranked_count: int
+    semantic_retrieval_active: bool = False
     timings_ms: dict[str, float] = Field(default_factory=dict)
 
 

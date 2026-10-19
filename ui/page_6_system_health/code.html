@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LexisPolicy AI - System Health &amp; Runtime Infrastructure Diagnostics</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary-container": "#a65900",
+            "primary-container": "#2563eb",
+            "on-surface-variant": "#434655",
+            "surface-variant": "#dae2fd",
+            "on-surface": "#131b2e",
+            "on-secondary-container": "#006f66",
+            "on-error": "#ffffff",
+            "surface-dim": "#d2d9f4",
+            "on-tertiary": "#ffffff",
+            "surface-container": "#eaedff",
+            "surface-container-highest": "#dae2fd",
+            "on-primary-container": "#eeefff",
+            "inverse-surface": "#283044",
+            "on-tertiary-container": "#ffede1",
+            "background": "#faf8ff",
+            "surface-container-high": "#e2e7ff",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed-variant": "#6e3900",
+            "outline": "#737686",
+            "on-secondary-fixed": "#00201d",
+            "tertiary-fixed": "#ffdcc3",
+            "surface-container-lowest": "#ffffff",
+            "secondary": "#006a61",
+            "inverse-primary": "#b4c5ff",
+            "inverse-on-surface": "#eef0ff",
+            "secondary-fixed-dim": "#6bd8cb",
+            "on-tertiary-fixed": "#2f1500",
+            "error": "#ba1a1a",
+            "on-secondary-fixed-variant": "#005049",
+            "on-primary-fixed": "#00174b",
+            "tertiary": "#824500",
+            "secondary-fixed": "#89f5e7",
+            "tertiary-fixed-dim": "#ffb77d",
+            "on-primary-fixed-variant": "#003ea8",
+            "outline-variant": "#c3c6d7",
+            "surface-container-low": "#f2f3ff",
+            "primary": "#004ac6",
+            "primary-fixed-dim": "#b4c5ff",
+            "secondary-container": "#86f2e4",
+            "primary-fixed": "#dbe1ff",
+            "error-container": "#ffdad6",
+            "on-background": "#131b2e",
+            "on-secondary": "#ffffff",
+            "surface-tint": "#0053db",
+            "surface": "#faf8ff",
+            "on-primary": "#ffffff",
+            "surface-bright": "#faf8ff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "margin": "1rem",
+            "gutter-desktop": "1.5rem",
+            "space-xl": "1.5rem",
+            "space-sm": "0.5rem",
+            "space-md": "0.75rem",
+            "space-2xl": "2rem",
+            "margin-desktop": "2rem",
+            "space-lg": "1rem",
+            "space-xs": "0.25rem",
+            "space-3xl": "3rem"
+          },
+          "fontFamily": {
+            "code-inline": ["JetBrains Mono"],
+            "headline-lg": ["Geist"],
+            "body-sm": ["Geist"],
+            "label-sm": ["JetBrains Mono"],
+            "label-md": ["JetBrains Mono"],
+            "body-lg": ["Geist"],
+            "headline-sm": ["Geist"],
+            "headline-md": ["Geist"],
+            "label-lg": ["JetBrains Mono"],
+            "body-md": ["Geist"],
+            "display-lg": ["Geist"],
+            "display-lg-mobile": ["Geist"]
+          },
+          "fontSize": {
+            "code-inline": ["12px", {"lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400"}],
+            "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+            "body-sm": ["12px", {"lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400"}],
+            "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0em", "fontWeight": "500"}],
+            "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+            "body-lg": ["15px", {"lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400"}],
+            "headline-sm": ["16px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600"}],
+            "label-lg": ["13px", {"lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+            "body-md": ["14px", {"lineHeight": "22px", "letterSpacing": "-0.003em", "fontWeight": "400"}],
+            "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.025em", "fontWeight": "600"}],
+            "display-lg-mobile": ["26px", {"lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      font-size: 18px;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f8fafc;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface h-full flex overflow-hidden antialiased selection:bg-surface-variant selection:text-primary">
+<!-- SideNavBar Anchor -->
+<aside class="fixed top-0 left-0 h-screen w-64 flex flex-col justify-between bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant dark:border-outline z-30 select-none">
+<div class="w-64 flex flex-col py-4 px-3">
+<!-- Header Brand -->
+<div class="px-2 mb-6 flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-primary text-on-primary flex items-center justify-center font-bold font-headline-sm text-[13px] tracking-tight shadow-sm">
+            LP
+          </div>
+<div>
+<div class="text-headline-sm font-headline-sm font-bold tracking-tight text-on-surface dark:text-inverse-on-surface">LexisPolicy AI</div>
+<div class="text-body-sm font-body-sm text-outline dark:text-outline-variant leading-none mt-0.5">Enterprise Intelligence v4.2</div>
+</div>
+</div>
+</div>
+<!-- Action Button CTA -->
+<div class="px-1 mb-4">
+<button class="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-primary font-label-md text-label-md border border-outline-variant transition-colors duration-150 ease-in-out">
+<span class="material-symbols-outlined text-[16px]">difference</span>
+<span>Audit Policy Diff</span>
+</button>
+</div>
+<!-- Main Navigation Links -->
+<nav class="space-y-1">
+<!-- 1. Dashboard -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low dark:hover:bg-surface-container hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors duration-150 ease-in-out" href="../page_1_policy_intelligence_dashboard/code.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-label-md font-label-md">Dashboard</span>
+</a>
+<!-- 2. Ask Policy -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low dark:hover:bg-surface-container hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors duration-150 ease-in-out" href="../page_2_ask_policy_workspace/code.html">
+<span class="material-symbols-outlined">chat</span>
+<span class="text-label-md font-label-md">Ask Policy</span>
+</a>
+<!-- 3. Policy Change Intelligence -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low dark:hover:bg-surface-container hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors duration-150 ease-in-out" href="../page_3_policy_change_intelligence/code.html">
+<span class="material-symbols-outlined">published_with_changes</span>
+<span class="text-label-md font-label-md">Policy Change Intelligence</span>
+</a>
+<!-- 4. Document Library -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low dark:hover:bg-surface-container hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors duration-150 ease-in-out" href="../page_4_document_library/code.html">
+<span class="material-symbols-outlined">folder</span>
+<span class="text-label-md font-label-md">Document Library</span>
+</a>
+<!-- 5. Evaluations & Benchmarks -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low dark:hover:bg-surface-container hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors duration-150 ease-in-out" href="../page_5_evaluations_benchmarks/code.html">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-label-md font-label-md">Evaluations &amp; Benchmarks</span>
+</a>
+<!-- 6. System Health (ACTIVE TAB) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-surface-container dark:bg-surface-container-high text-primary dark:text-inverse-primary font-semibold border-l-2 border-primary dark:border-inverse-primary transition-colors duration-150 ease-in-out" href="code.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">monitor_heart</span>
+<span class="text-label-md font-label-md">System Health</span>
+</a>
+<!-- 7. About & Architecture -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low dark:hover:bg-surface-container hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors duration-150 ease-in-out" href="../page_7_about_architecture/code.html">
+<span class="material-symbols-outlined">info</span>
+<span class="text-label-md font-label-md">About &amp; Architecture</span>
+</a>
+</nav>
+</div>
+<!-- SideNav Footer -->
+<div class="w-64 py-3 px-3 border-t border-outline-variant dark:border-outline space-y-1 bg-surface-container-lowest dark:bg-inverse-surface">
+<a class="flex items-center gap-3 px-3 py-1.5 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-label-md font-label-md">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-1.5 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="text-label-md font-label-md">Documentation</span>
+</a>
+</div>
+</aside>
+<!-- Main Canvas Container -->
+<div class="flex-1 ml-64 flex flex-col h-screen overflow-hidden bg-background">
+<!-- TopNavBar Anchor -->
+<header class="flex justify-between items-center w-full h-14 px-6 bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-outline shrink-0 z-20">
+<!-- Left: Breadcrumb / Scope Search -->
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 text-label-md font-label-md text-on-surface-variant">
+<span class="font-semibold text-on-surface">LexisPolicy AI</span>
+<span class="text-outline-variant">/</span>
+<span class="text-primary font-semibold">System Health / Runtime Diagnostics</span>
+</div>
+<div class="h-4 w-[1px] bg-outline-variant mx-1"></div>
+<div class="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container-low border border-outline-variant text-outline">
+<span class="material-symbols-outlined text-[15px]">search</span>
+<input class="bg-transparent border-0 p-0 text-body-sm font-body-sm text-on-surface focus:ring-0 w-44 placeholder:text-outline" placeholder="Filter metrics, nodes, flags..." type="text"/>
+<span class="text-[10px] font-code-inline font-label-sm bg-surface-container-lowest px-1 rounded border border-outline-variant">⌘K</span>
+</div>
+</div>
+<!-- Center Links from JSON -->
+<div class="hidden xl:flex items-center gap-6">
+<a class="text-on-surface-variant dark:text-surface-variant font-medium text-label-md font-label-md hover:text-on-surface transition-colors duration-150" href="#">Statutes</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-medium text-label-md font-label-md hover:text-on-surface transition-colors duration-150" href="#">Federal Register</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-medium text-label-md font-label-md hover:text-on-surface transition-colors duration-150" href="#">Institutional Code</a>
+</div>
+<!-- Trailing Status Badges & Controls -->
+<div class="flex items-center gap-3">
+<!-- Live API Badge (secondary trailing) -->
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f0fdfa] border border-[#ccfbf1] text-[#0f766e] text-label-sm font-label-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-[#0d9488] animate-pulse"></span>
+<span>Connected: Live API</span>
+</div>
+<!-- Role Pill (primary trailing) -->
+<span class="px-2 py-0.5 rounded bg-surface-container font-code-inline text-label-sm font-label-sm text-primary font-semibold border border-outline-variant">
+          Role: Admin
+        </span>
+<!-- Icon Actions -->
+<div class="flex items-center gap-1 text-on-surface-variant">
+<button class="p-1 rounded hover:bg-surface-container-low transition-colors" title="Notifications">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-1 rounded hover:bg-surface-container-low transition-colors" title="System Help">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="p-1 rounded hover:bg-surface-container-low transition-colors" title="Diagnostics Tuning">
+<span class="material-symbols-outlined">tune</span>
+</button>
+</div>
+<!-- Profile Avatar -->
+<div class="w-7 h-7 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center font-code-inline text-label-sm text-primary font-semibold" title="User Analyst Profile Avatar">
+          UA
+        </div>
+</div>
+</header>
+<!-- Scrollable Workspace Surface -->
+<main class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+<!-- Sub-Header / Telemetry Overview Banner -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-[0_1px_2px_0_rgba(15,23,42,0.04)]">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="space-y-1">
+<div class="flex items-center gap-2.5">
+<span class="p-1.5 rounded-lg bg-surface-container text-primary">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">monitor_heart</span>
+</span>
+<h1 class="text-headline-lg font-headline-lg tracking-tight text-on-surface">System Health &amp; Component Status</h1>
+<span class="px-2 py-0.5 rounded-full bg-[#f0fdfa] text-[#0f766e] text-label-sm font-label-sm font-medium border border-[#ccfbf1]">ALL NODES OPERATIONAL</span>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant">
+              Real-time telemetry and verified operational status across backend services, vector indexes, and reranking pipelines.
+            </p>
+</div>
+<!-- Polling Indicator & Actions -->
+<div class="flex items-center gap-3 shrink-0">
+<div class="text-right">
+<div class="text-label-sm font-label-sm text-on-surface-variant flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-secondary inline-block"></span>
+<span>Checked 12s ago (Polling interval: 30s)</span>
+</div>
+<div class="text-code-inline font-code-inline text-[11px] text-outline">Latency Threshold: &lt; 50ms (Nominal)</div>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md border border-outline-variant transition-all">
+<span class="material-symbols-outlined text-[16px]">sync</span>
+<span>Force Poll</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Core Infrastructure Status Cards (Grid of 6) -->
+<div>
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="text-label-lg font-label-lg text-on-surface font-semibold uppercase tracking-wider text-[11px]">Core Infrastructure Subsystems</span>
+<span class="text-code-inline font-code-inline text-[11px] bg-surface-container px-1.5 py-0.2 rounded text-outline">6/6 ONLINE</span>
+</div>
+<span class="text-label-sm font-label-sm text-outline">Protocol: gRPC / Internal TLS 1.3</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<!-- 1. FastAPI Backend -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-4 flex flex-col justify-between hover:border-outline transition-colors shadow-[0_1px_2px_0_rgba(15,23,42,0.04)]">
+<div>
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<span class="p-1 rounded bg-surface-container text-primary">
+<span class="material-symbols-outlined text-[18px]">dns</span>
+</span>
+<div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface leading-tight">FastAPI Backend</h3>
+<div class="text-code-inline font-code-inline text-[11px] text-outline">HTTP 200 /healthz</div>
+</div>
+</div>
+<span class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f0fdfa] text-[#0f766e] text-label-sm font-label-sm border border-[#ccfbf1]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#0d9488]"></span>
+                  HEALTHY
+                </span>
+</div>
+<!-- Metric Grid -->
+<div class="mt-4 grid grid-cols-2 gap-2 text-label-sm font-label-sm">
+<div class="p-2 rounded bg-surface-container-low border border-surface-container-highest">
+<div class="text-outline text-[10px] uppercase">Latency</div>
+<div class="text-headline-sm font-code-inline text-on-surface mt-0.5">4ms</div>
+</div>
+<div class="p-2 rounded bg-surface-container-low border border-surface-container-highest">
+<div class="text-outline text-[10px] uppercase">Uptime</div>
+<div class="text-headline-sm font-code-inline text-on-surface mt-0.5">99.98%</div>
+</div>
+</div>
+</div>
+<div class="mt-3 pt-2.5 border-t border-outline-variant flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant">
+<span>Host runtime</span>
+<span class="font-code-inline text-label-sm text-on-surface font-medium">uvicorn worker pool (x4)</span>
+</div>
+</div>
+<!-- 2. PostgreSQL + pgvector -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-4 flex flex-col justify-between hover:border-outline transition-colors shadow-[0_1px_2px_0_rgba(15,23,42,0.04)]">
+<div>
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<span class="p-1 rounded bg-surface-container text-primary">
+<span class="material-symbols-outlined text-[18px]">database</span>
+</span>
+<div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface leading-tight">PostgreSQL + pgvector</h3>
+<div class="text-code-inline font-code-inline text-[11px] text-outline">v16.2 / libpq-async</div>
+</div>
+</div>
+<span class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f0fdfa] text-[#0f766e] text-label-sm font-label-sm border border-[#ccfbf1]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#0d9488]"></span>
+                  HEALTHY
+                </span>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-2 text-label-sm font-label-sm">
+<div class="p-2 rounded bg-surface-container-low border border-surface-container-highest">
+<div class="text-outline text-[10px] uppercase">Vectors Indexed</div>
+<div class="text-headline-sm font-code-inline text-on-surface mt-0.5">48,290</div>
+</div>
+<div class="p-2 rounded bg-surface-container-low border border-surface-container-highest">
+<div class="text-outline text-[10px] uppercase">Total Size</div>
+<div class="text-headline-sm font-code-inline text-on-surface mt-0.5">142MB</div>
+</div>
+</div>
+</div>
+<div class="mt-3 pt-2.5 border-t border-outline-variant flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant">
+<span>Index Topology</span>
+<span class="font-code-inline text-label-sm text-on-surface font-medium">HNSW m=16 ef_const=64</span>
+</div>
+</div>
+<!-- 3. MiniLM ONNX Embedding Engine -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-4 flex flex-col justify-between hover:border-outline transition-colors shadow-[0_1px_2px_0_rgba(15,23,42,0.04)]">
+<div>
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<span class="p-1 rounded bg-surface-container text-primary">
+<span class="material-symbols-outlined text-[18px]">memory</span>
+</span>
+<div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface leading-tight">MiniLM ONNX Engine</h3>
+<div class="text-code-inline font-code-inline text-[11px] text-outline">all-MiniLM-L6-v2</div>
+</div>
+</div>
+<span class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f0fdfa] text-[#0f766e] text-label-sm font-label-sm border border-[#ccfbf1]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#0d9488]"></span>
+                  HEALTHY
+                </span>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-2 text-label-sm font-label-sm">
+<div class="p-2 rounded bg-surface-container-low border border-surface-container-highest">
+<div class="text-outline text-[10px] uppercase">Mean Infer Time</div>
+<div class="text-headline-sm font-code-inline text-on-surface mt-0.5">14.2ms</div>
+</div>
+<div class="p-2 rounded bg-surface-container-low border border-surface-container-highest">
+<div class="text-outline text-[10px] uppercase">Dimensions</div>
+<div class="text-headline-sm font-code-inline text-on-surface mt-0.5">384 d</div>
+</div>
+</div>
+</div>
+<div class="mt-3 pt-2.5 border-t border-outline-variant flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant">
+<span>Runtime Engine</span>
+<span class="font-code-inline text-label-sm text-on-surface font-medium">ONNX Runtime CPU / AVX2</span>
+</div>
+</div>
+<!-- 4. FlashRank Reranker -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-4 flex flex-col justify-between hover:border-outline transition-colors shadow-[0_1px_2px_0_rgba(15,23,42,0.04)]">
+<div>
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<span class="p-1 rounded bg-surface-container text-primary">
+<span class="material-symbols-outlined text-[18px]">sort</span>
+</span>
+<div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface leading-tight">FlashRank Reranker</h3>
+<div class="text-code-inline font-code-inline text-[11px] text-outline">ms-marco-TinyBERT-L-2-v2</div>
+</div>
+</div>
+<span class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f0fdfa] text-[#0f766e] text-label-sm font-label-sm border border-[#ccfbf1]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#0d9488]"></span>
+                  HEALTHY
+                </span>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-2 text-label-sm font-label-sm">
+<div class="p-2 rounded bg-surface-container-low border border-surface-container-highest">
+<div class="text-outline text-[10px] uppercase">Batch Size</div>
+<div class="text-headline-sm font-code-inline text-on-surface mt-0.5">16 docs</div>
+</div>
+<div class="p-2 rounded bg-surface-container-low border border-surface-container-highest">
+<div class="text-outline text-[10px] uppercase">Mean Latency</div>
+<div class="text-headline-sm font-code-inline text-on-surface mt-0.5">22ms</div>
+</div>
+</div>
+</div>
+<div class="mt-3 pt-2.5 border-t border-outline-variant flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant">
+<span>Model Architecture</span>
+<span class="font-code-inline text-label-sm text-on-surface font-medium">Cross-Encoder Quantized</span>
+</div>
+</div>
+<!-- 5. Document Parsing Pipeline -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-4 flex flex-col justify-between hover:border-outline transition-colors shadow-[0_1px_2px_0_rgba(15,23,42,0.04)]">
+<div>
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<span class="p-1 rounded bg-surface-container text-primary">
+<span class="material-symbols-outlined text-[18px]">account_tree</span>
+</span>
+<div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface leading-tight">Document Parsing</h3>
+<div class="text-code-inline font-code-inline text-[11px] text-outline">PDFPlumber + PyMuPDF</div>
+</div>
+</div>
+<span class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f0fdfa] text-[#0f766e] text-label-sm font-label-sm border border-[#ccfbf1]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#0d9488]"></span>
+                  HEALTHY
+                </span>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-2 text-label-sm font-label-sm">
+<div class="p-2 rounded bg-surface-container-low border border-surface-container-highest">
+<div class="text-outline text-[10px] uppercase">Failed Ingestion Jobs</div>
+<div class="text-headline-sm font-code-inline text-on-surface mt-0.5">0 errors</div>
+</div>
+<div class="p-2 rounded bg-surface-container-low border border-surface-container-highest">
+<div class="text-outline text-[10px] uppercase">Layout Extraction</div>
+<div class="text-headline-sm font-code-inline text-secondary mt-0.5">Active</div>
+</div>
+</div>
+</div>
+<div class="mt-3 pt-2.5 border-t border-outline-variant flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant">
+<span>Segmentation Mode</span>
+<span class="font-code-inline text-label-sm text-on-surface font-medium">Semantic Clause Chunking</span>
+</div>
+</div>
+<!-- 6. LLM Generation Provider -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-4 flex flex-col justify-between hover:border-outline transition-colors shadow-[0_1px_2px_0_rgba(15,23,42,0.04)]">
+<div>
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<span class="p-1 rounded bg-surface-container text-primary">
+<span class="material-symbols-outlined text-[18px]">neurology</span>
+</span>
+<div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface leading-tight">LLM Generation Provider</h3>
+<div class="text-code-inline font-code-inline text-[11px] text-outline">Gemini 1.5 Flash (Primary)</div>
+</div>
+</div>
+<span class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f0fdfa] text-[#0f766e] text-label-sm font-label-sm border border-[#ccfbf1]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#0d9488]"></span>
+                  CONFIGURED &amp; OPERATIONAL
+                </span>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-2 text-label-sm font-label-sm">
+<div class="p-2 rounded bg-surface-container-low border border-surface-container-highest">
+<div class="text-outline text-[10px] uppercase">Fallback Handler</div>
+<div class="text-headline-sm font-code-inline text-secondary mt-0.5">Verified Ready</div>
+</div>
+<div class="p-2 rounded bg-surface-container-low border border-surface-container-highest">
+<div class="text-outline text-[10px] uppercase">Quota Isolation</div>
+<div class="text-headline-sm font-code-inline text-on-surface mt-0.5">Mock Provider</div>
+</div>
+</div>
+</div>
+<div class="mt-3 pt-2.5 border-t border-outline-variant flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant">
+<span>Failover Strategy</span>
+<span class="font-code-inline text-label-sm text-on-surface font-medium">Auto-Switch on RateLimit/429</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Runtime Flags & Pipeline Parameters Table -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-[0_1px_2px_0_rgba(15,23,42,0.04)]">
+<div class="px-5 py-3.5 border-b border-outline-variant flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">tune</span>
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Runtime Flags &amp; Pipeline Parameters</h2>
+<span class="text-label-sm font-label-sm px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">Production Spec</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-code-inline font-code-inline text-[11px] text-outline">Target Hash: <code class="text-on-surface font-semibold">cfg_81a0e4</code></span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/60 border-b border-outline-variant">
+<th class="py-2.5 px-4 font-code-inline text-label-sm uppercase tracking-wider text-outline font-medium">Parameter / Flag Identifier</th>
+<th class="py-2.5 px-4 font-code-inline text-label-sm uppercase tracking-wider text-outline font-medium">Current Production Value</th>
+<th class="py-2.5 px-4 font-code-inline text-label-sm uppercase tracking-wider text-outline font-medium">State / Control</th>
+<th class="py-2.5 px-4 font-code-inline text-label-sm uppercase tracking-wider text-outline font-medium">Operational Specification</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-high text-body-sm font-body-sm">
+<!-- Flag 1 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3 px-4 font-code-inline text-label-md text-on-surface font-medium">
+                  global_semantic_retrieval_enabled
+                  <div class="text-[11px] font-body-sm text-outline">Primary toggle for dense dual-encoder pass</div>
+</td>
+<td class="py-3 px-4">
+<span class="font-code-inline text-label-sm px-2 py-0.5 rounded bg-[#f0fdfa] text-[#0f766e] font-semibold border border-[#ccfbf1]">
+                    ENABLED
+                  </span>
+</td>
+<td class="py-3 px-4">
+<div class="relative inline-block group">
+<!-- Disabled Toggle -->
+<button aria-disabled="true" class="w-10 h-5 bg-primary/40 rounded-full relative cursor-not-allowed opacity-60 flex items-center p-0.5" disabled="">
+<div class="w-4 h-4 bg-white rounded-full ml-auto shadow-sm"></div>
+</button>
+<!-- Tooltip -->
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center z-30 pointer-events-none w-56">
+<div class="bg-inverse-surface text-inverse-on-surface text-[11px] font-body-sm px-2.5 py-1.5 rounded shadow-lg text-center">
+                        Requires SuperAdmin role to modify runtime flags
+                      </div>
+<div class="w-2 h-2 bg-inverse-surface rotate-45 -mt-1"></div>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 text-on-surface-variant font-body-sm">
+                  Active dense vector traversal enabled globally across all 50 state title collections.
+                </td>
+</tr>
+<!-- Flag 2 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3 px-4 font-code-inline text-label-md text-on-surface font-medium">
+                  rrf_constant_k
+                  <div class="text-[11px] font-body-sm text-outline">Reciprocal Rank Fusion smoothing coefficient</div>
+</td>
+<td class="py-3 px-4">
+<span class="font-code-inline text-label-md text-on-surface font-semibold bg-surface-container px-2 py-0.5 rounded border border-outline-variant">
+                    60
+                  </span>
+</td>
+<td class="py-3 px-4">
+<span class="text-label-sm font-label-sm text-outline font-code-inline">LOCKED (IMMUTABLE)</span>
+</td>
+<td class="py-3 px-4 text-on-surface-variant font-body-sm">
+                  Optimized for top-10 fusion ranking stability, preventing rank skew on low-density legal statutes.
+                </td>
+</tr>
+<!-- Flag 3 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3 px-4 font-code-inline text-label-md text-on-surface font-medium">
+                  hybrid_weight_distribution
+                  <div class="text-[11px] font-body-sm text-outline">BM25 vs. Dense Embedding interpolation balance</div>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center gap-2">
+<span class="font-code-inline text-label-sm bg-surface-container-low border border-outline-variant px-1.5 py-0.5 rounded text-on-surface">0.30 Lexical</span>
+<span class="text-outline">/</span>
+<span class="font-code-inline text-label-sm bg-surface-container border border-outline-variant px-1.5 py-0.5 rounded text-primary font-medium">0.70 Dense Semantic</span>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="text-label-sm font-label-sm text-outline font-code-inline">CONFIGURED</span>
+</td>
+<td class="py-3 px-4 text-on-surface-variant font-body-sm">
+                  Favors conceptual legal intent over exact phrase overlap while retaining statutory term-art anchors.
+                </td>
+</tr>
+<!-- Flag 4 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3 px-4 font-code-inline text-label-md text-on-surface font-medium">
+                  strict_citation_threshold
+                  <div class="text-[11px] font-body-sm text-outline">Minimum vector alignment for direct statutory quotation</div>
+</td>
+<td class="py-3 px-4">
+<span class="font-code-inline text-label-md text-on-surface font-semibold bg-surface-container px-2 py-0.5 rounded border border-outline-variant">
+                    0.82
+                  </span>
+</td>
+<td class="py-3 px-4">
+<span class="px-2 py-0.5 rounded bg-surface-container text-primary font-code-inline text-label-sm font-medium">Cosine Metric</span>
+</td>
+<td class="py-3 px-4 text-on-surface-variant font-body-sm">
+                  Mandatory threshold required before citations are marked as 'Verified Evidence' in court-ready exports.
+                </td>
+</tr>
+<!-- Flag 5 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3 px-4 font-code-inline text-label-md text-on-surface font-medium">
+                  abstention_trigger_boundary
+                  <div class="text-[11px] font-body-sm text-outline">Hallucination suppression &amp; safety margin delimiter</div>
+</td>
+<td class="py-3 px-4">
+<span class="font-code-inline text-label-sm px-2 py-0.5 rounded bg-[#fffbeb] text-[#b45309] font-semibold border border-[#fde68a]">
+                    &lt; 0.65 Safety Delta
+                  </span>
+</td>
+<td class="py-3 px-4">
+<span class="text-label-sm font-label-sm text-error font-code-inline font-medium">AUTOREFUSAL ACTIVE</span>
+</td>
+<td class="py-3 px-4 text-on-surface-variant font-body-sm">
+                  Margin of safety &lt; 0.65 triggers automatic refusal. Forces the model to emit non-speculative disclaimer.
+                </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Bento Split Row: Security Note & Disaster Recovery -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+<!-- Security & Config Audit Note -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-[0_1px_2px_0_rgba(15,23,42,0.04)] flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-2 mb-3">
+<span class="p-1 rounded bg-[#fef2f2] text-[#b91c1c] border border-[#fecaca]">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Security &amp; Configuration Audit Callout</h3>
+</div>
+<div class="p-3.5 rounded-lg bg-surface-container-low border border-outline-variant text-body-sm font-body-sm text-on-surface space-y-2">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[#0f766e] text-[18px] shrink-0 mt-0.5">lock</span>
+<div>
+<span class="font-semibold text-on-surface">Zero-Trust Isolation Active:</span>
+<span class="text-on-surface-variant ml-1">
+                    Environment isolation active. Database credentials, API tokens, and provider keys are masked in accordance with Zero-Trust compliance. Never expose secret keys in client logs.
+                  </span>
+</div>
+</div>
+<!-- Sanitized Vault Indicators -->
+<div class="mt-3 grid grid-cols-2 gap-2 font-code-inline text-label-sm">
+<div class="bg-surface-container-lowest p-2 rounded border border-outline-variant flex items-center justify-between">
+<span class="text-outline">PG_VECTOR_PWD:</span>
+<span class="text-on-surface font-medium">••••••••••••[HSM]</span>
+</div>
+<div class="bg-surface-container-lowest p-2 rounded border border-outline-variant flex items-center justify-between">
+<span class="text-outline">GEMINI_API_TOKEN:</span>
+<span class="text-on-surface font-medium">sk-vault_••••89fa</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant flex items-center justify-between text-label-sm font-label-sm text-outline">
+<span>Audit Authority: ISO/IEC 27001 FedRAMP High Profile</span>
+<span class="font-code-inline text-secondary">Signed Key #882b-09c</span>
+</div>
+</div>
+<!-- Rollback & Disaster Recovery -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-[0_1px_2px_0_rgba(15,23,42,0.04)] flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="p-1 rounded bg-[#fffbeb] text-[#b45309] border border-[#fde68a]">
+<span class="material-symbols-outlined text-[18px]">restore</span>
+</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Rollback &amp; Disaster Recovery Protocol</h3>
+</div>
+<span class="px-2 py-0.5 rounded text-label-sm font-code-inline bg-surface-container text-on-surface-variant">Hot Standby Ready</span>
+</div>
+<!-- Citation/Callout Block Style from Guidance -->
+<div class="bg-surface-container-low border-l-[3px] border-primary p-3.5 rounded-r-lg space-y-2">
+<div class="text-headline-sm font-headline-sm text-primary text-[14px]">
+                Autonomous Lexical Fallback Circuit Breaker
+              </div>
+<p class="text-body-sm font-body-sm text-on-surface-variant leading-relaxed">
+                In the event of an embedding node failure, ONNX runtime out-of-memory exception, or vector partition timeout, the ingestion and search pipeline instantly falls back to <strong>Lexical FTS (Postgres Full-Text Search with TsVector / GiST indexing)</strong>.
+              </p>
+<div class="flex items-center gap-3 pt-1 text-code-inline text-label-sm">
+<span class="text-outline">Failover RTO: <strong class="text-on-surface font-medium">&lt; 150ms</strong></span>
+<span class="text-outline">Data Loss (RPO): <strong class="text-on-surface font-medium">0.00s</strong></span>
+<span class="text-outline">Statutory Corpus: <strong class="text-secondary font-medium">Uninterrupted</strong></span>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant flex items-center justify-between">
+<div class="flex items-center gap-1.5 text-label-sm font-label-sm text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span>DR Dry-Run passed: Today at 04:00 UTC (Automated)</span>
+</div>
+<button class="px-2.5 py-1 rounded bg-surface-container-lowest hover:bg-surface-container text-primary font-code-inline text-label-sm border border-outline-variant transition-colors">
+              Simulate Failure
+            </button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

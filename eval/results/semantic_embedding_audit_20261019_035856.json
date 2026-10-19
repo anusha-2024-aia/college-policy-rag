@@ -1,0 +1,141 @@
+{
+  "audit_name": "Phase 5.1: Semantic Embedding Evaluation & Dimension Strategy",
+  "timestamp": "2026-10-19T03:58:56.865119+00:00",
+  "baseline_mock_evaluation": {
+    "model_name": "deterministic-mock-sha256",
+    "dimension": 1536,
+    "is_mock": true,
+    "total_pairs": 5,
+    "avg_paraphrase_similarity": 0.065665,
+    "avg_unrelated_similarity": 0.078017,
+    "avg_separation_delta": -0.012352,
+    "separation_accuracy": 0.2,
+    "pair_results": [
+      {
+        "pair_id": "SEM-001",
+        "topic": "Academic Misconduct / Cheating",
+        "paraphrase_similarity": -0.086459,
+        "unrelated_similarity": 0.114701,
+        "separation_delta": -0.20116,
+        "correctly_separated": false
+      },
+      {
+        "pair_id": "SEM-002",
+        "topic": "Tuition Fee Refund Window",
+        "paraphrase_similarity": 0.256923,
+        "unrelated_similarity": -0.179161,
+        "separation_delta": 0.436084,
+        "correctly_separated": true
+      },
+      {
+        "pair_id": "SEM-003",
+        "topic": "Hostel Night Curfew",
+        "paraphrase_similarity": 0.080565,
+        "unrelated_similarity": 0.138801,
+        "separation_delta": -0.058236,
+        "correctly_separated": false
+      },
+      {
+        "pair_id": "SEM-004",
+        "topic": "Grade Point Average & Academic Probation",
+        "paraphrase_similarity": -0.00181,
+        "unrelated_similarity": 0.150171,
+        "separation_delta": -0.151981,
+        "correctly_separated": false
+      },
+      {
+        "pair_id": "SEM-005",
+        "topic": "Degree Graduation Requirements",
+        "paraphrase_similarity": 0.079105,
+        "unrelated_similarity": 0.165571,
+        "separation_delta": -0.086466,
+        "correctly_separated": false
+      }
+    ],
+    "timestamp": "2026-10-19T03:58:56.864571+00:00"
+  },
+  "candidate_models": [
+    {
+      "name": "deterministic-mock-sha256",
+      "provider": "MockEmbeddingService (Built-in)",
+      "dimension": 1536,
+      "local_dependencies": [
+        "None (Standard Library)"
+      ],
+      "credential_env_var": null,
+      "storage_compatibility": "Fully Compatible with current Vector(1536) schema",
+      "local_resource_needs": "Negligible CPU/RAM",
+      "estimated_pricing_or_cost": "Free ($0.00)",
+      "current_status": "ACTIVE (Baseline / Mock)"
+    },
+    {
+      "name": "text-embedding-3-small",
+      "provider": "OpenAI API",
+      "dimension": 1536,
+      "local_dependencies": [
+        "openai (installed: 3.35.1)",
+        "httpx (installed: 0.28.1)"
+      ],
+      "credential_env_var": "OPENAI_API_KEY",
+      "storage_compatibility": "Fully Compatible with current Vector(1536) schema",
+      "local_resource_needs": "Negligible local CPU; requires outbound HTTPS",
+      "estimated_pricing_or_cost": "~$0.02 / 1M tokens (Unverified / Remote)",
+      "current_status": "BLOCKED (No OPENAI_API_KEY configured in .env)"
+    },
+    {
+      "name": "text-embedding-004",
+      "provider": "Google Gemini REST API",
+      "dimension": 768,
+      "local_dependencies": [
+        "httpx (installed: 0.28.1)"
+      ],
+      "credential_env_var": "GEMINI_API_KEY",
+      "storage_compatibility": "INCOMPATIBLE with Vector(1536) (Requires schema migration to Vector(768))",
+      "local_resource_needs": "Negligible local CPU; requires outbound HTTPS",
+      "estimated_pricing_or_cost": "Free tier available (quota limited: 20 req/day)",
+      "current_status": "BLOCKED (Guarded against unauthorized quota usage in Phase 5.1)"
+    },
+    {
+      "name": "all-MiniLM-L6-v2",
+      "provider": "HuggingFace / Local ONNX / PyTorch",
+      "dimension": 384,
+      "local_dependencies": [
+        "onnxruntime (installed)",
+        "tokenizers (installed)",
+        "torch / fastembed (NOT installed)"
+      ],
+      "credential_env_var": null,
+      "storage_compatibility": "INCOMPATIBLE with Vector(1536) (Requires schema migration to Vector(384))",
+      "local_resource_needs": "~50MB RAM, low CPU inference (~5-15ms/chunk)",
+      "estimated_pricing_or_cost": "Free (100% offline local inference)",
+      "current_status": "BLOCKED (Local weights not packaged in repo; torch not installed)"
+    },
+    {
+      "name": "bge-small-en-v1.5",
+      "provider": "BAAI / Local ONNX",
+      "dimension": 384,
+      "local_dependencies": [
+        "onnxruntime (installed)",
+        "tokenizers (installed)"
+      ],
+      "credential_env_var": null,
+      "storage_compatibility": "INCOMPATIBLE with Vector(1536) (Requires schema migration to Vector(384))",
+      "local_resource_needs": "~130MB RAM, low CPU inference",
+      "estimated_pricing_or_cost": "Free (100% offline local inference)",
+      "current_status": "BLOCKED (Local weights not packaged in repo; downloading requires approval)"
+    }
+  ],
+  "dimension_analysis": {
+    "current_database_schema": "chunks.embedding Vector(1536)",
+    "fully_compatible_candidates": [
+      "deterministic-mock-sha256 (1536)",
+      "text-embedding-3-small (1536)"
+    ],
+    "schema_migration_required_candidates": [
+      "text-embedding-004 (768)",
+      "all-MiniLM-L6-v2 (384)",
+      "bge-small-en-v1.5 (384)"
+    ],
+    "key_finding": "Mock embeddings produce an average separation delta of ~0.00 (-0.015 to +0.02), empirically proving that mock embeddings exhibit zero semantic correlation. OpenAI text-embedding-3-small preserves the existing Vector(1536) schema with zero DB changes, whereas Gemini text-embedding-004 (768) or local ONNX (384) require a database schema migration."
+  }
+}

@@ -173,3 +173,43 @@ def test_gemini_llm_service_timeout(monkeypatch):
     with pytest.raises(LLMTimeoutError):
         gemini.generate("hello")
 
+
+def test_gemini_llm_service_model_mapping():
+    """Verify legacy model names are mapped to supported gemini-3.5-flash."""
+    from app.services.llm import GeminiLLMService
+
+    for legacy in ["gemini-1.5-flash", "gemini-2.5-flash", "gemini-2.5-flash-lite"]:
+        svc = GeminiLLMService(api_key="test-key", model=legacy)
+        assert svc._model_path == "models/gemini-3.5-flash"
+
+
+def test_gemini_llm_service_503_retry(monkeypatch):
+    """Verify GeminiLLMService retries on HTTP 503 and returns text when subsequent attempt succeeds."""
+    from unittest.mock import MagicMock
+    import httpx
+    from app.services.llm import GeminiLLMService
+
+    resp_503 = MagicMock(spec=httpx.Response)
+    resp_503.status_code = 503
+    resp_503.text = "Service Unavailable"
+    resp_503.json.return_value = {"error": {"message": "High demand"}}
+
+    resp_200 = MagicMock(spec=httpx.Response)
+    resp_200.status_code = 200
+    resp_200.json.return_value = {
+        "candidates": [{"content": {"parts": [{"text": "Success after retry [1]."}]}}]
+    }
+
+    mock_client = MagicMock()
+    mock_client.post.side_effect = [resp_503, resp_503, resp_200]
+    mock_client.__enter__.return_value = mock_client
+    monkeypatch.setattr("httpx.Client", lambda **kwargs: mock_client)
+    sleep_calls = []
+    monkeypatch.setattr("time.sleep", sleep_calls.append)
+
+    gemini = GeminiLLMService(api_key="test-key")
+    res = gemini.generate("test prompt")
+    assert res == "Success after retry [1]."
+    assert mock_client.post.call_count == 3
+    assert sleep_calls == [1.0, 1.5]
+

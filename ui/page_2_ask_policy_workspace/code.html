@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LexisPolicy AI - Ask Policy Workspace</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary-container": "#a65900",
+            "primary-container": "#2563eb",
+            "on-surface-variant": "#434655",
+            "surface-variant": "#dae2fd",
+            "on-surface": "#131b2e",
+            "on-secondary-container": "#006f66",
+            "on-error": "#ffffff",
+            "surface-dim": "#d2d9f4",
+            "on-tertiary": "#ffffff",
+            "surface-container": "#eaedff",
+            "surface-container-highest": "#dae2fd",
+            "on-primary-container": "#eeefff",
+            "inverse-surface": "#283044",
+            "on-tertiary-container": "#ffede1",
+            "background": "#faf8ff",
+            "surface-container-high": "#e2e7ff",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed-variant": "#6e3900",
+            "outline": "#737686",
+            "on-secondary-fixed": "#00201d",
+            "tertiary-fixed": "#ffdcc3",
+            "surface-container-lowest": "#ffffff",
+            "secondary": "#006a61",
+            "inverse-primary": "#b4c5ff",
+            "inverse-on-surface": "#eef0ff",
+            "secondary-fixed-dim": "#6bd8cb",
+            "on-tertiary-fixed": "#2f1500",
+            "error": "#ba1a1a",
+            "on-secondary-fixed-variant": "#005049",
+            "on-primary-fixed": "#00174b",
+            "tertiary": "#824500",
+            "secondary-fixed": "#89f5e7",
+            "tertiary-fixed-dim": "#ffb77d",
+            "on-primary-fixed-variant": "#003ea8",
+            "outline-variant": "#c3c6d7",
+            "surface-container-low": "#f2f3ff",
+            "primary": "#004ac6",
+            "primary-fixed-dim": "#b4c5ff",
+            "secondary-container": "#86f2e4",
+            "primary-fixed": "#dbe1ff",
+            "error-container": "#ffdad6",
+            "on-background": "#131b2e",
+            "on-secondary": "#ffffff",
+            "surface-tint": "#0053db",
+            "surface": "#faf8ff",
+            "on-primary": "#ffffff",
+            "surface-bright": "#faf8ff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "margin": "1rem",
+            "gutter-desktop": "1.5rem",
+            "space-xl": "1.5rem",
+            "space-sm": "0.5rem",
+            "space-md": "0.75rem",
+            "space-2xl": "2rem",
+            "margin-desktop": "2rem",
+            "space-lg": "1rem",
+            "space-xs": "0.25rem",
+            "space-3xl": "3rem"
+          },
+          "fontFamily": {
+            "code-inline": ["JetBrains Mono"],
+            "headline-lg": ["Geist"],
+            "body-sm": ["Geist"],
+            "label-sm": ["JetBrains Mono"],
+            "label-md": ["JetBrains Mono"],
+            "body-lg": ["Geist"],
+            "headline-sm": ["Geist"],
+            "headline-md": ["Geist"],
+            "label-lg": ["JetBrains Mono"],
+            "body-md": ["Geist"],
+            "display-lg": ["Geist"],
+            "display-lg-mobile": ["Geist"]
+          },
+          "fontSize": {
+            "code-inline": ["12px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "body-lg": ["15px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "label-lg": ["13px", { "lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "body-md": ["14px", { "lineHeight": "22px", "letterSpacing": "-0.003em", "fontWeight": "400" }],
+            "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+            "display-lg-mobile": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 18px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+  </style>
+</head>
+<body class="h-full bg-background font-body-md text-on-surface antialiased overflow-hidden flex flex-col">
+<!-- TOP APP BAR (from Shared Components JSON) -->
+<header class="bg-surface-container-lowest border-b border-outline-variant docked full-width top-0 h-14 shrink-0 z-30">
+<div class="flex justify-between items-center w-full h-14 px-6">
+<!-- Left side: Brand + Search combo -->
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">gavel</span>
+<span class="text-headline-sm font-headline-sm font-bold text-on-surface">LexisPolicy AI</span>
+</div>
+<div class="relative w-72">
+<span class="material-symbols-outlined absolute left-2.5 top-2 text-outline text-base">search</span>
+<input class="w-full h-8 pl-8 pr-8 bg-surface-container-low border border-outline-variant rounded text-body-sm font-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Search statutes, index, or logs (⌘K)..." type="text"/>
+<span class="absolute right-2 top-1.5 font-label-sm text-label-sm text-outline border border-outline-variant bg-surface-container-lowest px-1 rounded">⌘K</span>
+</div>
+<nav class="hidden lg:flex items-center gap-5 text-body-sm font-body-sm">
+<a class="text-on-surface-variant font-medium hover:text-on-surface transition-colors" href="#">Statutes</a>
+<a class="text-on-surface-variant font-medium hover:text-on-surface transition-colors" href="#">Federal Register</a>
+<a class="text-primary font-semibold border-b-2 border-primary pb-1" href="#">Institutional Code</a>
+</nav>
+</div>
+<!-- Right side: Connection + Role badge + Actions + Avatar -->
+<div class="flex items-center gap-3">
+<!-- Connected: Live API -->
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container-low border border-outline-variant font-label-sm text-label-sm text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>Connected: Live API</span>
+</div>
+<!-- Role: Admin -->
+<div class="flex items-center gap-1 px-2.5 py-1 rounded bg-primary-fixed border border-primary/20 font-label-sm text-label-sm text-on-primary-fixed font-semibold">
+<span class="material-symbols-outlined text-[14px]">admin_panel_settings</span>
+<span>Role: Admin</span>
+</div>
+<div class="h-4 w-px bg-outline-variant mx-1"></div>
+<!-- Trailing Icon Actions -->
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded transition-colors" title="Notifications">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded transition-colors" title="Help &amp; Docs">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded transition-colors" title="Settings / Tune">
+<span class="material-symbols-outlined">tune</span>
+</button>
+<!-- Profile Avatar -->
+<div class="w-7 h-7 rounded-full bg-surface-variant text-primary border border-outline-variant flex items-center justify-center font-label-sm font-semibold text-label-sm ml-1" title="User Analyst Profile Avatar">
+          AL
+        </div>
+</div>
+</div>
+</header>
+<!-- WORKBENCH BODY: Sidebar + Two-column workspace -->
+<div class="flex-1 flex overflow-hidden">
+<!-- SIDE NAVIGATION BAR (from Shared Components JSON) -->
+<aside class="w-64 bg-surface-container-lowest border-r border-outline-variant flex flex-col justify-between shrink-0 select-none">
+<div class="w-64 h-full flex flex-col py-4 px-3">
+<!-- Header area inside sidebar -->
+<div class="px-2 mb-4">
+<div class="flex items-center justify-between">
+<span class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider">Enterprise Intelligence v4.2</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container text-primary font-label-sm text-[10px] font-semibold">PROD</span>
+</div>
+</div>
+<!-- Audit Policy Diff CTA -->
+<div class="mb-4">
+<button class="w-full flex items-center justify-center gap-2 bg-primary text-on-primary hover:bg-primary-container h-8 rounded px-3 text-label-md font-label-md font-medium transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[16px]">rule</span>
+<span>Audit Policy Diff</span>
+</button>
+</div>
+<!-- Navigation Links: 'Ask Policy' is active according to Active State Logic -->
+<nav class="space-y-1 flex-1 overflow-y-auto">
+<!-- 1. Dashboard -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150 ease-in-out font-label-md text-label-md" href="../page_1_policy_intelligence_dashboard/code.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<!-- 2. Ask Policy (ACTIVE ITEM) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-surface-container text-primary font-semibold border-l-2 border-primary transition-colors duration-150 ease-in-out font-label-md text-label-md" href="code.html">
+<span class="material-symbols-outlined">chat</span>
+<span>Ask Policy</span>
+</a>
+<!-- 3. Policy Change Intelligence -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150 ease-in-out font-label-md text-label-md" href="../page_3_policy_change_intelligence/code.html">
+<span class="material-symbols-outlined">published_with_changes</span>
+<span>Policy Change Intelligence</span>
+</a>
+<!-- 4. Document Library -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150 ease-in-out font-label-md text-label-md" href="../page_4_document_library/code.html">
+<span class="material-symbols-outlined">folder</span>
+<span>Document Library</span>
+</a>
+<!-- 5. Evaluations & Benchmarks -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150 ease-in-out font-label-md text-label-md" href="../page_5_evaluations_benchmarks/code.html">
+<span class="material-symbols-outlined">analytics</span>
+<span>Evaluations &amp; Benchmarks</span>
+</a>
+<!-- 6. System Health -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150 ease-in-out font-label-md text-label-md" href="../page_6_system_health/code.html">
+<span class="material-symbols-outlined">monitor_heart</span>
+<span>System Health</span>
+</a>
+<!-- 7. About & Architecture -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150 ease-in-out font-label-md text-label-md" href="../page_7_about_architecture/code.html">
+<span class="material-symbols-outlined">info</span>
+<span>About &amp; Architecture</span>
+</a>
+</nav>
+<!-- Footer Tab Section -->
+<div class="pt-3 border-t border-outline-variant space-y-1">
+<a class="flex items-center gap-3 px-3 py-1.5 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[16px]">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-1.5 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[16px]">menu_book</span>
+<span>Documentation</span>
+</a>
+<div class="px-3 pt-2 flex items-center justify-between text-label-sm font-label-sm text-outline">
+<span>RAG Model v2.8</span>
+<span class="font-code-inline text-[10px]">p99: 142ms</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- MAIN TWO-COLUMN WORKSPACE CANVAS -->
+<main class="flex-1 flex overflow-hidden">
+<!-- LEFT/MAIN COLUMN (65% width) - Query Input & Synthesized Answer -->
+<section class="w-[65%] border-r border-outline-variant flex flex-col h-full bg-background overflow-y-auto">
+<!-- Header Sub-bar -->
+<div class="h-10 px-6 border-b border-outline-variant bg-surface-container-lowest flex items-center justify-between shrink-0">
+<div class="flex items-center gap-2">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Workspace: Institutional Regulatory Compliance</span>
+<span class="text-outline">/</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">KVIT Statutes Corpus</span>
+</div>
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
+<span class="flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+              Ground Truth Mode
+            </span>
+<span class="text-outline">|</span>
+<span>Temperature: 0.0</span>
+</div>
+</div>
+<div class="p-6 max-w-4xl w-full mx-auto space-y-6">
+<!-- 1. Search/Question Input Container -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-4 shadow-sm">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2 font-semibold">
+              Regulatory Query Console
+            </label>
+<div class="relative">
+<textarea class="w-full p-3 bg-surface-container-low border border-outline-variant rounded font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none leading-relaxed" rows="3">What is the attendance requirement and what happens if I drop below 75%?</textarea>
+<div class="flex items-center justify-between mt-3 pt-2 border-t border-outline-variant/60">
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1 text-on-surface-variant hover:text-on-surface px-2 py-1 rounded text-label-sm font-label-sm hover:bg-surface-container-low transition-colors" type="button">
+<span class="material-symbols-outlined text-[14px]">clear</span>
+<span>Clear</span>
+</button>
+<button class="flex items-center gap-1 text-on-surface-variant hover:text-on-surface px-2 py-1 rounded text-label-sm font-label-sm hover:bg-surface-container-low transition-colors" type="button">
+<span class="material-symbols-outlined text-[14px]">history</span>
+<span>Recent (12)</span>
+</button>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-outline font-code-inline">Shift + ↵ for newline</span>
+<button class="flex items-center gap-2 bg-primary text-on-primary hover:bg-primary-container px-4 py-1.5 rounded text-label-md font-label-md font-medium transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">search</span>
+<span>Ask Question</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Suggested query chips -->
+<div class="mt-4 pt-3 border-t border-outline-variant/40 flex flex-wrap items-center gap-2">
+<span class="font-label-sm text-label-sm text-outline">Suggested queries:</span>
+<button class="font-label-sm text-label-sm px-2.5 py-1 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface border border-outline-variant transition-colors">
+                What is the attendance requirement?
+              </button>
+<button class="font-label-sm text-label-sm px-2.5 py-1 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface border border-outline-variant transition-colors">
+                What are the hostel rules?
+              </button>
+<button class="font-label-sm text-label-sm px-2.5 py-1 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface border border-outline-variant transition-colors">
+                What is the examination eligibility policy?
+              </button>
+<button class="font-label-sm text-label-sm px-2.5 py-1 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface border border-outline-variant transition-colors">
+                Has the policy changed between versions?
+              </button>
+</div>
+</div>
+<!-- 2. Synthesized Answer Workspace -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-5 shadow-sm space-y-4">
+<!-- Answer Status Banner -->
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/60">
+<div class="flex items-center gap-2">
+<span class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#F0FDFA] border border-[#CCFBF1] text-[#0F766E] font-label-sm text-label-sm font-semibold">
+<span class="w-2 h-2 rounded-full bg-[#0D9488]"></span>
+<span class="material-symbols-outlined text-[14px]">verified_user</span>
+<span>Verified Answer</span>
+</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">
+                  Verified against <strong class="text-on-surface">KVIT Regulations 2024 (v2.4) Clause 4.1–4.3</strong>
+</span>
+</div>
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-outline font-code-inline">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+<span>Latency: 310ms</span>
+</div>
+</div>
+<!-- Synthesized Answer Narrative -->
+<div class="space-y-3 font-body-lg text-body-lg text-on-surface leading-relaxed">
+<p>
+                Under KVIT Academic Regulations 2024 v2.4, regular degree candidates must maintain a minimum of <strong>80% aggregate attendance</strong> in each registered course 
+                <a class="inline-flex items-center justify-center font-label-sm text-label-sm font-semibold px-1.5 py-0.2 mx-0.5 rounded bg-primary-fixed text-primary hover:bg-primary hover:text-on-primary transition-colors cursor-pointer border border-primary/20" href="#cite-1">[1]</a>.
+              </p>
+<p>
+                In cases of certified medical illness or approved university athletics participation, a condonation of <strong>up to 10%</strong> may be granted by the Academic Dean 
+                <a class="inline-flex items-center justify-center font-label-sm text-label-sm font-semibold px-1.5 py-0.2 mx-0.5 rounded bg-primary-fixed text-primary hover:bg-primary hover:text-on-primary transition-colors cursor-pointer border border-primary/20" href="#cite-2">[2]</a>.
+              </p>
+<p>
+                Students with attendance between <strong>65% and 74%</strong> are placed on <em>Academic Probation</em> and must undertake mandatory remedial coursework prior to the following session 
+                <a class="inline-flex items-center justify-center font-label-sm text-label-sm font-semibold px-1.5 py-0.2 mx-0.5 rounded bg-primary-fixed text-primary hover:bg-primary hover:text-on-primary transition-colors cursor-pointer border border-primary/20" href="#cite-3">[3]</a>. 
+                Students falling strictly <strong>below 65%</strong> are barred from final semester examinations without appeal 
+                <a class="inline-flex items-center justify-center font-label-sm text-label-sm font-semibold px-1.5 py-0.2 mx-0.5 rounded bg-primary-fixed text-primary hover:bg-primary hover:text-on-primary transition-colors cursor-pointer border border-primary/20" href="#cite-1">[1]</a>.
+              </p>
+</div>
+<!-- Interactive Citation Markers Ribbon -->
+<div class="p-3 bg-surface-container-low border border-outline-variant rounded flex flex-col gap-2">
+<div class="font-label-sm text-label-sm text-outline uppercase font-semibold">Active Citation Grounding</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+<div class="flex items-center gap-2 p-2 bg-surface-container-lowest border border-outline-variant rounded hover:border-primary cursor-pointer transition-colors group">
+<span class="font-label-sm text-label-sm font-bold text-primary px-1.5 py-0.5 bg-primary-fixed rounded">[1]</span>
+<div class="truncate">
+<p class="font-label-sm text-label-sm font-semibold text-on-surface truncate group-hover:text-primary">KVIT Academic Regs v2.4</p>
+<p class="font-label-sm text-[10px] text-outline">§4.1 Classroom Minimum</p>
+</div>
+</div>
+<div class="flex items-center gap-2 p-2 bg-surface-container-lowest border border-outline-variant rounded hover:border-primary cursor-pointer transition-colors group">
+<span class="font-label-sm text-label-sm font-bold text-primary px-1.5 py-0.5 bg-primary-fixed rounded">[2]</span>
+<div class="truncate">
+<p class="font-label-sm text-label-sm font-semibold text-on-surface truncate group-hover:text-primary">Medical Exemption Bylaw v1.8</p>
+<p class="font-label-sm text-[10px] text-outline">§2.3 Condonation Protocol</p>
+</div>
+</div>
+<div class="flex items-center gap-2 p-2 bg-surface-container-lowest border border-outline-variant rounded hover:border-primary cursor-pointer transition-colors group">
+<span class="font-label-sm text-label-sm font-bold text-primary px-1.5 py-0.5 bg-primary-fixed rounded">[3]</span>
+<div class="truncate">
+<p class="font-label-sm text-label-sm font-semibold text-on-surface truncate group-hover:text-primary">Academic Council Notif.</p>
+<p class="font-label-sm text-[10px] text-outline">AC-2023-09 Remedial</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Policy Conflict Warning Card (Amber border and background) -->
+<div class="p-3.5 bg-[#FFFBEB] border border-[#FDE68A] rounded flex items-start gap-3">
+<span class="material-symbols-outlined text-[#B45309] text-xl mt-0.5 shrink-0">warning</span>
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="font-label-md text-label-md font-bold text-[#B45309]">Conflict Alert: Preceding Statute Discrepancy</span>
+<span class="px-1.5 py-0.2 rounded bg-[#FEF3C7] text-[#92400E] font-label-sm text-[10px] border border-[#FDE68A]">SUPERSEDED</span>
+</div>
+<p class="font-body-md text-body-md text-[#92400E]">
+                  Attendance threshold in <strong>Student Handbook 2022 (§3.1)</strong> stated 75%, whereas <strong>Academic Regulations 2024 (§4.1)</strong> specifies 80%. 
+                  <em>Note: 2024 Regulations supersede 2022 text as per Senate Resolution SR-44.</em>
+</p>
+</div>
+</div>
+<!-- Feedback & Audit Bar -->
+<div class="pt-3 border-t border-outline-variant/60 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Was this answer helpful?</span>
+<div class="flex items-center gap-1.5">
+<button class="flex items-center gap-1 px-2.5 py-1 rounded bg-surface-container-low border border-outline-variant hover:border-primary text-label-sm font-label-sm text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[14px]">thumb_up</span>
+<span>Yes</span>
+</button>
+<button class="flex items-center gap-1 px-2.5 py-1 rounded bg-surface-container-low border border-outline-variant hover:border-error text-label-sm font-label-sm text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[14px]">thumb_down</span>
+<span>No</span>
+</button>
+<button class="flex items-center gap-1 px-2.5 py-1 rounded bg-surface-container-low border border-outline-variant hover:border-tertiary text-label-sm font-label-sm text-tertiary transition-colors">
+<span class="material-symbols-outlined text-[14px]">flag</span>
+<span>Flag Inconsistency</span>
+</button>
+</div>
+</div>
+<!-- Abstention safeguard test section toggle -->
+<button class="flex items-center gap-1 px-2 py-1 rounded border border-outline-variant hover:bg-surface-container-low text-label-sm font-label-sm text-outline hover:text-on-surface transition-colors" id="toggle-abstention-btn" onclick="document.getElementById('abstention-modal').classList.toggle('hidden')" title="Test how the system behaves when threshold is not met">
+<span class="material-symbols-outlined text-[14px]">shield_with_heart</span>
+<span>Simulate Abstention Guard</span>
+</button>
+</div>
+</div>
+<!-- Secondary Insight: Version Delta Timeline -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-4 shadow-sm">
+<div class="flex items-center justify-between mb-3">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Clause Lineage &amp; Revision Velocity</span>
+<span class="font-label-sm text-label-sm text-outline font-code-inline">Corpus Hash: #a89f302</span>
+</div>
+<div class="flex items-center gap-4 text-body-sm font-body-sm">
+<div class="flex-1 p-2 rounded bg-surface-container-low border border-outline-variant/60">
+<div class="font-label-sm text-[10px] text-outline uppercase">2022 Baseline</div>
+<div class="font-label-md text-label-md font-semibold text-on-surface">75% Standard</div>
+<div class="text-[11px] text-on-surface-variant">Enacted under Bylaw 12</div>
+</div>
+<span class="material-symbols-outlined text-outline">arrow_forward</span>
+<div class="flex-1 p-2 rounded bg-surface-container-low border border-outline-variant/60">
+<div class="font-label-sm text-[10px] text-outline uppercase">2023 Amendment</div>
+<div class="font-label-md text-label-md font-semibold text-on-surface">Probation Remediation Added</div>
+<div class="text-[11px] text-on-surface-variant">Council Directive AC-2023-09</div>
+</div>
+<span class="material-symbols-outlined text-outline">arrow_forward</span>
+<div class="flex-1 p-2 rounded bg-primary-fixed border border-primary/30">
+<div class="font-label-sm text-[10px] text-primary uppercase font-bold">2024 Active v2.4</div>
+<div class="font-label-md text-label-md font-semibold text-primary">80% Mandatory + Strict Condonation</div>
+<div class="text-[11px] text-on-surface">Supersedes all prior statutes</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- RIGHT COLUMN (35% width) - Evidence & Verification Inspector -->
+<aside class="w-[35%] flex flex-col h-full bg-surface-container-lowest overflow-hidden">
+<!-- Inspector Tab Header -->
+<div class="h-10 px-4 border-b border-outline-variant bg-surface-container-low flex items-center justify-between shrink-0">
+<div class="flex items-center space-x-1 font-label-md text-label-md">
+<button class="px-3 py-1 font-semibold text-primary border-b-2 border-primary bg-surface-container-lowest">
+              Cited Passages (3)
+            </button>
+<button class="px-3 py-1 text-on-surface-variant hover:text-on-surface transition-colors">
+              Retrieval Trace
+            </button>
+<button class="px-3 py-1 text-on-surface-variant hover:text-on-surface transition-colors">
+              Token Distribution
+            </button>
+</div>
+<span class="material-symbols-outlined text-outline text-sm">filter_list</span>
+</div>
+<!-- Evidence Cards Container -->
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<div class="flex items-center justify-between px-1">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider font-semibold">Authoritative Ground Truth Passages</span>
+<span class="font-label-sm text-label-sm text-secondary flex items-center gap-1 font-code-inline">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+              RRF Score &gt; 0.85
+            </span>
+</div>
+<!-- Card 1: KVIT Academic Regulations 2024 -->
+<div class="border border-outline-variant rounded p-3.5 bg-surface-container-lowest shadow-sm space-y-3 hover:border-primary/50 transition-colors" id="cite-1">
+<!-- Header -->
+<div class="flex items-start justify-between gap-2 border-b border-outline-variant/60 pb-2">
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-label-sm text-label-sm font-bold text-primary px-1.5 py-0.2 bg-primary-fixed rounded">[1]</span>
+<span class="font-label-md text-label-md font-semibold text-on-surface">KVIT Academic Regulations 2024 (v2.4)</span>
+</div>
+<div class="font-label-sm text-label-sm text-outline mt-0.5">
+                  Page 14 · Clause 4.1 'Mandatory Classroom Attendance'
+                </div>
+</div>
+<span class="px-2 py-0.5 rounded bg-[#F0FDFA] border border-[#CCFBF1] text-[#0F766E] font-label-sm text-label-sm font-semibold flex items-center gap-1 shrink-0">
+<span class="w-1.5 h-1.5 rounded-full bg-[#0D9488]"></span>
+                Verified Ground Truth
+              </span>
+</div>
+<!-- Excerpt with highlighting -->
+<div class="p-2.5 bg-surface-container-low border-l-2 border-secondary font-code-inline text-code-inline text-on-surface leading-relaxed">
+              "...every candidate shall maintain a minimum classroom attendance percentage of <mark class="bg-secondary-container text-on-secondary-container px-1 py-0.5 rounded font-semibold">not less than 80% across lectures, tutorials, and practical labs</mark>. Failure to achieve 65% aggregate leads to unconditional debarment from end-semester assessments..."
+            </div>
+<!-- Metadata & Actions -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant font-code-inline">
+<span>Relevance: <strong class="text-on-surface">0.942</strong></span>
+<span class="text-outline">·</span>
+<span>RRF Hybrid</span>
+</div>
+<button class="flex items-center gap-1 px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-high text-primary font-label-sm text-label-sm font-medium transition-colors">
+<span class="material-symbols-outlined text-[14px]">open_in_new</span>
+<span>View PDF Page</span>
+</button>
+</div>
+</div>
+<!-- Card 2: Medical Exemption Bylaw v1.8 -->
+<div class="border border-outline-variant rounded p-3.5 bg-surface-container-lowest shadow-sm space-y-3 hover:border-primary/50 transition-colors" id="cite-2">
+<!-- Header -->
+<div class="flex items-start justify-between gap-2 border-b border-outline-variant/60 pb-2">
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-label-sm text-label-sm font-bold text-primary px-1.5 py-0.2 bg-primary-fixed rounded">[2]</span>
+<span class="font-label-md text-label-md font-semibold text-on-surface">Medical Exemption Bylaw v1.8</span>
+</div>
+<div class="font-label-sm text-label-sm text-outline mt-0.5">
+                  Page 3 · Clause 2.3 'Condonation Protocol'
+                </div>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container text-primary font-label-sm text-label-sm font-semibold flex items-center gap-1 shrink-0">
+<span class="material-symbols-outlined text-[14px]">fact_check</span>
+                Statutory Exception
+              </span>
+</div>
+<!-- Excerpt with highlighting -->
+<div class="p-2.5 bg-surface-container-low border-l-2 border-primary font-code-inline text-code-inline text-on-surface leading-relaxed">
+              "The Dean (Academic) may <mark class="bg-primary-fixed text-primary px-1 py-0.5 rounded font-semibold">condone shortage of attendance up to 10%</mark> upon verified submission of medical records within 5 working days of resuming classes, contingent on recommendation by University Health Officer..."
+            </div>
+<!-- Metadata & Actions -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant font-code-inline">
+<span>Relevance: <strong class="text-on-surface">0.887</strong></span>
+<span class="text-outline">·</span>
+<span>Dense Embed</span>
+</div>
+<button class="flex items-center gap-1 px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-high text-primary font-label-sm text-label-sm font-medium transition-colors">
+<span class="material-symbols-outlined text-[14px]">open_in_new</span>
+<span>View PDF Page</span>
+</button>
+</div>
+</div>
+<!-- Card 3: Academic Council Notification AC-2023-09 -->
+<div class="border border-outline-variant rounded p-3.5 bg-surface-container-lowest shadow-sm space-y-3 hover:border-primary/50 transition-colors" id="cite-3">
+<!-- Header -->
+<div class="flex items-start justify-between gap-2 border-b border-outline-variant/60 pb-2">
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-label-sm text-label-sm font-bold text-primary px-1.5 py-0.2 bg-primary-fixed rounded">[3]</span>
+<span class="font-label-md text-label-md font-semibold text-on-surface">Academic Council Notification AC-2023-09</span>
+</div>
+<div class="font-label-sm text-label-sm text-outline mt-0.5">
+                  Page 1 · Sub-item 4 'Probationary Framework'
+                </div>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm font-semibold flex items-center gap-1 shrink-0">
+<span class="material-symbols-outlined text-[14px]">history_edu</span>
+                Circular
+              </span>
+</div>
+<!-- Excerpt with highlighting -->
+<div class="p-2.5 bg-surface-container-low border-l-2 border-outline font-code-inline text-code-inline text-on-surface leading-relaxed">
+              "Candidates registering between 65% and 74% aggregate shall undergo mandatory academic probation and register for remedial contact periods not exceeding 20 lecture hours..."
+            </div>
+<!-- Metadata & Actions -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant font-code-inline">
+<span>Relevance: <strong class="text-on-surface">0.812</strong></span>
+<span class="text-outline">·</span>
+<span>Sparse BM25</span>
+</div>
+<button class="flex items-center gap-1 px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-high text-primary font-label-sm text-label-sm font-medium transition-colors">
+<span class="material-symbols-outlined text-[14px]">open_in_new</span>
+<span>View PDF Page</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Inspector Footer: Corpus Telemetry -->
+<div class="p-3 border-t border-outline-variant bg-surface-container-low text-label-sm font-label-sm text-on-surface-variant flex items-center justify-between shrink-0">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[15px] text-outline">database</span>
+<span>Index: 48,290 Chunks</span>
+</div>
+<span class="font-code-inline text-[10px] text-outline">Precision: 99.4%</span>
+</div>
+</aside>
+</main>
+</div>
+<!-- SIMULATED MODAL: Abstention Safeguard Test Section (Insufficient Evidence) -->
+<div class="hidden fixed inset-0 bg-on-surface/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" id="abstention-modal">
+<div class="bg-surface-container-lowest border border-outline rounded-lg max-w-lg w-full shadow-2xl p-6 space-y-4">
+<div class="flex items-start justify-between pb-3 border-b border-outline-variant">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded bg-error-container text-on-error-container flex items-center justify-center">
+<span class="material-symbols-outlined">file_open</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Abstention Safeguard Triggered</h3>
+<p class="font-label-sm text-label-sm text-outline">Simulation Mode: Sub-threshold confidence</p>
+</div>
+</div>
+<button class="text-outline hover:text-on-surface" onclick="document.getElementById('abstention-modal').classList.add('hidden')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="p-3 bg-surface-container-low border border-outline-variant rounded font-body-md text-body-md space-y-2">
+<p class="font-semibold text-error">Status: Insufficient Authoritative Ground Truth</p>
+<p class="text-on-surface-variant text-body-sm font-body-sm leading-relaxed">
+          The simulated query does not meet the mandatory <strong>0.85 RRF retrieval confidence threshold</strong> across verified institutional repositories. LexisPolicy AI is programmed to abstain from generating synthetic answers rather than hazarding regulatory hallucination.
+        </p>
+</div>
+<div class="space-y-2">
+<span class="font-label-sm text-label-sm text-outline uppercase font-semibold">Corpus Inspection Results</span>
+<div class="p-2 bg-surface-container border border-outline-variant rounded font-code-inline text-code-inline text-on-surface-variant space-y-1 text-[11px]">
+<div class="flex justify-between"><span>Cosine Similarity Max:</span><span class="text-error font-semibold">0.481 &lt; 0.850</span></div>
+<div class="flex justify-between"><span>Exact Statute Identifier:</span><span>NOT FOUND</span></div>
+<div class="flex justify-between"><span>Fallback Mode:</span><span>Human Escalation Required</span></div>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 pt-2">
+<button class="px-3 py-1.5 rounded border border-outline-variant hover:bg-surface-container text-on-surface font-label-md text-label-md transition-colors" onclick="document.getElementById('abstention-modal').classList.add('hidden')">
+          Dismiss Simulation
+        </button>
+<button class="px-3 py-1.5 rounded bg-primary text-on-primary hover:bg-primary-container font-label-md text-label-md font-medium transition-colors" onclick="document.getElementById('abstention-modal').classList.add('hidden')">
+          Route to Legal Compliance Officer
+        </button>
+</div>
+</div>
+</div>
+</body></html>

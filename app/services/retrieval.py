@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.models.document import Document
 from app.models.chunk import Chunk
+from app.models.chunk_semantic import ChunkSemantic
 from app.schemas.retrieval import (
     ScoredChunk,
     FusedChunk,
@@ -17,6 +18,7 @@ from app.schemas.retrieval import (
     RetrievalResponse,
 )
 from app.services.embedding import BaseEmbeddingService, get_embedding_service
+from app.services.embedding_onnx import ONNXEmbeddingService
 from app.services.reranker import BaseRerankerService, get_reranker_service
 from app.core.config import settings
 from app.core.roles import validate_role, build_role_filter, InvalidRoleError
@@ -71,16 +73,39 @@ class HybridRetrievalService:
         db_session: Session,
         embedding_service: Optional[BaseEmbeddingService] = None,
         reranker_service: Optional[BaseRerankerService] = None,
+        semantic_embedding_service: Optional[ONNXEmbeddingService] = None,
         rrf_k: int = 60,
+        semantic_retrieval_enabled: Optional[bool] = None,
     ):
         self.db = db_session
         self.embedding_service = embedding_service or get_embedding_service()
         self.reranker_service = reranker_service or get_reranker_service()
         self.rrf_k = rrf_k or settings.RRF_K
+        self.semantic_retrieval_enabled = (
+            semantic_retrieval_enabled
+            if semantic_retrieval_enabled is not None
+            else settings.SEMANTIC_RETRIEVAL_ENABLED
+        )
+        self._semantic_embedding_service = semantic_embedding_service
 
-    def vector_search(self, query: str, k: int = 20, role: str = "student") -> list[ScoredChunk]:
+    @property
+    def semantic_embedding_service(self) -> ONNXEmbeddingService:
+        """Lazily initialize ONNXEmbeddingService when requested."""
+        if self._semantic_embedding_service is None:
+            self._semantic_embedding_service = ONNXEmbeddingService()
+        return self._semantic_embedding_service
+
+    def vector_search(
+        self,
+        query: str,
+        k: int = 20,
+        role: str = "student",
+        use_semantic: Optional[bool] = None,
+    ) -> list[ScoredChunk]:
         """Retrieve top k chunks by vector cosine distance filtered strictly by authorized role.
 
+        When semantic retrieval is active, uses 384-dimensional MiniLM embeddings querying chunks_semantic.
+        Otherwise, uses the baseline embedding_service (1536-dim) querying chunks.embedding.
         Enforces role-based SQL access control directly inside the database query before candidates
         are ranked or passed to downstream fusion.
         """
@@ -88,9 +113,117 @@ class HybridRetrievalService:
             return []
 
         clean_role = validate_role(role)
+        # Operational feature-flag enforcement:
+        # 1. Global operational flag (self.semantic_retrieval_enabled) controls availability.
+        #    If disabled (False), semantic retrieval is strictly OFF; request-level True cannot bypass it.
+        # 2. If enabled (True), request-level False allows explicit per-request opt-out.
+        if not self.semantic_retrieval_enabled:
+            is_semantic = False
+        else:
+            is_semantic = (use_semantic is not False)
+
+        self._last_semantic_active = False
+
+        if is_semantic:
+            try:
+                results = self._semantic_vector_search(query=query, k=k, role=clean_role)
+                if results:
+                    self._last_semantic_active = True
+                    return results
+                logger.warning(
+                    "Semantic vector search returned 0 candidates (chunks_semantic may be empty); "
+                    "falling back to baseline vector search."
+                )
+            except Exception as exc:
+                logger.warning(
+                    "Semantic vector search failed; falling back to baseline vector search: %s",
+                    exc,
+                )
+
+        self._last_semantic_active = False
+        return self._legacy_vector_search(query=query, k=k, role=clean_role)
+
+    def _semantic_vector_search(
+        self, query: str, k: int, role: str
+    ) -> list[ScoredChunk]:
+        """Execute vector search using 384-dimensional ONNX embeddings on chunks_semantic."""
+        query_vec = self.semantic_embedding_service.embed_query(query)
+        if len(query_vec) != 384:
+            raise ValueError(
+                f"Query embedding dimension mismatch: expected 384, got {len(query_vec)}"
+            )
+
+        is_postgres = self.db.bind is not None and self.db.bind.dialect.name == "postgresql"
+        role_filter = build_role_filter(Document, role, "postgresql" if is_postgres else "sqlite")
+        scored_chunks: list[ScoredChunk] = []
+
+        if is_postgres:
+            distance_expr = ChunkSemantic.embedding.cosine_distance(query_vec).label("distance")
+            results = (
+                self.db.query(Chunk, Document, distance_expr)
+                .join(ChunkSemantic, Chunk.id == ChunkSemantic.chunk_id)
+                .join(Document, Chunk.document_id == Document.id)
+                .filter(role_filter)
+                .order_by(distance_expr.asc())
+                .limit(k)
+                .all()
+            )
+
+            for rank_idx, (chunk, doc, distance) in enumerate(results, start=1):
+                similarity = round(max(0.0, 1.0 - float(distance)), 4)
+                scored_chunks.append(
+                    ScoredChunk(
+                        chunk_id=chunk.id,
+                        document_id=doc.id,
+                        file_name=doc.file_name,
+                        title=doc.title,
+                        page_number=chunk.page_number,
+                        text=chunk.text,
+                        score=similarity,
+                        rank=rank_idx,
+                    )
+                )
+        else:
+            chunks_with_doc_and_sem = (
+                self.db.query(Chunk, Document, ChunkSemantic)
+                .join(ChunkSemantic, Chunk.id == ChunkSemantic.chunk_id)
+                .join(Document, Chunk.document_id == Document.id)
+                .filter(role_filter)
+                .all()
+            )
+
+            candidate_scores: list[tuple[float, Chunk, Document]] = []
+            for chunk, doc, sem in chunks_with_doc_and_sem:
+                sem_emb = sem.embedding if isinstance(sem.embedding, list) else list(sem.embedding)
+                sim = cosine_similarity(query_vec, sem_emb)
+                clamped_sim = max(0.0, sim)
+                candidate_scores.append((clamped_sim, chunk, doc))
+
+            candidate_scores.sort(key=lambda x: x[0], reverse=True)
+
+            for rank_idx, (sim, chunk, doc) in enumerate(candidate_scores[:k], start=1):
+                scored_chunks.append(
+                    ScoredChunk(
+                        chunk_id=chunk.id,
+                        document_id=doc.id,
+                        file_name=doc.file_name,
+                        title=doc.title,
+                        page_number=chunk.page_number,
+                        text=chunk.text,
+                        score=round(sim, 4),
+                        rank=rank_idx,
+                    )
+                )
+
+        return scored_chunks
+
+    def _legacy_vector_search(
+        self, query: str, k: int, role: str
+    ) -> list[ScoredChunk]:
+        """Retrieve top k chunks using legacy 1536-dimensional mock embeddings on chunks table."""
         query_vec = self.embedding_service.embed_query(query)
         is_postgres = self.db.bind is not None and self.db.bind.dialect.name == "postgresql"
-        role_filter = build_role_filter(Document, clean_role, "postgresql" if is_postgres else "sqlite")
+        role_filter = build_role_filter(Document, role, "postgresql" if is_postgres else "sqlite")
 
         scored_chunks: list[ScoredChunk] = []
 
@@ -341,14 +474,16 @@ class HybridRetrievalService:
         top_n: int = 5,
         k_rrf: Optional[int] = None,
         role: str = "student",
+        use_semantic: Optional[bool] = None,
     ) -> RetrievalResponse:
         """Execute full hybrid retrieval pipeline returning authorized passages and diagnostics."""
         clean_role = validate_role(role)
         timings: dict[str, float] = {}
-
-        # 1. Vector Search (filtered by authorized role)
+        # 1. Vector Search (filtered by authorized role and feature-flag rules)
         t0 = time.perf_counter()
-        vector_results = self.vector_search(query, k=top_k, role=clean_role)
+        vector_results = self.vector_search(
+            query, k=top_k, role=clean_role, use_semantic=use_semantic
+        )
         timings["vector_search_ms"] = round((time.perf_counter() - t0) * 1000, 2)
 
         # 2. Keyword Search (filtered by authorized role)
@@ -373,6 +508,7 @@ class HybridRetrievalService:
             keyword_count=len(keyword_results),
             fused_count=len(fused_results),
             reranked_count=len(reranked_results),
+            semantic_retrieval_active=getattr(self, "_last_semantic_active", False),
             timings_ms=timings,
         )
 

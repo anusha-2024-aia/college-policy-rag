@@ -1,0 +1,82 @@
+# ==============================================================================
+# Render Blueprint Configuration for College Policy RAG Assistant
+# ==============================================================================
+# Deploys:
+# 1. FastAPI Backend Web Service (Dockerfile.backend)
+# 2. React + Vite Production Frontend (Render Static Site)
+# 3. Streamlit Fallback Web Service (Dockerfile.frontend)
+#
+# Prerequisite: A managed PostgreSQL instance with pgvector extension enabled
+# (e.g. Neon.tech, Supabase, or Render PostgreSQL).
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. FastAPI Backend Service
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: college-rag-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile.backend
+    plan: starter # Starter plan recommended for ONNX embedding & FlashRank CPU inference
+    region: oregon
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: DATABASE_URL
+        sync: false # Set in Render Dashboard: postgresql://<user>:<password>@<host>/<database>?sslmode=require
+      - key: LLM_PROVIDER
+        value: gemini
+      - key: LLM_MODEL
+        value: gemini-2.5-flash
+      - key: GEMINI_API_KEY
+        sync: false # Set your Gemini API key in Render Dashboard
+      - key: SEMANTIC_RETRIEVAL_ENABLED
+        value: "true"
+      - key: EMBEDDING_PROVIDER
+        value: mock
+      - key: RERANKER_PROVIDER
+        value: flashrank
+      - key: VERSION_AWARE_ENABLED
+        value: "true"
+      - key: CORS_ORIGINS
+        value: "https://college-rag-react-frontend.onrender.com,https://college-rag-frontend.onrender.com"
+
+  # ----------------------------------------------------------------------------
+  # 2. React + Vite Production Web Frontend (Primary)
+  # ----------------------------------------------------------------------------
+  - type: static_site
+    name: college-rag-react-frontend
+    buildCommand: cd frontend && npm install && npm run build
+    publishPath: frontend/dist
+    autoDeploy: true
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: college-rag-backend
+          property: host
+
+  # ----------------------------------------------------------------------------
+  # 3. Streamlit Frontend UI Service (Verified Fallback)
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: college-rag-frontend
+    runtime: docker
+    dockerfilePath: ./Dockerfile.frontend
+    plan: starter
+    region: oregon
+    healthCheckPath: /_stcore/health
+    autoDeploy: true
+    envVars:
+      - key: BACKEND_API_URL
+        fromService:
+          type: web
+          name: college-rag-backend
+          property: host
+      - key: DATABASE_URL
+        sync: false # Optional: Set to enable Tab 3 live document catalog inspection

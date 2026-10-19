@@ -51,6 +51,7 @@ class IngestionService:
         pdf_parser: Optional[PDFParserService] = None,
         chunker: Optional[ChunkerService] = None,
         embedding_service: Optional[BaseEmbeddingService] = None,
+        semantic_embedding_service: Optional[any] = None,
     ):
         self.db = db_session
         self.manifest_service = manifest_service or ManifestService()
@@ -60,6 +61,18 @@ class IngestionService:
             chunk_overlap_tokens=settings.CHUNK_OVERLAP_TOKENS,
         )
         self.embedding_service = embedding_service or get_embedding_service()
+        self.semantic_embedding_service = semantic_embedding_service
+
+    @property
+    def semantic_embedder(self):
+        """Lazily initialize ONNXEmbeddingService when semantic retrieval is enabled."""
+        if self.semantic_embedding_service is None and settings.SEMANTIC_RETRIEVAL_ENABLED:
+            try:
+                from app.services.embedding_onnx import ONNXEmbeddingService
+                self.semantic_embedding_service = ONNXEmbeddingService()
+            except Exception as exc:
+                logger.warning("Could not initialize ONNXEmbeddingService in ingestion: %s", exc)
+        return self.semantic_embedding_service
 
     def ingest_manifest(
         self,
@@ -131,6 +144,12 @@ class IngestionService:
 
                 # 5. Generate embeddings
                 embeddings = self.embedding_service.embed_texts(chunk_texts) if chunk_texts else []
+                sem_embedder = self.semantic_embedder
+                sem_embeddings = (
+                    sem_embedder.embed_texts(chunk_texts)
+                    if sem_embedder and chunk_texts
+                    else []
+                )
 
                 # 6. Database Transaction (Atomic Upsert)
                 doc_record = existing_doc
@@ -177,6 +196,20 @@ class IngestionService:
 
                 if db_chunks:
                     self.db.add_all(db_chunks)
+                    self.db.flush()  # Populate chunk_obj.id
+
+                    if sem_embeddings:
+                        from app.models.chunk_semantic import ChunkSemantic
+                        db_sem_records = []
+                        for idx, chunk_obj in enumerate(db_chunks):
+                            sem_obj = ChunkSemantic(
+                                chunk_id=chunk_obj.id,
+                                embedding=sem_embeddings[idx],
+                                model_name="all-MiniLM-L6-v2",
+                            )
+                            db_sem_records.append(sem_obj)
+                        if db_sem_records:
+                            self.db.add_all(db_sem_records)
 
                 self.db.commit()
 

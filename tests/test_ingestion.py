@@ -182,3 +182,36 @@ def test_gemini_embedding_service(monkeypatch):
     assert len(results[0]) == 768
     assert results[0][0] == 0.1
     assert mock_client.post.called
+
+
+def test_ingestion_with_semantic_embeddings(test_db: Session, sample_pdf_workspace: Path, mock_embedding_service: MockEmbeddingService):
+    """Verify IngestionService automatically writes to chunks_semantic when semantic embedder is supplied."""
+    from unittest.mock import MagicMock
+    from app.models.chunk_semantic import ChunkSemantic
+
+    mock_sem = MagicMock()
+    mock_sem.embed_texts.side_effect = lambda texts: [[0.05] * 384 for _ in texts]
+
+    manifest_service = ManifestService(base_dir=sample_pdf_workspace)
+    ingestion_service = IngestionService(
+        db_session=test_db,
+        manifest_service=manifest_service,
+        embedding_service=mock_embedding_service,
+        semantic_embedding_service=mock_sem,
+    )
+
+    manifest_path = sample_pdf_workspace / "documents_manifest.csv"
+    report = ingestion_service.ingest_manifest(manifest_path=manifest_path)
+
+    assert report.ingested_count == 2
+    chunks = test_db.query(Chunk).all()
+    assert len(chunks) > 0
+
+    sem_rows = test_db.query(ChunkSemantic).all()
+    assert len(sem_rows) == len(chunks)
+    assert all(len(s.embedding) == 384 for s in sem_rows)
+    assert all(s.model_name == "all-MiniLM-L6-v2" for s in sem_rows)
+    # Verify FK constraint integrity
+    chunk_ids = {c.id for c in chunks}
+    sem_chunk_ids = {s.chunk_id for s in sem_rows}
+    assert sem_chunk_ids == chunk_ids

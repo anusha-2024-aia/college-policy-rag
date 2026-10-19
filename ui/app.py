@@ -13,6 +13,7 @@ while _ui_dir in sys.path:
     sys.path.remove(_ui_dir)
 
 import json
+import os
 from typing import Any
 import streamlit as st
 
@@ -24,6 +25,13 @@ from ui.client import (
     ServiceUnavailableError,
     GatewayTimeoutError,
     APIClientError,
+    format_conflict_markdown,
+    format_citation_header,
+    discover_evaluation_reports,
+    read_evaluation_report_content,
+    get_matching_json_export,
+    get_database_document_summary,
+    inspect_pdf_bytes,
 )
 
 # Page configuration
@@ -47,9 +55,10 @@ st.markdown(
 st.sidebar.title("🏛️ Document RAG")
 st.sidebar.subheader("System Configuration")
 
+default_api_base_url = os.getenv("BACKEND_API_URL", "http://127.0.0.1:8000")
 api_base_url = st.sidebar.text_input(
     "Backend API Base URL",
-    value="http://127.0.0.1:8080",
+    value=default_api_base_url,
     help="Target FastAPI service address",
 )
 
@@ -113,19 +122,15 @@ with tab_assistant:
                     st.warning("⚠️ **Policy Version Conflict Detected**: Evidence contains both active and superseded policies.")
                     if msg.get("conflict_details"):
                         for conf in msg["conflict_details"]:
-                            st.info(
-                                f"**Active**: {conf.get('current_title', 'Current Policy')} "
-                                f"(Effective: {conf.get('current_effective_date', 'N/A')})\n\n"
-                                f"**Superseded**: {conf.get('superseded_title', 'Older Policy')} "
-                                f"(Effective: {conf.get('superseded_effective_date', 'N/A')})\n\n"
-                                f"*{conf.get('description', '')}*"
-                            )
+                            st.info(format_conflict_markdown(conf))
 
                 if msg.get("abstained"):
                     st.info(
                         "ℹ️ **No Sufficient Evidence Found**: The system searched available authorized documents for your role, "
                         "but could not find sufficient verifiable evidence to answer this question. (Abstained to prevent hallucination)."
                     )
+                    if msg.get("content"):
+                        st.caption(f"System statement: *{msg['content']}*")
                 else:
                     st.markdown(msg["content"])
 
@@ -134,7 +139,7 @@ with tab_assistant:
                     if citations:
                         with st.expander(f"📚 Verified Citations ({len(citations)})", expanded=False):
                             for c in citations:
-                                st.markdown(f"**[{c['index']}]** 📄 `{c['file_name']}` — **Page {c['page_number']}**")
+                                st.markdown(format_citation_header(c))
                                 if c.get("snippet"):
                                     st.caption(f'"{c["snippet"]}"')
 
@@ -198,24 +203,22 @@ with tab_assistant:
                         st.warning("⚠️ **Policy Version Conflict Detected**: Evidence contains both active and superseded policies.")
                         if response.conflict_details:
                             for conf in response.conflict_details:
-                                st.info(
-                                    f"**Active**: {conf.current_title} (Effective: {conf.current_effective_date or 'N/A'})\n\n"
-                                    f"**Superseded**: {conf.superseded_title} (Effective: {conf.superseded_effective_date or 'N/A'})\n\n"
-                                    f"*{conf.description}*"
-                                )
+                                st.info(format_conflict_markdown(conf))
 
                     if response.abstained:
                         st.info(
                             "ℹ️ **No Sufficient Evidence Found**: The system searched available authorized documents for your role, "
                             "but could not find sufficient verifiable evidence to answer this question. (Abstained to prevent hallucination)."
                         )
+                        if response.answer:
+                            st.caption(f"System statement: *{response.answer}*")
                     else:
                         st.markdown(response.answer)
 
                         if response.citations:
                             with st.expander(f"📚 Verified Citations ({len(response.citations)})", expanded=True):
                                 for c in response.citations:
-                                    st.markdown(f"**[{c.index}]** 📄 `{c.file_name}` — **Page {c.page_number}**")
+                                    st.markdown(format_citation_header(c))
                                     if c.snippet:
                                         st.caption(f'"{c.snippet}"')
 
@@ -265,44 +268,38 @@ with tab_eval:
     )
 
     results_dir = Path("eval/results")
-    if not results_dir.exists():
-        st.info("Directory `eval/results/` does not exist yet. Run the evaluation CLI to generate reports.")
-        st.code("python -m eval.run_eval --golden-path eval/golden.jsonl", language="bash")
+    reports = discover_evaluation_reports(results_dir)
+
+    if not reports:
+        st.info("No benchmark reports found in `eval/results/`. Run the evaluation CLI to generate reports:")
+        st.code("python -m eval.run_eval --golden-path eval/kvit_golden.jsonl", language="bash")
     else:
-        # Find all markdown reports
-        md_reports = sorted(list(results_dir.glob("eval_report_*.md")), reverse=True)
-        json_reports = sorted(list(results_dir.glob("eval_results_*.json")), reverse=True)
+        selected_report_name = st.selectbox(
+            "Select Benchmark Run",
+            options=[r.name for r in reports],
+            index=0,
+        )
 
-        if not md_reports and not json_reports:
-            st.info("No benchmark reports found in `eval/results/`. Run the evaluation CLI to generate reports:")
-            st.code("python -m eval.run_eval --golden-path eval/golden.jsonl", language="bash")
-        else:
-            selected_report = st.selectbox(
-                "Select Benchmark Run",
-                options=[r.name for r in md_reports],
-                index=0,
-            )
-
-            if selected_report:
-                report_path = results_dir / selected_report
-                with open(report_path, "r", encoding="utf-8") as f:
-                    report_content = f.read()
-
+        if selected_report_name:
+            report_path = results_dir / selected_report_name
+            try:
+                report_content = read_evaluation_report_content(report_path)
                 st.markdown(report_content)
+            except Exception as exc:
+                st.error(f"Failed to read report {selected_report_name}: {exc}")
 
-                # Matching JSON export for download
-                matching_json_name = selected_report.replace("eval_report_", "eval_results_").replace(".md", ".json")
-                matching_json_path = results_dir / matching_json_name
-
-                if matching_json_path.exists():
-                    with open(matching_json_path, "r", encoding="utf-8") as jf:
-                        json_data = jf.read()
+            json_export = get_matching_json_export(report_path)
+            if json_export:
+                json_name, json_data, is_valid = json_export
+                if is_valid:
                     st.download_button(
                         label="📥 Download Raw JSON Results",
                         data=json_data,
-                        file_name=matching_json_name,
+                        file_name=json_name,
                         mime="application/json",
                     )
+                else:
+                    st.warning(f"⚠️ Matching export `{json_name}` is present but contains malformed JSON.")
 
 
 # ============================================================================
@@ -317,32 +314,15 @@ with tab_docs:
 
     try:
         from app.core.database import SessionLocal
-        from app.models.document import Document
-
         with SessionLocal() as db:
-            docs = db.query(Document).order_by(Document.effective_date.desc()).all()
+            summary = get_database_document_summary(db)
 
             col1, col2, col3 = st.columns(3)
-            total_chunks = sum(d.total_chunks for d in docs)
-            total_pages = sum(d.total_pages for d in docs)
-            col1.metric("Indexed Documents", len(docs))
-            col2.metric("Total Extracted Chunks", total_chunks)
-            col3.metric("Total Document Pages", total_pages)
+            col1.metric("Indexed Documents", summary["total_docs"])
+            col2.metric("Total Extracted Chunks", summary["total_chunks"])
+            col3.metric("Total Document Pages", summary["total_pages"])
 
-            table_data = [
-                {
-                    "File Name": d.file_name,
-                    "Title": d.title,
-                    "Effective Date": str(d.effective_date),
-                    "Supersedes": d.supersedes or "—",
-                    "Allowed Roles": ", ".join(d.allowed_roles) if isinstance(d.allowed_roles, list) else str(d.allowed_roles),
-                    "Pages": d.total_pages,
-                    "Chunks": d.total_chunks,
-                    "Status": d.status,
-                }
-                for d in docs
-            ]
-            st.dataframe(table_data, use_container_width=True)
+            st.dataframe(summary["rows"], use_container_width=True)
 
     except Exception as exc:
         st.warning(f"Could not load live document records from database: {exc}")
@@ -354,19 +334,16 @@ with tab_docs:
     uploaded_pdf = st.file_uploader("Select PDF file to inspect", type=["pdf"], key="pdf_preview_uploader")
     if uploaded_pdf is not None:
         try:
-            import pypdf
-            reader = pypdf.PdfReader(uploaded_pdf)
-            num_pages = len(reader.pages)
-            file_size_kb = len(uploaded_pdf.getvalue()) / 1024.0
+            pdf_info = inspect_pdf_bytes(uploaded_pdf.getvalue(), uploaded_pdf.name)
 
             pcol1, pcol2 = st.columns(2)
-            pcol1.metric("File Name", uploaded_pdf.name)
-            pcol2.metric("Parsed Pages", f"{num_pages} pages ({file_size_kb:.1f} KB)")
+            pcol1.metric("File Name", pdf_info["filename"])
+            pcol2.metric("Parsed Pages", f"{pdf_info['num_pages']} pages ({pdf_info['file_size_kb']:.1f} KB)")
 
-            if num_pages > 0:
-                preview_text = reader.pages[0].extract_text() or ""
+            if pdf_info["num_pages"] > 0 and pdf_info["preview_text"]:
                 with st.expander("🔍 Page 1 Text Preview", expanded=True):
-                    st.text(preview_text[:500] + ("..." if len(preview_text) > 500 else ""))
+                    preview_excerpt = pdf_info["preview_text"][:500] + ("..." if len(pdf_info["preview_text"]) > 500 else "")
+                    st.text(preview_excerpt)
 
             st.info(
                 "🔒 **Read-Only Inspection Notice**: Direct database ingestion from the UI is disabled for institutional data integrity. "
@@ -375,4 +352,5 @@ with tab_docs:
             )
         except Exception as exc:
             st.error(f"Failed to parse PDF file: {exc}")
+
 

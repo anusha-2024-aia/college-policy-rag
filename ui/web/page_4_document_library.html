@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Document Library - LexisPolicy AI</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Geist and JetBrains Mono Typography -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary-container": "#a65900",
+            "primary-container": "#2563eb",
+            "on-surface-variant": "#434655",
+            "surface-variant": "#dae2fd",
+            "on-surface": "#131b2e",
+            "on-secondary-container": "#006f66",
+            "on-error": "#ffffff",
+            "surface-dim": "#d2d9f4",
+            "on-tertiary": "#ffffff",
+            "surface-container": "#eaedff",
+            "surface-container-highest": "#dae2fd",
+            "on-primary-container": "#eeefff",
+            "inverse-surface": "#283044",
+            "on-tertiary-container": "#ffede1",
+            "background": "#faf8ff",
+            "surface-container-high": "#e2e7ff",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed-variant": "#6e3900",
+            "outline": "#737686",
+            "on-secondary-fixed": "#00201d",
+            "tertiary-fixed": "#ffdcc3",
+            "surface-container-lowest": "#ffffff",
+            "secondary": "#006a61",
+            "inverse-primary": "#b4c5ff",
+            "inverse-on-surface": "#eef0ff",
+            "secondary-fixed-dim": "#6bd8cb",
+            "on-tertiary-fixed": "#2f1500",
+            "error": "#ba1a1a",
+            "on-secondary-fixed-variant": "#005049",
+            "on-primary-fixed": "#00174b",
+            "tertiary": "#824500",
+            "secondary-fixed": "#89f5e7",
+            "tertiary-fixed-dim": "#ffb77d",
+            "on-primary-fixed-variant": "#003ea8",
+            "outline-variant": "#c3c6d7",
+            "surface-container-low": "#f2f3ff",
+            "primary": "#004ac6",
+            "primary-fixed-dim": "#b4c5ff",
+            "secondary-container": "#86f2e4",
+            "primary-fixed": "#dbe1ff",
+            "error-container": "#ffdad6",
+            "on-background": "#131b2e",
+            "on-secondary": "#ffffff",
+            "surface-tint": "#0053db",
+            "surface": "#faf8ff",
+            "on-primary": "#ffffff",
+            "surface-bright": "#faf8ff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "margin": "1rem",
+            "gutter-desktop": "1.5rem",
+            "space-xl": "1.5rem",
+            "space-sm": "0.5rem",
+            "space-md": "0.75rem",
+            "space-2xl": "2rem",
+            "margin-desktop": "2rem",
+            "space-lg": "1rem",
+            "space-xs": "0.25rem",
+            "space-3xl": "3rem"
+          },
+          "fontFamily": {
+            "code-inline": ["JetBrains Mono"],
+            "headline-lg": ["Geist"],
+            "body-sm": ["Geist"],
+            "label-sm": ["JetBrains Mono"],
+            "label-md": ["JetBrains Mono"],
+            "body-lg": ["Geist"],
+            "headline-sm": ["Geist"],
+            "headline-md": ["Geist"],
+            "label-lg": ["JetBrains Mono"],
+            "body-md": ["Geist"],
+            "display-lg": ["Geist"],
+            "display-lg-mobile": ["Geist"]
+          },
+          "fontSize": {
+            "code-inline": ["12px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "body-lg": ["15px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "label-lg": ["13px", { "lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "body-md": ["14px", { "lineHeight": "22px", "letterSpacing": "-0.003em", "fontWeight": "400" }],
+            "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+            "display-lg-mobile": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-surface text-on-surface h-full overflow-hidden flex flex-col font-body-md selection:bg-surface-variant selection:text-primary">
+<!-- TOP APP BAR (Shared Extended Header) -->
+<header class="bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-outline flex justify-between items-center w-full h-14 px-6 shrink-0 z-30 transition-all duration-150 ease-in-out">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="policy">policy</span>
+<span class="text-headline-sm font-headline-sm font-bold text-on-surface dark:text-inverse-on-surface tracking-tight">LexisPolicy AI</span>
+</div>
+<!-- Top Search Bar -->
+<div class="relative w-80">
+<span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-sm" data-icon="search">search</span>
+<input class="w-full pl-8 pr-12 py-1 bg-surface-container-low dark:bg-surface-container border border-outline-variant rounded-lg text-body-sm font-body-sm focus:outline-none focus:border-primary text-on-surface placeholder:text-outline" placeholder="Global statute index..." type="text"/>
+<span class="absolute right-2.5 top-1/2 -translate-y-1/2 font-label-sm text-label-sm text-outline border border-outline-variant rounded px-1">⌘K</span>
+</div>
+<!-- Links -->
+<nav class="hidden lg:flex items-center gap-5 font-label-md text-label-md">
+<a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-primary transition-colors" href="index.html#dashboard">Statutes</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-primary transition-colors" href="index.html#ask-policy">Federal Register</a>
+<a class="text-primary dark:text-inverse-primary font-semibold border-b-2 border-primary dark:border-inverse-primary pb-1" href="index.html#policy-change">Institutional Code</a>
+</nav>
+</div>
+<!-- Trailing Actions & Identity -->
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded border border-outline-variant bg-surface-container-low text-label-sm font-label-sm text-on-surface font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+          Connected: Live API
+        </span>
+<span class="inline-flex items-center px-2 py-0.5 rounded border border-outline-variant bg-surface-container font-label-sm text-label-sm text-primary font-semibold">
+          Role: Admin
+        </span>
+</div>
+<div class="h-4 w-px bg-outline-variant"></div>
+<div class="flex items-center gap-1">
+<button class="p-1.5 rounded hover:bg-surface-container-low text-on-surface-variant transition-colors" title="Notifications">
+<span class="material-symbols-outlined text-lg" data-icon="notifications">notifications</span>
+</button>
+<button class="p-1.5 rounded hover:bg-surface-container-low text-on-surface-variant transition-colors" title="Help Desk">
+<span class="material-symbols-outlined text-lg" data-icon="help">help</span>
+</button>
+<button class="p-1.5 rounded hover:bg-surface-container-low text-on-surface-variant transition-colors" title="Engine Tuning">
+<span class="material-symbols-outlined text-lg" data-icon="tune">tune</span>
+</button>
+</div>
+<div class="h-4 w-px bg-outline-variant"></div>
+<!-- User Analyst Profile Avatar -->
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-on-primary font-label-sm text-label-sm font-bold shadow-sm">
+          AL
+        </div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- SIDE NAVIGATION BAR (Exact Schema Anchors) -->
+<aside class="w-64 h-full flex flex-col justify-between bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant dark:border-outline shrink-0 z-20 transition-colors duration-150 ease-in-out">
+<div class="w-64 h-full flex flex-col py-4 px-3 overflow-y-auto">
+<!-- Logo sub-header -->
+<div class="px-3 pb-4 mb-2 border-b border-outline-variant">
+<div class="flex items-center gap-2 mb-0.5">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="verified_user">verified_user</span>
+<span class="text-headline-sm font-headline-sm font-bold tracking-tight text-on-surface dark:text-inverse-on-surface">LexisPolicy AI</span>
+</div>
+<p class="text-body-sm font-body-sm text-outline">Enterprise Intelligence v4.2</p>
+</div>
+<!-- Primary Navigation List -->
+<nav class="space-y-1">
+<!-- Item 1: Dashboard -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low dark:hover:bg-surface-container hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors duration-150 ease-in-out" href="index.html#document-library">
+<span class="material-symbols-outlined text-lg" data-icon="dashboard">dashboard</span>
+<span class="text-label-md font-label-md">Dashboard</span>
+</a>
+<!-- Item 2: Ask Policy -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low dark:hover:bg-surface-container hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors duration-150 ease-in-out" href="index.html#evaluations">
+<span class="material-symbols-outlined text-lg" data-icon="chat">chat</span>
+<span class="text-label-md font-label-md">Ask Policy</span>
+</a>
+<!-- Item 3: Policy Change Intelligence -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low dark:hover:bg-surface-container hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors duration-150 ease-in-out" href="index.html#evaluations">
+<span class="material-symbols-outlined text-lg" data-icon="published_with_changes">published_with_changes</span>
+<span class="text-label-md font-label-md">Policy Change Intelligence</span>
+</a>
+<!-- Item 4: Document Library (ACTIVE MATCH) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-surface-container dark:bg-surface-container-high text-primary dark:text-inverse-primary font-semibold border-l-2 border-primary dark:border-inverse-primary transition-colors duration-150 ease-in-out" href="index.html#system-health">
+<span class="material-symbols-outlined text-lg" data-icon="folder" style="font-variation-settings: 'FILL' 1;">folder</span>
+<span class="text-label-md font-label-md">Document Library</span>
+</a>
+<!-- Item 5: Evaluations & Benchmarks -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low dark:hover:bg-surface-container hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors duration-150 ease-in-out" href="index.html#about-architecture">
+<span class="material-symbols-outlined text-lg" data-icon="analytics">analytics</span>
+<span class="text-label-md font-label-md">Evaluations &amp; Benchmarks</span>
+</a>
+<!-- Item 6: System Health -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low dark:hover:bg-surface-container hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors duration-150 ease-in-out" href="index.html#about-architecture">
+<span class="material-symbols-outlined text-lg" data-icon="monitor_heart">monitor_heart</span>
+<span class="text-label-md font-label-md">System Health</span>
+</a>
+<!-- Item 7: About & Architecture -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low dark:hover:bg-surface-container hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="info">info</span>
+<span class="text-label-md font-label-md">About &amp; Architecture</span>
+</a>
+</nav>
+<!-- CTA Action -->
+<div class="mt-6 px-1">
+<button class="w-full flex items-center justify-center gap-2 py-2 px-3 bg-primary text-on-primary rounded-lg text-label-md font-label-md font-medium hover:bg-primary-container transition-colors shadow-sm">
+<span class="material-symbols-outlined text-base" data-icon="rule">rule</span>
+<span>Audit Policy Diff</span>
+</button>
+</div>
+<!-- Footer Tab Labels -->
+<div class="mt-auto pt-4 border-t border-outline-variant space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low dark:hover:bg-surface-container hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="settings">settings</span>
+<span class="text-label-md font-label-md">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low dark:hover:bg-surface-container hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="menu_book">menu_book</span>
+<span class="text-label-md font-label-md">Documentation</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- MAIN WORKSPACE CANVAS -->
+<main class="flex-1 flex flex-col h-full overflow-hidden bg-background">
+<!-- SUB-HEADER SECTION -->
+<section class="bg-surface-container-lowest px-6 py-4 border-b border-outline-variant shrink-0">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+<div>
+<div class="flex items-center gap-2">
+<h1 class="text-headline-lg font-headline-lg text-on-surface">Document Library</h1>
+<span class="px-2 py-0.5 rounded text-label-sm font-label-sm bg-surface-container text-primary font-medium border border-outline-variant">Corpus v8.4.1</span>
+</div>
+<p class="text-body-sm font-body-sm text-outline mt-0.5">Authoritative college policy corpus with version histories, indexing status, and chunk distribution. Demonstrating synthetic KVIT dataset.</p>
+</div>
+<div class="flex items-center gap-3 self-end md:self-auto">
+<div class="flex items-center gap-1 bg-surface-container-low p-1 rounded-lg border border-outline-variant">
+<button class="px-2.5 py-1 text-label-sm font-label-sm bg-surface-container-lowest text-primary rounded shadow-xs font-semibold flex items-center gap-1.5 border border-outline-variant">
+<span class="material-symbols-outlined text-sm" data-icon="table_chart">table_chart</span>
+<span>Table View</span>
+</button>
+<button class="px-2.5 py-1 text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface rounded font-medium flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="grid_view">grid_view</span>
+<span>Card Grid View</span>
+</button>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-on-primary text-label-md font-label-md font-semibold hover:bg-primary-container transition-colors shadow-xs">
+<span class="material-symbols-outlined text-base" data-icon="cloud_upload">cloud_upload</span>
+<span>Sync / Ingest Policy</span>
+</button>
+</div>
+</div>
+<!-- CONTROL BAR -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-3 mt-4 pt-3 border-t border-outline-variant/60 items-center">
+<!-- Search input -->
+<div class="md:col-span-5 relative">
+<span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-base" data-icon="search">search</span>
+<input class="w-full pl-8 pr-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-primary placeholder:text-outline" placeholder="Search indexed documents by title, statute code, or keyword..." type="text"/>
+</div>
+<!-- Category Filter -->
+<div class="md:col-span-2">
+<div class="relative">
+<select class="w-full pl-2.5 pr-7 py-1.5 text-label-md font-label-md bg-surface-container-lowest border border-outline-variant rounded-lg text-on-surface focus:outline-none focus:border-primary appearance-none cursor-pointer">
+<option selected="">All Categories</option>
+<option>Academic</option>
+<option>Conduct &amp; Hostel</option>
+<option>Examination</option>
+<option>Administrative</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-base" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<!-- Status Filter -->
+<div class="md:col-span-2">
+<div class="relative">
+<select class="w-full pl-2.5 pr-7 py-1.5 text-label-md font-label-md bg-surface-container-lowest border border-outline-variant rounded-lg text-on-surface focus:outline-none focus:border-primary appearance-none cursor-pointer">
+<option selected="">All Statuses</option>
+<option>100% Indexed</option>
+<option>Needs Re-indexing</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-base" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<!-- Version Filter -->
+<div class="md:col-span-3 flex items-center justify-between gap-2">
+<div class="relative flex-1">
+<select class="w-full pl-2.5 pr-7 py-1.5 text-label-md font-label-md bg-surface-container-lowest border border-outline-variant rounded-lg text-on-surface focus:outline-none focus:border-primary appearance-none cursor-pointer">
+<option selected="">Active Latest</option>
+<option>Superseded Archives</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-base" data-icon="expand_more">expand_more</span>
+</div>
+<button class="p-1.5 border border-outline-variant rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" title="Export Corpus Report">
+<span class="material-symbols-outlined text-base" data-icon="download">download</span>
+</button>
+</div>
+</div>
+</section>
+<!-- DATA TABLE AND BOTTOM INSPECTOR WORKBENCH (Split Layout) -->
+<div class="flex-1 flex flex-col min-h-0 overflow-hidden">
+<!-- TABLE VIEW CONTAINER -->
+<div class="flex-1 overflow-auto bg-surface-container-lowest border-b border-outline-variant">
+<table class="w-full border-collapse text-left">
+<thead class="bg-surface-container-low sticky top-0 z-10 border-b border-outline-variant">
+<tr>
+<th class="py-2 px-4 font-label-sm text-label-sm text-outline uppercase tracking-wider font-semibold">Document Title</th>
+<th class="py-2 px-3 font-label-sm text-label-sm text-outline uppercase tracking-wider font-semibold">Category</th>
+<th class="py-2 px-3 font-label-sm text-label-sm text-outline uppercase tracking-wider font-semibold">Active Version</th>
+<th class="py-2 px-3 font-label-sm text-label-sm text-outline uppercase tracking-wider font-semibold">Effective Date</th>
+<th class="py-2 px-3 font-label-sm text-label-sm text-outline uppercase tracking-wider font-semibold text-right">Indexed Chunks</th>
+<th class="py-2 px-3 font-label-sm text-label-sm text-outline uppercase tracking-wider font-semibold">Status</th>
+<th class="py-2 px-4 font-label-sm text-label-sm text-outline uppercase tracking-wider font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/60 font-body-sm text-body-sm">
+<!-- Row 1: KVIT Academic Regulations & Credit Framework (Selected) -->
+<tr class="bg-surface-container-high/40 hover:bg-surface-container-high transition-colors border-l-2 border-primary cursor-pointer group">
+<td class="py-2.5 px-4 font-medium text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-base" data-icon="description">description</span>
+<div>
+<span class="font-semibold text-primary block leading-tight">KVIT Academic Regulations &amp; Credit Framework</span>
+<span class="font-label-sm text-label-sm text-outline">STAT-KVIT-2024-AC-01 • Synthetic Corpus</span>
+</div>
+</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-label-sm font-label-sm bg-surface-container text-primary font-medium border border-outline-variant">Academic</span>
+</td>
+<td class="py-2.5 px-3">
+<span class="font-code-inline text-code-inline px-1.5 py-0.5 rounded bg-surface-container-low border border-outline-variant text-on-surface font-semibold">v2.4 (Active)</span>
+</td>
+<td class="py-2.5 px-3 font-code-inline text-code-inline text-on-surface-variant">Aug 2024</td>
+<td class="py-2.5 px-3 text-right font-code-inline text-code-inline tabular-nums">
+<span class="font-semibold text-on-surface">284</span>
+<span class="text-outline text-label-sm"> (MiniLM)</span>
+</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-secondary text-label-sm font-label-sm font-medium bg-secondary-container/30 text-on-secondary-container">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                    Indexed (100%)
+                  </span>
+</td>
+<td class="py-2.5 px-4 text-right">
+<div class="inline-flex items-center gap-1 opacity-90 group-hover:opacity-100">
+<button class="px-2 py-1 text-label-sm font-label-sm rounded bg-surface-container-lowest border border-outline-variant text-primary hover:bg-surface-container font-semibold transition-colors">View Chunks</button>
+<button class="px-2 py-1 text-label-sm font-label-sm rounded bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">Audit Diff</button>
+<button class="px-2 py-1 text-label-sm font-label-sm rounded bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">Preview PDF</button>
+</div>
+</td>
+</tr>
+<!-- Row 2: Hostel Resident Code of Conduct & Curfew Norms -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group">
+<td class="py-2.5 px-4 font-medium text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-base" data-icon="description">description</span>
+<div>
+<span class="font-medium text-on-surface block leading-tight">Hostel Resident Code of Conduct &amp; Curfew Norms</span>
+<span class="font-label-sm text-label-sm text-outline">STAT-KVIT-2024-ST-09 • Campus Living</span>
+</div>
+</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-label-sm font-label-sm bg-surface-container-low text-on-surface-variant font-medium border border-outline-variant">Student Affairs</span>
+</td>
+<td class="py-2.5 px-3">
+<span class="font-code-inline text-code-inline px-1.5 py-0.5 rounded bg-surface-container-low border border-outline-variant text-on-surface font-medium">v3.1 (Active)</span>
+</td>
+<td class="py-2.5 px-3 font-code-inline text-code-inline text-on-surface-variant">Jun 2024</td>
+<td class="py-2.5 px-3 text-right font-code-inline text-code-inline tabular-nums">
+<span class="font-medium text-on-surface">142</span>
+<span class="text-outline text-label-sm"> chunks</span>
+</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-secondary text-label-sm font-label-sm font-medium bg-secondary-container/30 text-on-secondary-container">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                    Indexed (100%)
+                  </span>
+</td>
+<td class="py-2.5 px-4 text-right">
+<div class="inline-flex items-center gap-1">
+<button class="px-2 py-1 text-label-sm font-label-sm rounded bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">View Chunks</button>
+<button class="p-1 rounded text-outline hover:text-on-surface hover:bg-surface-container">
+<span class="material-symbols-outlined text-base" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3: Examination Ordinance & Disciplinary Procedures -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group">
+<td class="py-2.5 px-4 font-medium text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-base" data-icon="description">description</span>
+<div>
+<span class="font-medium text-on-surface block leading-tight">Examination Ordinance &amp; Disciplinary Procedures</span>
+<span class="font-label-sm text-label-sm text-outline">STAT-KVIT-2024-EX-03 • Proctorate Board</span>
+</div>
+</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-label-sm font-label-sm bg-surface-container-low text-on-surface-variant font-medium border border-outline-variant">Examination</span>
+</td>
+<td class="py-2.5 px-3">
+<span class="font-code-inline text-code-inline px-1.5 py-0.5 rounded bg-surface-container-low border border-outline-variant text-on-surface font-medium">v2.1 (Active)</span>
+</td>
+<td class="py-2.5 px-3 font-code-inline text-code-inline text-on-surface-variant">Aug 2024</td>
+<td class="py-2.5 px-3 text-right font-code-inline text-code-inline tabular-nums">
+<span class="font-medium text-on-surface">318</span>
+<span class="text-outline text-label-sm"> chunks</span>
+</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-secondary text-label-sm font-label-sm font-medium bg-secondary-container/30 text-on-secondary-container">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                    Indexed (100%)
+                  </span>
+</td>
+<td class="py-2.5 px-4 text-right">
+<div class="inline-flex items-center gap-1">
+<button class="px-2 py-1 text-label-sm font-label-sm rounded bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">View Chunks</button>
+<button class="p-1 rounded text-outline hover:text-on-surface hover:bg-surface-container">
+<span class="material-symbols-outlined text-base" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4: Examination Ordinance & Disciplinary Procedures (Archive) -->
+<tr class="hover:bg-surface-container-low transition-colors bg-surface-container-low/30 cursor-pointer group">
+<td class="py-2.5 px-4 font-medium text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-base" data-icon="history_edu">history_edu</span>
+<div>
+<span class="font-normal text-on-surface-variant block leading-tight">Examination Ordinance &amp; Disciplinary Procedures (Archive)</span>
+<span class="font-label-sm text-label-sm text-outline">STAT-KVIT-2022-EX-03 • Superseded Code</span>
+</div>
+</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-label-sm font-label-sm bg-surface-container-low text-outline font-medium border border-outline-variant">Examination</span>
+</td>
+<td class="py-2.5 px-3">
+<span class="font-code-inline text-code-inline px-1.5 py-0.5 rounded bg-surface-container-high border border-outline-variant text-outline font-medium">v1.4 (Superseded)</span>
+</td>
+<td class="py-2.5 px-3 font-code-inline text-code-inline text-outline">Aug 2022</td>
+<td class="py-2.5 px-3 text-right font-code-inline text-code-inline tabular-nums">
+<span class="font-normal text-outline">290</span>
+<span class="text-outline text-label-sm"> chunks</span>
+</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-outline-variant text-label-sm font-label-sm font-medium bg-surface-container text-outline">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                    Indexed (Historical Archive)
+                  </span>
+</td>
+<td class="py-2.5 px-4 text-right">
+<div class="inline-flex items-center gap-1">
+<button class="px-2 py-1 text-label-sm font-label-sm rounded bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">Compare Diff</button>
+<button class="p-1 rounded text-outline hover:text-on-surface hover:bg-surface-container">
+<span class="material-symbols-outlined text-base" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 5: Faculty Workload & Research Ethics Guidelines -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group">
+<td class="py-2.5 px-4 font-medium text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-base" data-icon="description">description</span>
+<div>
+<span class="font-medium text-on-surface block leading-tight">Faculty Workload &amp; Research Ethics Guidelines</span>
+<span class="font-label-sm text-label-sm text-outline">STAT-KVIT-2024-AD-07 • Institutional Oversight</span>
+</div>
+</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-label-sm font-label-sm bg-surface-container-low text-on-surface-variant font-medium border border-outline-variant">Administrative</span>
+</td>
+<td class="py-2.5 px-3">
+<span class="font-code-inline text-code-inline px-1.5 py-0.5 rounded bg-surface-container-low border border-outline-variant text-on-surface font-medium">v1.2 (Active)</span>
+</td>
+<td class="py-2.5 px-3 font-code-inline text-code-inline text-on-surface-variant">Jan 2024</td>
+<td class="py-2.5 px-3 text-right font-code-inline text-code-inline tabular-nums">
+<span class="font-medium text-on-surface">196</span>
+<span class="text-outline text-label-sm"> chunks</span>
+</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-secondary text-label-sm font-label-sm font-medium bg-secondary-container/30 text-on-secondary-container">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                    Indexed (100%)
+                  </span>
+</td>
+<td class="py-2.5 px-4 text-right">
+<div class="inline-flex items-center gap-1">
+<button class="px-2 py-1 text-label-sm font-label-sm rounded bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">View Chunks</button>
+<button class="p-1 rounded text-outline hover:text-on-surface hover:bg-surface-container">
+<span class="material-symbols-outlined text-base" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- DOCUMENT DETAILS FLYOUT / BOTTOM INSPECTOR PANEL -->
+<section class="h-64 bg-surface-container-lowest border-t-2 border-primary/20 flex flex-col shrink-0 shadow-lg relative z-10">
+<!-- Inspector Header -->
+<div class="h-10 px-6 bg-surface-container-low flex items-center justify-between border-b border-outline-variant">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-base" data-icon="analytics">analytics</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">Ingestion Inspector: <span class="font-code-inline text-primary">KVIT Academic Regulations v2.4</span></span>
+<span class="px-2 py-0.5 rounded text-label-sm font-label-sm bg-secondary-container/30 text-on-secondary-container border border-secondary">Synapse Pipeline Ready</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-2 py-1 text-label-sm font-label-sm border border-outline-variant rounded bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="refresh">refresh</span>
+<span>Re-chunk Spec</span>
+</button>
+<button class="px-2 py-1 text-label-sm font-label-sm border border-outline-variant rounded bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="open_in_new">open_in_new</span>
+<span>Full Inspector</span>
+</button>
+</div>
+</div>
+<!-- Inspector Content Grid -->
+<div class="flex-1 grid grid-cols-1 md:grid-cols-4 divide-x divide-outline-variant overflow-y-auto px-6 py-3">
+<!-- Panel 1: Document & PDF Verification Metadata -->
+<div class="pr-4 flex flex-col justify-between">
+<div>
+<h4 class="font-label-sm text-label-sm uppercase tracking-wider text-outline mb-2">Ingestion Provenance</h4>
+<div class="space-y-1.5 text-body-sm font-body-sm">
+<div class="flex justify-between items-center">
+<span class="text-outline">Corpus Target:</span>
+<span class="font-code-inline text-code-inline text-on-surface font-semibold">KVIT-AC-REG-2024</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-outline">PDF Pagination:</span>
+<span class="font-code-inline text-code-inline text-on-surface font-semibold">48 pages</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-outline">SHA-256 Digest:</span>
+<span class="font-code-inline text-label-sm text-primary underline truncate max-w-[130px]" title="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855">e3b0c44298fc...</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-outline">OCR Extraction Rate:</span>
+<span class="font-code-inline text-code-inline text-secondary font-bold">99.8% Perfect</span>
+</div>
+</div>
+</div>
+<div class="pt-2 border-t border-outline-variant/60 flex items-center gap-1 text-label-sm font-label-sm text-outline">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="verified">verified</span>
+<span>Signed by Institutional Registrar</span>
+</div>
+</div>
+<!-- Panel 2: Clause Hierarchy -->
+<div class="px-4">
+<h4 class="font-label-sm text-label-sm uppercase tracking-wider text-outline mb-2">Extracted Clause Hierarchy</h4>
+<ul class="space-y-1 text-label-sm font-label-sm">
+<li class="flex items-center gap-1.5 text-on-surface">
+<span class="material-symbols-outlined text-xs text-primary" data-icon="folder_open">folder_open</span>
+<span class="font-semibold">Section 1: General Curricular Norms</span>
+</li>
+<li class="pl-4 flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-xs text-outline" data-icon="subdirectory_arrow_right">subdirectory_arrow_right</span>
+<span>1.1 Minimum Attendance (75%)</span>
+</li>
+<li class="pl-4 flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-xs text-outline" data-icon="subdirectory_arrow_right">subdirectory_arrow_right</span>
+<span>1.2 Credit Transfer Policy (Moocs)</span>
+</li>
+<li class="flex items-center gap-1.5 text-on-surface">
+<span class="material-symbols-outlined text-xs text-primary" data-icon="folder_open">folder_open</span>
+<span class="font-semibold">Section 2: Grading Scale &amp; CGPA</span>
+</li>
+<li class="pl-4 flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-xs text-outline" data-icon="subdirectory_arrow_right">subdirectory_arrow_right</span>
+<span>2.3 Arrear Limits for Honors</span>
+</li>
+</ul>
+</div>
+<!-- Panel 3: Linked Active Queries & Benchmarks -->
+<div class="px-4">
+<h4 class="font-label-sm text-label-sm uppercase tracking-wider text-outline mb-2">Active Linked Inquiries</h4>
+<div class="space-y-1.5">
+<div class="p-1.5 rounded bg-surface-container-low border border-outline-variant">
+<p class="font-body-sm text-body-sm text-on-surface line-clamp-1">"Can a student convert NPTEL course to departmental core credit?"</p>
+<div class="flex items-center justify-between text-label-sm font-label-sm text-outline mt-0.5">
+<span>Target: Clause 1.2.4</span>
+<span class="text-secondary font-semibold">98.4% Match</span>
+</div>
+</div>
+<div class="p-1.5 rounded bg-surface-container-low border border-outline-variant">
+<p class="font-body-sm text-body-sm text-on-surface line-clamp-1">"Minimum SGPA threshold for continuation in Year 3."</p>
+<div class="flex items-center justify-between text-label-sm font-label-sm text-outline mt-0.5">
+<span>Target: Clause 2.1.1</span>
+<span class="text-secondary font-semibold">96.1% Match</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Panel 4: Vector Chunk Density Map -->
+<div class="pl-4 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-center mb-1">
+<h4 class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Chunk Vector Density</h4>
+<span class="font-code-inline text-label-sm text-outline">284 vectors (dim: 384)</span>
+</div>
+<!-- Heatmap Density Simulation Grid -->
+<div class="grid grid-cols-12 gap-1 p-2 bg-surface-container-low rounded border border-outline-variant">
+<div class="h-2.5 rounded-xs bg-secondary" title="Dense cluster: Chunks 1-24"></div>
+<div class="h-2.5 rounded-xs bg-secondary" title="Dense cluster"></div>
+<div class="h-2.5 rounded-xs bg-secondary-container" title="Medium cluster"></div>
+<div class="h-2.5 rounded-xs bg-secondary" title="Dense cluster"></div>
+<div class="h-2.5 rounded-xs bg-secondary" title="Dense cluster"></div>
+<div class="h-2.5 rounded-xs bg-secondary-container" title="Medium cluster"></div>
+<div class="h-2.5 rounded-xs bg-secondary-container" title="Medium cluster"></div>
+<div class="h-2.5 rounded-xs bg-secondary" title="Dense cluster"></div>
+<div class="h-2.5 rounded-xs bg-secondary" title="Dense cluster"></div>
+<div class="h-2.5 rounded-xs bg-surface-variant" title="Sparse cluster"></div>
+<div class="h-2.5 rounded-xs bg-secondary" title="Dense cluster"></div>
+<div class="h-2.5 rounded-xs bg-secondary" title="Dense cluster"></div>
+<div class="h-2.5 rounded-xs bg-secondary-container"></div>
+<div class="h-2.5 rounded-xs bg-secondary"></div>
+<div class="h-2.5 rounded-xs bg-secondary"></div>
+<div class="h-2.5 rounded-xs bg-secondary-container"></div>
+<div class="h-2.5 rounded-xs bg-secondary"></div>
+<div class="h-2.5 rounded-xs bg-secondary"></div>
+<div class="h-2.5 rounded-xs bg-secondary"></div>
+<div class="h-2.5 rounded-xs bg-secondary"></div>
+<div class="h-2.5 rounded-xs bg-secondary-container"></div>
+<div class="h-2.5 rounded-xs bg-secondary"></div>
+<div class="h-2.5 rounded-xs bg-secondary-container"></div>
+<div class="h-2.5 rounded-xs bg-secondary"></div>
+</div>
+<div class="flex items-center justify-between text-label-sm font-label-sm text-outline mt-1 px-1">
+<span>Index: FAISS Inner Product</span>
+<span class="text-on-surface font-semibold">Latency: 4.2ms</span>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 pt-2">
+<button class="px-2.5 py-1 rounded border border-outline-variant bg-surface-container-lowest hover:bg-surface-container text-primary font-label-sm text-label-sm font-semibold transition-colors">
+                  Inspect Chunk Embeddings
+                </button>
+</div>
+</div>
+</div>
+<!-- Prominent Footnote Bar -->
+<footer class="h-7 px-6 bg-surface-container border-t border-outline-variant flex items-center justify-between text-label-sm font-label-sm text-outline">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="info">info</span>
+<span class="font-medium text-on-surface-variant">KVIT demonstration corpus consists of synthetic policy statutes designed for regulatory QA and version-conflict benchmarks.</span>
+</div>
+<div class="flex items-center gap-3 font-code-inline">
+<span>Parser: PDFPlumber v0.10</span>
+<span>•</span>
+<span>Embedder: all-MiniLM-L6-v2</span>
+<span>•</span>
+<span class="text-secondary font-semibold">Sync Status: OK</span>
+</div>
+</footer>
+</section>
+</div>
+</main>
+</div>
+</body></html>

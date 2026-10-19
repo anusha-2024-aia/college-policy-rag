@@ -1,0 +1,35 @@
+# Git and IDE
+.git
+.gitignore
+.gemini/
+.idea/
+.vscode/
+
+# Environment and Secrets (CRITICAL: never bake .env into image)
+.env
+.env.*
+!.env.example
+
+# Python virtual environment and bytecode
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Testing, coverage and benchmark results
+.pytest_cache/
+.coverage
+htmlcov/
+eval/results/
+
+# Local data and scratch directories
+data/raw_pdfs/
+data/processed/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+desktop.ini

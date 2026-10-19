@@ -104,7 +104,7 @@ class EvaluationRunner:
                     answer_text = self.qa_service.ABSTENTION_SENTENCE
                 else:
                     answer_text = raw_ans
-                    valid_cites, _ = self.qa_service.validate_citations(answer_text, passages)
+                    valid_cites, *_ = self.qa_service.validate_citations(answer_text, passages)
                     citations = [
                         CitationItem(index=c.index, file_name=c.file_name, page_number=c.page_number, snippet=c.snippet)
                         for c in valid_cites
@@ -140,7 +140,7 @@ class EvaluationRunner:
                     answer_text = self.qa_service.ABSTENTION_SENTENCE
                 else:
                     answer_text = raw_ans
-                    valid_cites, _ = self.qa_service.validate_citations(answer_text, passages)
+                    valid_cites, *_ = self.qa_service.validate_citations(answer_text, passages)
                     citations = [
                         CitationItem(index=c.index, file_name=c.file_name, page_number=c.page_number, snippet=c.snippet)
                         for c in valid_cites
@@ -180,7 +180,7 @@ class EvaluationRunner:
                     answer_text = self.qa_service.ABSTENTION_SENTENCE
                 else:
                     answer_text = raw_ans
-                    valid_cites, _ = self.qa_service.validate_citations(answer_text, passages)
+                    valid_cites, *_ = self.qa_service.validate_citations(answer_text, passages)
                     citations = [
                         CitationItem(index=c.index, file_name=c.file_name, page_number=c.page_number, snippet=c.snippet)
                         for c in valid_cites

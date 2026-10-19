@@ -1,6 +1,7 @@
 """Application settings configuration using Pydantic Settings."""
 
 from typing import Optional
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,13 +14,24 @@ class Settings(BaseSettings):
     HOST: str = "127.0.0.1"
     PORT: int = 8000
     DEBUG: bool = True
+    CORS_ORIGINS: str = ""
+
+    @field_validator("DEBUG", mode="before")
+    @classmethod
+    def parse_debug(cls, v):
+        if isinstance(v, str):
+            if v.lower() in ("true", "1", "yes", "on", "t", "dev", "development"):
+                return True
+            if v.lower() in ("false", "0", "no", "off", "f", "release", "production", "prod"):
+                return False
+        return bool(v)
 
     # Database Configuration (PostgreSQL + pgvector)
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/document_rag"
 
     # LLM Settings
     LLM_PROVIDER: str = "gemini"
-    LLM_MODEL: str = "gemini-2.5-flash"
+    LLM_MODEL: str = "gemini-3.5-flash"
     LLM_API_KEY: Optional[str] = None
     GEMINI_API_KEY: Optional[str] = None
 
@@ -44,6 +56,7 @@ class Settings(BaseSettings):
     RRF_K: int = 60
     RETRIEVAL_K: int = 20
     RERANKER_TOP_N: int = 5
+    SEMANTIC_RETRIEVAL_ENABLED: bool = False
 
     # Version-Aware Policy Settings
     VERSION_AWARE_ENABLED: bool = True
@@ -56,6 +69,8 @@ class Settings(BaseSettings):
             return url.replace("postgresql+asyncpg://", "postgresql+psycopg2://", 1)
         if url.startswith("postgresql://"):
             return url.replace("postgresql://", "postgresql+psycopg2://", 1)
+        if url.startswith("postgres://"):
+            return url.replace("postgres://", "postgresql+psycopg2://", 1)
         return url
 
     model_config = SettingsConfigDict(

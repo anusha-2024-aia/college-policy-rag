@@ -43,6 +43,7 @@ class QAService:
     """Orchestrates hybrid retrieval, evidence formatting, version awareness, LLM generation, and citation validation."""
 
     ABSTENTION_SENTENCE = "I do not have sufficient information in the provided documents to answer this question."
+    RELEVANCE_SCORE_FLOOR: float = 0.10
 
     def __init__(
         self,
@@ -93,47 +94,104 @@ class QAService:
         user_prompt = f"Context Evidence:\n{evidence_text}\n\nUser Question: {question.strip()}"
         return SYSTEM_PROMPT, user_prompt
 
+    @staticmethod
+    def _best_sentence(passage_text: str, answer_context: str, max_chars: int = 200) -> str:
+        """Return the sentence from passage_text most relevant to the answer context.
+
+        Uses word-intersection scoring (bag-of-words overlap) with the surrounding
+        answer text. Falls back to the first non-trivially-short sentence.
+        No external dependencies required.
+        """
+        # Tokenise answer context into a lowercase word set
+        ctx_words: set[str] = set(
+            re.findall(r"[a-z]{3,}", answer_context.lower())
+        )
+        # Split passage into sentences on period / exclamation / question mark
+        raw_sentences = re.split(r"(?<=[.!?])\s+", passage_text.strip())
+        sentences = [s.strip() for s in raw_sentences if len(s.strip()) >= 20]
+        if not sentences:
+            # No proper sentences — return first max_chars chars
+            return passage_text[:max_chars].strip() + ("..." if len(passage_text) > max_chars else "")
+
+        def overlap(sentence: str) -> int:
+            words = set(re.findall(r"[a-z]{3,}", sentence.lower()))
+            return len(words & ctx_words)
+
+        best = max(sentences, key=overlap)
+        if len(best) > max_chars:
+            best = best[:max_chars].rstrip() + "..."
+        return best
+
     def validate_citations(
         self,
         answer_text: str,
         passages: list[PassageEvidence],
-    ) -> tuple[list[Citation], list[int]]:
-        """Extract and validate all citation references [N] from answer text.
+    ) -> tuple[list[Citation], list[int], str]:
+        """Extract and validate citation references [N] from answer text.
 
-        Ensures every citation strictly points to an actual retrieved passage.
-        Hallucinated indices (e.g., [99]) are flagged and omitted from the valid citation list.
+        - Only references that correspond to a real retrieved passage survive.
+        - Hallucinated indices are discarded.
+        - Surviving citations are renumbered sequentially (1, 2, 3…) and the
+          answer text is rewritten so [old_N] → [new_N] throughout.
+        - Snippet is the best-matching sentence from the passage (word-overlap
+          with surrounding answer text), not just the first 120 characters.
+
+        Returns:
+            (valid_citations, invalid_indices, rewritten_answer_text)
         """
         passages_by_idx = {p.index: p for p in passages}
         raw_matches = re.findall(r"\[(\d+)\]", answer_text)
 
-        valid_citations: list[Citation] = []
+        # Preserve first-occurrence order while deduplicating
+        seen: set[int] = set()
+        ordered_orig_indices: list[int] = []
         invalid_indices: list[int] = []
-        seen_indices: set[int] = set()
 
         for match_str in raw_matches:
             cited_idx = int(match_str)
             if cited_idx in passages_by_idx:
-                if cited_idx not in seen_indices:
-                    seen_indices.add(cited_idx)
-                    passage = passages_by_idx[cited_idx]
-                    valid_citations.append(
-                        Citation(
-                            index=cited_idx,
-                            file_name=passage.file_name,
-                            page_number=passage.page_number,
-                            snippet=passage.text[:120].strip() + ("..." if len(passage.text) > 120 else ""),
-                        )
-                    )
+                if cited_idx not in seen:
+                    seen.add(cited_idx)
+                    ordered_orig_indices.append(cited_idx)
             else:
-                invalid_indices.append(cited_idx)
+                if cited_idx not in invalid_indices:
+                    invalid_indices.append(cited_idx)
                 logger.warning(
                     "Model hallucinated citation [%d]; valid passage indices are %s",
                     cited_idx,
                     list(passages_by_idx.keys()),
                 )
 
+        # Build sequential renumber map: original index → new sequential index
+        renumber: dict[int, int] = {
+            orig: new for new, orig in enumerate(ordered_orig_indices, start=1)
+        }
+
+        # Rewrite answer text: replace every [N] with the new sequential number
+        def _replace_citation(m: re.Match) -> str:
+            n = int(m.group(1))
+            if n in renumber:
+                return f"[{renumber[n]}]"
+            return m.group(0)
+
+        rewritten_answer = re.sub(r"\[(\d+)\]", _replace_citation, answer_text)
+
+        # Build Citation objects using the new sequential indices
+        valid_citations: list[Citation] = []
+        for orig_idx, new_idx in renumber.items():
+            passage = passages_by_idx[orig_idx]
+            snippet = self._best_sentence(passage.text, answer_text)
+            valid_citations.append(
+                Citation(
+                    index=new_idx,
+                    file_name=passage.file_name,
+                    page_number=passage.page_number,
+                    snippet=snippet,
+                )
+            )
+
         valid_citations.sort(key=lambda c: c.index)
-        return valid_citations, invalid_indices
+        return valid_citations, invalid_indices, rewritten_answer
 
     def should_abstain(
         self,
@@ -178,6 +236,7 @@ class QAService:
             top_k=request.top_k,
             top_n=request.top_n,
             role=clean_role,
+            use_semantic=request.semantic_retrieval,
         )
 
         raw_candidates = retrieval_res.reranked_results
@@ -216,6 +275,70 @@ class QAService:
                     )
                 )
 
+            # Version-aware amendment enrichment:
+            # If an evidence passage is partially amended and touches an amendment clause,
+            # ensure the corresponding active amendment document chunk is present in evidence.
+            present_files = {p.file_name for p in passages}
+            for p in list(passages):
+                v_stat = status_by_file.get(p.file_name)
+                if v_stat and v_stat.is_partially_amended and v_stat.amended_by_file:
+                    amen_file = v_stat.amended_by_file
+                    if amen_file not in present_files and amen_file in status_by_file:
+                        scope_text = v_stat.amendment_scope or ""
+                        clause_ids = re.findall(r"\b\d+\.\d+\b", scope_text)
+                        touches = (
+                            any(
+                                re.search(
+                                    r"\b(?:clause|section|sec\.|cl\.)?\s*[-:]?\s*" + re.escape(c) + r"\b",
+                                    p.text,
+                                    re.IGNORECASE,
+                                )
+                                for c in clause_ids
+                            )
+                            if clause_ids
+                            else True
+                        )
+                        if touches:
+                            amen_chunk = next(
+                                (fc for fc in retrieval_res.fused_results if fc.file_name == amen_file),
+                                None,
+                            )
+                            if not amen_chunk:
+                                from app.models.chunk import Chunk
+                                amen_doc = (
+                                    self.retrieval_service.db.query(Document)
+                                    .filter(Document.file_name == amen_file, role_filter)
+                                    .first()
+                                )
+                                if amen_doc:
+                                    db_c = (
+                                        self.retrieval_service.db.query(Chunk)
+                                        .filter(Chunk.document_id == amen_doc.id)
+                                        .order_by(Chunk.page_number)
+                                        .first()
+                                    )
+                                    if db_c:
+                                        amen_chunk = db_c
+
+                            if amen_chunk:
+                                amen_stat = status_by_file.get(amen_file)
+                                passages.append(
+                                    PassageEvidence(
+                                        index=0,
+                                        chunk_id=amen_chunk.chunk_id if hasattr(amen_chunk, "chunk_id") else str(amen_chunk.id),
+                                        file_name=amen_file,
+                                        page_number=amen_chunk.page_number,
+                                        text=amen_chunk.text,
+                                        score=p.score,
+                                        document_title=amen_stat.title if amen_stat else getattr(amen_chunk, "title", amen_file),
+                                        effective_date=amen_stat.effective_date if amen_stat else None,
+                                        is_superseded=False,
+                                        is_partially_amended=False,
+                                        amendment_scope=None,
+                                    )
+                                )
+                                present_files.add(amen_file)
+
             # Group passages by lineage
             passages_by_lineage: dict[str, list[PassageEvidence]] = {}
             for p in passages:
@@ -223,9 +346,14 @@ class QAService:
                 lineage_id = v_stat.lineage_root_id if v_stat else p.file_name
                 passages_by_lineage.setdefault(lineage_id, []).append(p)
 
-            # Sort each lineage: active/current passages come first, then superseded
+            # Sort each lineage: active amendment circulars come first (0), then partially amended base clauses (0.5), then superseded (1)
             for l_passages in passages_by_lineage.values():
-                l_passages.sort(key=lambda p: (1 if p.is_superseded else 0, -p.score))
+                l_passages.sort(
+                    key=lambda p: (
+                        1 if p.is_superseded else (0.5 if getattr(p, "is_partially_amended", False) else 0),
+                        -p.score,
+                    )
+                )
 
             # Order lineages by their highest-scoring passage descending
             sorted_lineages = sorted(
@@ -270,14 +398,25 @@ class QAService:
 
         passages, has_conflict, conflicts, diagnostics = self._prepare_passages_and_conflicts(request)
 
-        # Early abstention if no passages retrieved or below threshold
+        # Determine effective score floor for evidence relevance
+        # FlashRank cross-encoder reranker scores for irrelevant documents are < 0.08,
+        # while relevant documents score >= 0.30. A calibrated floor of 0.10 guarantees
+        # that irrelevant or unauthorized chunks do not justify unsupported answers.
+        relevance_floor = getattr(self, "RELEVANCE_SCORE_FLOOR", 0.10)
+        effective_threshold = (
+            request.abstention_threshold
+            if request.abstention_threshold > 0.00005
+            else relevance_floor
+        )
+
+        # Early abstention if no passages retrieved or top score below relevance floor
         top_score = max((p.score for p in passages), default=0.0)
-        if not passages or top_score < request.abstention_threshold:
+        if not passages or top_score < effective_threshold:
             return AskResponse(
                 question=request.question,
                 answer=self.ABSTENTION_SENTENCE,
                 citations=[],
-                passages=passages,
+                passages=[],
                 abstained=True,
                 has_policy_conflict=False,
                 conflict_details=None,
@@ -293,24 +432,24 @@ class QAService:
         raw_answer = self.llm_service.generate(prompt=user_prompt, system_prompt=system_prompt)
 
         # Evaluate abstention on generated output
-        if self.should_abstain(raw_answer, passages, request.abstention_threshold):
+        if self.should_abstain(raw_answer, passages, effective_threshold):
             return AskResponse(
                 question=request.question,
                 answer=self.ABSTENTION_SENTENCE,
                 citations=[],
-                passages=passages,
+                passages=[],
                 abstained=True,
                 has_policy_conflict=False,
                 conflict_details=None,
                 diagnostics=diagnostics if request.include_diagnostics else None,
             )
 
-        # Validate and extract citations
-        valid_citations, invalid_indices = self.validate_citations(raw_answer, passages)
+        # Validate and extract citations with sequential renumbering and best-sentence snippets
+        valid_citations, invalid_indices, rewritten_answer = self.validate_citations(raw_answer, passages)
 
         return AskResponse(
             question=request.question,
-            answer=raw_answer.strip(),
+            answer=rewritten_answer.strip(),
             citations=valid_citations,
             passages=passages,
             abstained=False,
@@ -329,7 +468,30 @@ class QAService:
 
         passages, has_conflict, conflicts, diagnostics = self._prepare_passages_and_conflicts(request)
 
-        # Send passages metadata event
+        # Determine effective score floor for evidence relevance
+        relevance_floor = getattr(self, "RELEVANCE_SCORE_FLOOR", 0.10)
+        effective_threshold = (
+            request.abstention_threshold
+            if request.abstention_threshold > 0.00005
+            else relevance_floor
+        )
+
+        # Check early abstention
+        top_score = max((p.score for p in passages), default=0.0)
+        if not passages or top_score < effective_threshold:
+            metadata_payload = {
+                "passages": [],
+                "has_policy_conflict": False,
+                "conflict_details": None,
+                "diagnostics": diagnostics.model_dump() if (diagnostics and request.include_diagnostics) else None,
+            }
+            yield f"event: metadata\ndata: {json.dumps(metadata_payload)}\n\n"
+            yield f'event: token\ndata: {json.dumps({"token": self.ABSTENTION_SENTENCE})}\n\n'
+            yield f'event: citations\ndata: {json.dumps({"citations": [], "abstained": True, "has_policy_conflict": False})}\n\n'
+            yield 'event: done\ndata: {}\n\n'
+            return
+
+        # Send passages metadata event for legitimate relevant evidence
         metadata_payload = {
             "passages": [p.model_dump() for p in passages],
             "has_policy_conflict": has_conflict,
@@ -337,14 +499,6 @@ class QAService:
             "diagnostics": diagnostics.model_dump() if (diagnostics and request.include_diagnostics) else None,
         }
         yield f"event: metadata\ndata: {json.dumps(metadata_payload)}\n\n"
-
-        # Check early abstention
-        top_score = max((p.score for p in passages), default=0.0)
-        if not passages or top_score < request.abstention_threshold:
-            yield f'event: token\ndata: {json.dumps({"token": self.ABSTENTION_SENTENCE})}\n\n'
-            yield f'event: citations\ndata: {json.dumps({"citations": [], "abstained": True, "has_policy_conflict": False})}\n\n'
-            yield 'event: done\ndata: {}\n\n'
-            return
 
         system_prompt, user_prompt = self.build_full_prompt(
             request.question, passages, version_aware=is_version_aware
@@ -356,8 +510,10 @@ class QAService:
             yield f'event: token\ndata: {json.dumps({"token": token})}\n\n'
 
         complete_text = "".join(full_tokens)
-        abstained = self.should_abstain(complete_text, passages, request.abstention_threshold)
-        citations, _ = self.validate_citations(complete_text, passages) if not abstained else ([], [])
+        abstained = self.should_abstain(complete_text, passages, effective_threshold)
+        citations = []
+        if not abstained:
+            citations, _, _ = self.validate_citations(complete_text, passages)
 
         citations_payload = {
             "citations": [c.model_dump() for c in citations],

@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-background text-on-surface" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>System Architecture &amp; Technical Overview - LexisPolicy AI</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Theme Configuration Verbatim -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary-container": "#a65900",
+            "primary-container": "#2563eb",
+            "on-surface-variant": "#434655",
+            "surface-variant": "#dae2fd",
+            "on-surface": "#131b2e",
+            "on-secondary-container": "#006f66",
+            "on-error": "#ffffff",
+            "surface-dim": "#d2d9f4",
+            "on-tertiary": "#ffffff",
+            "surface-container": "#eaedff",
+            "surface-container-highest": "#dae2fd",
+            "on-primary-container": "#eeefff",
+            "inverse-surface": "#283044",
+            "on-tertiary-container": "#ffede1",
+            "background": "#faf8ff",
+            "surface-container-high": "#e2e7ff",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed-variant": "#6e3900",
+            "outline": "#737686",
+            "on-secondary-fixed": "#00201d",
+            "tertiary-fixed": "#ffdcc3",
+            "surface-container-lowest": "#ffffff",
+            "secondary": "#006a61",
+            "inverse-primary": "#b4c5ff",
+            "inverse-on-surface": "#eef0ff",
+            "secondary-fixed-dim": "#6bd8cb",
+            "on-tertiary-fixed": "#2f1500",
+            "error": "#ba1a1a",
+            "on-secondary-fixed-variant": "#005049",
+            "on-primary-fixed": "#00174b",
+            "tertiary": "#824500",
+            "secondary-fixed": "#89f5e7",
+            "tertiary-fixed-dim": "#ffb77d",
+            "on-primary-fixed-variant": "#003ea8",
+            "outline-variant": "#c3c6d7",
+            "surface-container-low": "#f2f3ff",
+            "primary": "#004ac6",
+            "primary-fixed-dim": "#b4c5ff",
+            "secondary-container": "#86f2e4",
+            "primary-fixed": "#dbe1ff",
+            "error-container": "#ffdad6",
+            "on-background": "#131b2e",
+            "on-secondary": "#ffffff",
+            "surface-tint": "#0053db",
+            "surface": "#faf8ff",
+            "on-primary": "#ffffff",
+            "surface-bright": "#faf8ff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "margin": "1rem",
+            "gutter-desktop": "1.5rem",
+            "space-xl": "1.5rem",
+            "space-sm": "0.5rem",
+            "space-md": "0.75rem",
+            "space-2xl": "2rem",
+            "margin-desktop": "2rem",
+            "space-lg": "1rem",
+            "space-xs": "0.25rem",
+            "space-3xl": "3rem"
+          },
+          "fontFamily": {
+            "code-inline": ["JetBrains Mono"],
+            "headline-lg": ["Geist"],
+            "body-sm": ["Geist"],
+            "label-sm": ["JetBrains Mono"],
+            "label-md": ["JetBrains Mono"],
+            "body-lg": ["Geist"],
+            "headline-sm": ["Geist"],
+            "headline-md": ["Geist"],
+            "label-lg": ["JetBrains Mono"],
+            "body-md": ["Geist"],
+            "display-lg": ["Geist"],
+            "display-lg-mobile": ["Geist"]
+          },
+          "fontSize": {
+            "code-inline": ["12px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "body-lg": ["15px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "label-lg": ["13px", { "lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "body-md": ["14px", { "lineHeight": "22px", "letterSpacing": "-0.003em", "fontWeight": "400" }],
+            "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+            "display-lg-mobile": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      font-size: 18px;
+      line-height: 1;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f2f3ff;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #c3c6d7;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="h-full overflow-hidden flex bg-background text-on-surface antialiased font-body-md text-body-md">
+<!-- ========================================== -->
+<!-- SIDE NAVIGATION (From Shared Components JSON) -->
+<!-- ========================================== -->
+<aside class="fixed top-0 left-0 h-screen w-64 flex flex-col justify-between bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant dark:border-outline z-30">
+<!-- Header Brand Area -->
+<div class="p-4 border-b border-outline-variant/60">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-on-primary font-bold shadow-sm">
+<span class="material-symbols-outlined" style="font-size: 20px;">account_balance</span>
+</div>
+<div>
+<div class="text-headline-sm font-headline-sm font-bold tracking-tight text-on-surface dark:text-inverse-on-surface">LexisPolicy AI</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+            Enterprise Intelligence v4.2
+          </div>
+</div>
+</div>
+<!-- CTA Button from JSON -->
+<button class="w-full mt-3 py-1.5 px-3 rounded-lg bg-surface-container-low hover:bg-surface-container text-primary font-label-md text-label-md border border-outline-variant/50 transition-colors duration-150 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">difference</span>
+<span>Audit Policy Diff</span>
+</button>
+</div>
+<!-- Navigation Items List (Tab 7: About & Architecture active) -->
+<div class="flex-1 overflow-y-auto px-3 py-3 space-y-1 custom-scrollbar">
+<!-- 1. Dashboard -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150" href="index.html#dashboard">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<!-- 2. Ask Policy -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150" href="index.html#ask-policy">
+<span class="material-symbols-outlined">chat</span>
+<span class="font-body-md text-body-md">Ask Policy</span>
+</a>
+<!-- 3. Policy Change Intelligence -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150" href="index.html#policy-change">
+<span class="material-symbols-outlined">published_with_changes</span>
+<span class="font-body-md text-body-md">Policy Change Intelligence</span>
+</a>
+<!-- 4. Document Library -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150" href="index.html#document-library">
+<span class="material-symbols-outlined">folder</span>
+<span class="font-body-md text-body-md">Document Library</span>
+</a>
+<!-- 5. Evaluations & Benchmarks -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150" href="index.html#evaluations">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-body-md text-body-md">Evaluations &amp; Benchmarks</span>
+</a>
+<!-- 6. System Health -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150" href="index.html#system-health">
+<span class="material-symbols-outlined">monitor_heart</span>
+<span class="font-body-md text-body-md">System Health</span>
+</a>
+<!-- 7. About & Architecture (ACTIVE STATE PER RULES) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-surface-container dark:bg-surface-container-high text-primary dark:text-inverse-primary font-semibold border-l-2 border-primary dark:border-inverse-primary transition-colors duration-150" href="index.html#about-architecture">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">info</span>
+<span class="font-body-md text-body-md">About &amp; Architecture</span>
+</a>
+</div>
+<!-- Footer Area (From JSON) -->
+<div class="p-3 border-t border-outline-variant/60 space-y-1">
+<a class="flex items-center gap-3 px-3 py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-sm text-body-sm">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-body-sm text-body-sm">Documentation</span>
+</a>
+<div class="pt-2 mt-2 border-t border-outline-variant/40 flex items-center justify-between px-1">
+<span class="font-label-sm text-label-sm text-outline">Cluster US-EAST-1</span>
+<span class="px-1.5 py-0.5 rounded bg-secondary/10 text-secondary font-label-sm text-label-sm border border-secondary/20">Operational</span>
+</div>
+</div>
+</aside>
+<!-- ========================================== -->
+<!-- MAIN WORKBENCH CANVAS (Offset by 64 / 256px)-->
+<!-- ========================================== -->
+<div class="flex-1 ml-64 flex flex-col h-screen overflow-hidden">
+<!-- TopNavBar (Extended Component from JSON) -->
+<header class="docked full-width top-0 h-14 bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-outline flex justify-between items-center w-full px-6 shrink-0 z-20">
+<!-- Breadcrumb & Search -->
+<div class="flex items-center gap-4">
+<!-- Breadcrumb specified in prompt -->
+<nav class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant">
+<span class="hover:text-primary cursor-pointer transition-colors">Policy Intelligence</span>
+<span class="text-outline">/</span>
+<span class="font-semibold text-primary">Architecture Overview</span>
+</nav>
+<div class="h-4 w-px bg-outline-variant"></div>
+<!-- Left Search Combobox -->
+<div class="relative w-72">
+<span class="material-symbols-outlined absolute left-2.5 top-2 text-outline" style="font-size: 16px;">search</span>
+<input class="w-full h-8 pl-8 pr-12 rounded border border-outline-variant/80 bg-surface-container-low/50 text-body-sm font-body-sm placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Search architectural specs, vectors, schemas..." type="text"/>
+<kbd class="absolute right-2 top-2 font-label-sm text-[10px] bg-surface-container-lowest border border-outline-variant rounded px-1 text-outline">⌘K</kbd>
+</div>
+</div>
+<!-- Navigation Links from JSON -->
+<div class="hidden lg:flex items-center gap-6">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Statutes</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Federal Register</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Institutional Code</a>
+</div>
+<!-- Trailing Primary/Secondary Actions & User Cluster -->
+<div class="flex items-center gap-3">
+<!-- Secondary Trailing Action from JSON -->
+<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-secondary/10 text-secondary font-label-sm text-label-sm border border-secondary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+          Connected: Live API
+        </span>
+<!-- Primary Trailing Action from JSON -->
+<span class="inline-flex items-center px-2.5 py-1 rounded bg-surface-container-high text-on-surface font-label-sm text-label-sm border border-outline-variant">
+          Role: Admin
+        </span>
+<!-- Trailing Icons from JSON: notifications, help, tune -->
+<div class="flex items-center border-l border-outline-variant pl-3 ml-1 space-x-1">
+<button class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" title="Notifications">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" title="Help">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" title="Tune Settings">
+<span class="material-symbols-outlined">tune</span>
+</button>
+</div>
+<!-- Profile Avatar from JSON -->
+<div class="w-7 h-7 rounded-full bg-primary-container text-on-primary-container font-label-md flex items-center justify-center font-bold text-xs ring-1 ring-outline-variant/60 cursor-pointer">
+          PA
+        </div>
+</div>
+</header>
+<!-- Scrollable Content Canvas -->
+<main class="flex-1 overflow-y-auto px-8 py-6 custom-scrollbar space-y-8 bg-background">
+<!-- ========================================== -->
+<!-- SECTION 1: HEADER & HIGH-LEVEL STATS -->
+<!-- ========================================== -->
+<section class="border-b border-outline-variant/60 pb-6">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div class="max-w-3xl">
+<div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-surface-container border border-outline-variant/70 text-primary font-label-sm text-label-sm mb-2.5">
+<span class="material-symbols-outlined" style="font-size: 14px;">terminal</span>
+              Architectural Blueprint &amp; Spec Document v4.2.0-prod
+            </div>
+<h1 class="text-headline-lg font-headline-lg text-on-surface tracking-tight">System Architecture &amp; Technical Overview</h1>
+<p class="mt-1 text-body-lg font-body-lg text-on-surface-variant">
+              End-to-end design of the Policy Intelligence Assistant: hybrid retrieval, version intelligence, and grounded citation verification.
+            </p>
+</div>
+<!-- Quick Engine Status Badges -->
+<div class="flex items-center gap-2">
+<div class="px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-right shadow-sm">
+<div class="font-label-sm text-label-sm text-outline">Pipeline Latency</div>
+<div class="font-label-lg text-label-lg font-semibold text-secondary">312ms avg</div>
+</div>
+<div class="px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-right shadow-sm">
+<div class="font-label-sm text-label-sm text-outline">Refusal Precision</div>
+<div class="font-label-lg text-label-lg font-semibold text-primary">99.8% Grounded</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================== -->
+<!-- SECTION 2: INTERACTIVE PIPELINE FLOWCHART -->
+<!-- ========================================== -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<div>
+<h2 class="text-headline-sm font-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">account_tree</span>
+              Retrieval-to-Verification Architecture Pipeline
+            </h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Deterministic routing topology enforcing verifiable evidence extraction and version parity.</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-surface-container font-label-sm text-label-sm text-on-surface-variant border border-outline-variant">
+<span class="w-2 h-2 rounded-full bg-secondary"></span> 8 Pipeline Stages
+            </span>
+<span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-surface-container-lowest font-label-sm text-label-sm text-on-surface-variant border border-outline-variant">
+              Strict Non-Hallucination Barrier
+            </span>
+</div>
+</div>
+<!-- Pipeline Diagram Container (Card-based Flowchart) -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
+<!-- STAGE 1: UI Client -->
+<div class="border border-outline-variant rounded-lg p-4 bg-surface-bright hover:border-primary transition-colors flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-sm text-label-sm text-primary font-semibold">STAGE 01</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container font-label-sm text-[10px] text-outline">CLIENT</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">1. User Interface</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">React / Streamlit Client with multi-role state simulation.</p>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/40 flex items-center justify-between text-outline font-label-sm text-label-sm">
+<span>REST / WebSockets</span>
+<span class="material-symbols-outlined text-primary">arrow_forward</span>
+</div>
+</div>
+<!-- STAGE 2: FastAPI Gateway -->
+<div class="border border-outline-variant rounded-lg p-4 bg-surface-bright hover:border-primary transition-colors flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-sm text-label-sm text-primary font-semibold">STAGE 02</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container font-label-sm text-[10px] text-outline">GATEWAY</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">2. FastAPI Gateway</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">JWT Session validation, Query Normalization &amp; Intent Routing engine.</p>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/40 flex items-center justify-between text-outline font-label-sm text-label-sm">
+<span>Pydantic v2 Schema</span>
+<span class="material-symbols-outlined text-primary">arrow_forward</span>
+</div>
+</div>
+<!-- STAGE 3: Hybrid Retrieval Engine (Spans 2 cols visually or highlights dual branch) -->
+<div class="md:col-span-2 border-2 border-primary/30 rounded-lg p-4 bg-surface-container-low/40 relative">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-sm text-label-sm text-primary font-semibold">STAGE 03</span>
+<span class="px-2 py-0.5 rounded bg-primary/10 text-primary font-label-sm text-label-sm font-medium">Bimodal Retrieval</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">3. Hybrid Retrieval Engine</h3>
+<!-- Dual Branch Split -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+<!-- Branch A -->
+<div class="bg-surface-container-lowest p-3 rounded border border-outline-variant">
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm text-primary mb-1">
+<span class="material-symbols-outlined text-sm">segment</span> Branch A: Lexical
+                  </div>
+<div class="font-body-sm text-body-sm font-medium text-on-surface">PostgreSQL Full Text Search</div>
+<div class="font-label-sm text-[11px] text-outline mt-1">BM25-equivalent TSVector indexing on unaccented corpora</div>
+</div>
+<!-- Branch B -->
+<div class="bg-surface-container-lowest p-3 rounded border border-outline-variant">
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm text-secondary mb-1">
+<span class="material-symbols-outlined text-sm">hub</span> Branch B: Dense Vector
+                  </div>
+<div class="font-body-sm text-body-sm font-medium text-on-surface">MiniLM-L6-v2 ONNX</div>
+<div class="font-label-sm text-[11px] text-outline mt-1">384-d dense embeddings mapped via pgvector HNSW</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Mid Flow Connection Bar -->
+<div class="py-3 flex items-center justify-center gap-2 text-outline font-label-sm text-label-sm">
+<div class="h-px bg-outline-variant flex-1"></div>
+<div class="flex items-center gap-2 px-3 py-1 bg-surface-container rounded-full border border-outline-variant text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-sm">alt_route</span>
+<span>Merging Dense &amp; Sparse Scoring Distributions</span>
+</div>
+<div class="h-px bg-outline-variant flex-1"></div>
+</div>
+<!-- Bottom Half of Pipeline (Stages 4 to 8) -->
+<div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+<!-- STAGE 4: RRF -->
+<div class="border border-outline-variant rounded-lg p-3 bg-surface-bright flex flex-col justify-between">
+<div>
+<div class="font-label-sm text-label-sm text-primary font-semibold mb-1">STAGE 04</div>
+<h4 class="font-body-md text-body-md font-semibold text-on-surface">4. Reciprocal Rank Fusion (RRF)</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Constant k=60 candidate balancing to nullify scale biases.</p>
+</div>
+<div class="mt-3 pt-2 border-t border-outline-variant/30 text-outline font-label-sm text-[11px]">
+                Candidates: k=60
+              </div>
+</div>
+<!-- STAGE 5: FlashRank -->
+<div class="border border-outline-variant rounded-lg p-3 bg-surface-bright flex flex-col justify-between">
+<div>
+<div class="font-label-sm text-label-sm text-primary font-semibold mb-1">STAGE 05</div>
+<h4 class="font-body-md text-body-md font-semibold text-on-surface">5. FlashRank Reranker</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Lightweight cross-encoder prune selecting top 5 passages.</p>
+</div>
+<div class="mt-3 pt-2 border-t border-outline-variant/30 text-secondary font-label-sm text-[11px]">
+                Top 5 High Precision
+              </div>
+</div>
+<!-- STAGE 6: Verification & Version Engine -->
+<div class="border-2 border-tertiary-container/40 rounded-lg p-3 bg-surface-container-lowest flex flex-col justify-between">
+<div>
+<div class="font-label-sm text-label-sm text-tertiary font-semibold mb-1">STAGE 06</div>
+<h4 class="font-body-md text-body-md font-semibold text-on-surface">6. Verification Engine</h4>
+<div class="mt-1 space-y-1 text-[11px] font-body-sm text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span class="w-1 h-1 rounded-full bg-tertiary"></span> Version Registry (Active vs Superseded)
+                  </div>
+<div class="flex items-center gap-1">
+<span class="w-1 h-1 rounded-full bg-error"></span> Abstention Gate (&lt; 0.65 threshold)
+                  </div>
+</div>
+</div>
+<div class="mt-3 pt-2 border-t border-outline-variant/30 text-tertiary font-label-sm text-[11px]">
+                Refusal Trigger Gate
+              </div>
+</div>
+<!-- STAGE 7: Grounded LLM -->
+<div class="border border-outline-variant rounded-lg p-3 bg-surface-bright flex flex-col justify-between">
+<div>
+<div class="font-label-sm text-label-sm text-primary font-semibold mb-1">STAGE 07</div>
+<h4 class="font-body-md text-body-md font-semibold text-on-surface">7. Grounded LLM Generation</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Google Gemini API strictly bounded by retrieved JSON context.</p>
+</div>
+<div class="mt-3 pt-2 border-t border-outline-variant/30 text-outline font-label-sm text-[11px]">
+                Zero-Shot Grounded
+              </div>
+</div>
+<!-- STAGE 8: Traceable Payload -->
+<div class="border-2 border-secondary/50 rounded-lg p-3 bg-secondary/5 flex flex-col justify-between">
+<div>
+<div class="font-label-sm text-label-sm text-secondary font-semibold mb-1">STAGE 08</div>
+<h4 class="font-body-md text-body-md font-semibold text-on-surface">8. Traceable Citation Payload</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Verifiable response schema with page-locked PDF spans.</p>
+</div>
+<div class="mt-3 pt-2 border-t border-secondary/30 text-secondary font-label-sm text-[11px] font-semibold flex items-center justify-between">
+<span>Audit Verified</span>
+<span class="material-symbols-outlined text-sm">verified</span>
+</div>
+</div>
+</div>
+<!-- Mathematical Formula / Inset Code Explainer -->
+<div class="mt-5 p-3 rounded-lg bg-surface-container-low border border-outline-variant flex flex-col md:flex-row md:items-center justify-between gap-3">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">functions</span>
+<div>
+<span class="font-label-md text-label-md font-semibold text-on-surface">RRF Formula Formulation:</span>
+<span class="font-code-inline text-code-inline text-on-surface-variant ml-2">Score(d) = Σ [ 1 / (60 + r_dense(d)) ] + Σ [ 1 / (60 + r_bm25(d)) ]</span>
+</div>
+</div>
+<div class="font-label-sm text-label-sm text-outline flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Zero Division Hazard Immune
+            </div>
+</div>
+</div>
+</section>
+<!-- ========================================== -->
+<!-- SECTION 3: TECHNOLOGY STACK GRID -->
+<!-- ========================================== -->
+<section class="space-y-4">
+<div>
+<h2 class="text-headline-sm font-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">dns</span>
+            Enterprise Technology Stack
+          </h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Validated runtime configurations, low-footprint inference layers, and persistence specs.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<!-- Backend Stack -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm space-y-3">
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/60">
+<div class="flex items-center gap-2">
+<span class="p-1.5 rounded bg-primary/10 text-primary">
+<span class="material-symbols-outlined">developer_board</span>
+</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Backend &amp; Server</h3>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">Async ASGI</span>
+</div>
+<ul class="space-y-2 text-body-sm font-body-sm text-on-surface-variant">
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Framework</span>
+<span class="font-label-sm text-label-sm text-primary">FastAPI 0.111.x</span>
+</li>
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Runtime</span>
+<span class="font-label-sm text-label-sm">Python 3.11 CPython</span>
+</li>
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Serialization</span>
+<span class="font-label-sm text-label-sm">Pydantic v2 (Rust Core)</span>
+</li>
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Server Worker</span>
+<span class="font-label-sm text-label-sm">Uvicorn + uvloop</span>
+</li>
+</ul>
+</div>
+<!-- Vector Database Stack -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm space-y-3">
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/60">
+<div class="flex items-center gap-2">
+<span class="p-1.5 rounded bg-secondary/10 text-secondary">
+<span class="material-symbols-outlined">storage</span>
+</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Vector &amp; RDBMS</h3>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">Hybrid Index</span>
+</div>
+<ul class="space-y-2 text-body-sm font-body-sm text-on-surface-variant">
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Core Store</span>
+<span class="font-label-sm text-label-sm text-secondary font-semibold">PostgreSQL 16.2</span>
+</li>
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Extension</span>
+<span class="font-label-sm text-label-sm">pgvector v0.6+</span>
+</li>
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Index Type</span>
+<span class="font-label-sm text-label-sm">HNSW (m=16, ef_search=64)</span>
+</li>
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Lexical Inverted</span>
+<span class="font-label-sm text-label-sm">GIN Index (to_tsvector)</span>
+</li>
+</ul>
+</div>
+<!-- Embeddings & Encoders -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm space-y-3">
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/60">
+<div class="flex items-center gap-2">
+<span class="p-1.5 rounded bg-tertiary/10 text-tertiary">
+<span class="material-symbols-outlined">memory</span>
+</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Embeddings Engine</h3>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">CPU Quantized</span>
+</div>
+<ul class="space-y-2 text-body-sm font-body-sm text-on-surface-variant">
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Model</span>
+<span class="font-label-sm text-label-sm text-tertiary">all-MiniLM-L6-v2</span>
+</li>
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Dimension Vector</span>
+<span class="font-label-sm text-label-sm">384 Float32</span>
+</li>
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Execution Provider</span>
+<span class="font-label-sm text-label-sm">ONNX Runtime (int8)</span>
+</li>
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Inference Overhead</span>
+<span class="font-label-sm text-label-sm">~4.8ms / batch</span>
+</li>
+</ul>
+</div>
+<!-- Reranker -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm space-y-3">
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/60">
+<div class="flex items-center gap-2">
+<span class="p-1.5 rounded bg-primary/10 text-primary">
+<span class="material-symbols-outlined">sort</span>
+</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Precision Reranker</h3>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">Cross-Encoder</span>
+</div>
+<ul class="space-y-2 text-body-sm font-body-sm text-on-surface-variant">
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Provider</span>
+<span class="font-label-sm text-label-sm text-primary font-semibold">FlashRank</span>
+</li>
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Footprint</span>
+<span class="font-label-sm text-label-sm">&lt; 4MB In-Memory</span>
+</li>
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Passage Window</span>
+<span class="font-label-sm text-label-sm">Top 60 Candidates</span>
+</li>
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Selected Depth</span>
+<span class="font-label-sm text-label-sm">Top 5 Context Blocks</span>
+</li>
+</ul>
+</div>
+<!-- Generation Engine -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm space-y-3">
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/60">
+<div class="flex items-center gap-2">
+<span class="p-1.5 rounded bg-secondary/10 text-secondary">
+<span class="material-symbols-outlined">psychology</span>
+</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Generation &amp; LLM</h3>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">Dual-Provider</span>
+</div>
+<ul class="space-y-2 text-body-sm font-body-sm text-on-surface-variant">
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Primary Engine</span>
+<span class="font-label-sm text-label-sm text-secondary font-semibold">Google Gemini API</span>
+</li>
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Prompt Constraint</span>
+<span class="font-label-sm text-label-sm">Strict Grounded Context</span>
+</li>
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Fallback Mode</span>
+<span class="font-label-sm text-label-sm">Deterministic Mock Provider</span>
+</li>
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Abstention Rate</span>
+<span class="font-label-sm text-label-sm">Automated Refusal Trigger</span>
+</li>
+</ul>
+</div>
+<!-- Frontend Architecture -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm space-y-3">
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/60">
+<div class="flex items-center gap-2">
+<span class="p-1.5 rounded bg-outline/20 text-on-surface">
+<span class="material-symbols-outlined">devices</span>
+</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Frontend Architecture</h3>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">Component Spec</span>
+</div>
+<ul class="space-y-2 text-body-sm font-body-sm text-on-surface-variant">
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Design System</span>
+<span class="font-label-sm text-label-sm text-primary">Tailwind CSS 3.4+</span>
+</li>
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Typography Engine</span>
+<span class="font-label-sm text-label-sm">Geist + JetBrains Mono</span>
+</li>
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Iconography</span>
+<span class="font-label-sm text-label-sm">Material Symbols Outlined</span>
+</li>
+<li class="flex items-start justify-between">
+<span class="font-medium text-on-surface">Panel Topology</span>
+<span class="font-label-sm text-label-sm">Tri-Pane Workbench Grid</span>
+</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- ========================================== -->
+<!-- SECTION 4: GUARDRAILS & METHODOLOGY -->
+<!-- ========================================== -->
+<section class="space-y-4">
+<div>
+<h2 class="text-headline-sm font-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">gavel</span>
+            Guardrails &amp; Verification Methodology
+          </h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Algorithmic defenses engineered to guarantee traceability, statutory compliance, and zero hallucinated authority.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Protocol 1: Citation Integrity Protocol -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm space-y-4">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-secondary/10 text-secondary flex items-center justify-center font-bold">
+<span class="material-symbols-outlined">verified_user</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Citation Integrity Protocol</h3>
+<div class="font-label-sm text-label-sm text-secondary">Zero-Hallucination Verified Span Matching</div>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-secondary/15 text-secondary font-label-sm text-label-sm border border-secondary/20">Enforced</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant leading-relaxed">
+              Every sentence in the generated synthetic synthesis must strictly bind to an exact substring in the retrieved document corpus. If an authoritative statutory claim cannot compute a Levenshtein-normalized span alignment score ≥ 0.94 against indexed institutional code, the synthesis is stripped and sent to human review.
+            </p>
+<div class="bg-surface-container-low p-3 rounded-lg border border-outline-variant space-y-2">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="text-outline">Abstention Safety Threshold</span>
+<span class="font-mono text-on-surface font-semibold">τ = 0.65 Cosine Sim</span>
+</div>
+<div class="w-full bg-outline-variant/50 h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 65%;"></div>
+</div>
+<div class="text-[11px] font-label-sm text-outline flex items-center justify-between">
+<span>Refusal &lt; 0.65</span>
+<span>Automated Fallback Trigger</span>
+</div>
+</div>
+</div>
+<!-- Protocol 2: Policy Version Diffing -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm space-y-4">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold">
+<span class="material-symbols-outlined">difference</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Policy Version Diffing</h3>
+<div class="font-label-sm text-label-sm text-primary">Abstract Syntax Tree (AST) Revision Analysis</div>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-primary/15 text-primary font-label-sm text-label-sm border border-primary/20">Clause-Level</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant leading-relaxed">
+              Regulatory policies evolve incrementally across calendar years. The platform parses legal statutes into hierarchical document ASTs (Sections, Clauses, Subsections). When revisions occur, semantic difference graphs highlight superseding paragraphs, invalidating outdated interpretations before an analyst reads them.
+            </p>
+<div class="bg-surface-container-low p-3 rounded-lg border border-outline-variant font-code-inline text-code-inline space-y-1">
+<div class="text-[#0F766E] flex items-center gap-1.5">
+<span class="material-symbols-outlined text-xs">add_circle</span>
+<span>+ Clause 4.2.1 [AY 2024-25]: 75% Attendance mandatory for Semester End Exams</span>
+</div>
+<div class="text-[#B91C1C] flex items-center gap-1.5">
+<span class="material-symbols-outlined text-xs">remove_circle</span>
+<span>- Clause 4.2.1 [AY 2022-23]: 65% Minimum attendance with medical discretion</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Demonstration Notice Banner (Mandated in Prompt) -->
+<div class="border border-tertiary-container/30 bg-tertiary-fixed/20 rounded-xl p-4 flex items-start gap-3.5">
+<div class="p-2 rounded bg-tertiary text-on-tertiary shrink-0 mt-0.5">
+<span class="material-symbols-outlined" style="font-size: 20px;">info</span>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Demonstration Notice</h4>
+<span class="px-2 py-0.2 rounded bg-tertiary/10 text-tertiary font-label-sm text-[11px] font-semibold uppercase tracking-wider">Synthetic Environment</span>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant">
+              The dataset demonstrated is the synthetic KVIT college policy corpus. User roles (Student, Faculty, Admin) are simulated for demonstration purposes without real auth constraints.
+            </p>
+<div class="pt-2 flex items-center gap-4 text-outline font-label-sm text-label-sm">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">shield</span> Non-Production Token Scope
+              </span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">database</span> Isolated Synthetic Corpus Sandbox
+              </span>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Spacer for optical padding -->
+<div class="h-6"></div>
+</main>
+</div>
+</body></html>

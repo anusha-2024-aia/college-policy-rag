@@ -37,6 +37,10 @@ class AskRequest(BaseModel):
         default=None,
         description="Enable version-aware policy prioritization and conflict detection (defaults to system setting)",
     )
+    semantic_retrieval: Optional[bool] = Field(
+        default=None,
+        description="Enable 384-dimensional ONNX semantic retrieval (defaults to system setting)",
+    )
     role: str = Field(
         default="student",
         description="User access control role for retrieval authorization (student, faculty, admin)",

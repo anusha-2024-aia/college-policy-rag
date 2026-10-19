@@ -547,13 +547,22 @@ The UI communicates strictly with the FastAPI backend (`POST /ask`) via HTTP (`u
 ### Running the Streamlit App
 Ensure the FastAPI backend is running first:
 ```bash
-# Terminal 1: Start FastAPI backend
-python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+# Terminal 1: Start FastAPI backend (port 8000 or 8080 if 8000 is used by Windows svchost)
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8080
 ```
 
-Then start the Streamlit UI:
+#### Launch Modern React Frontend (Primary)
 ```bash
-# Terminal 2: Start Streamlit interface
+# Terminal 2: Start Vite React Frontend
+cd frontend
+npm install
+npm run dev
+```
+Open `http://127.0.0.1:5173` in your browser.
+
+#### Launch Streamlit Interface (Fallback)
+```bash
+# Terminal 3: Start Streamlit interface
 streamlit run ui/app.py --server.port 8501 --server.address 127.0.0.1
 ```
 Open `http://127.0.0.1:8501` in your browser.
@@ -561,4 +570,86 @@ Open `http://127.0.0.1:8501` in your browser.
 ### Running UI Automated Tests
 ```bash
 pytest tests/test_ui.py -v
+pytest tests/test_api_endpoints.py -v
 ```
+
+---
+
+## 14. Production Deployment Guide (Render & Managed PostgreSQL)
+
+This application is ready for deployment to [Render](https://render.com/) featuring a decoupled React web frontend, FastAPI backend container, and an optional Streamlit fallback service backed by a managed PostgreSQL instance with `pgvector` (e.g. [Neon.tech](https://neon.tech/), [Supabase](https://supabase.com/), or Render PostgreSQL).
+
+### Architecture Layout on Render
+```
+[ User Web Browser ]
+       │
+       ├─────────────────────────────────┐
+       ▼ (HTTPS)                         ▼ (HTTPS Fallback)
+[ React Vite Static Site ]         [ Streamlit Web Service ]
+(Render Static Site)               (Dockerfile.frontend — Port 8501)
+       │                                 │
+       ▼ (REST API / CORS)               ▼ (Server-to-Server)
+[ FastAPI Backend Web Service ] (Dockerfile.backend — Port 8000)
+       │
+       ▼ (SSL / TCP)
+[ Managed PostgreSQL + pgvector ] (Neon / Supabase / Render Postgres)
+```
+
+### 1. Database Provisioning (Prerequisite)
+1. Create a PostgreSQL 15+ database on **Neon** or **Supabase**.
+2. Enable the `vector` extension in your cloud SQL console:
+   ```sql
+   CREATE EXTENSION IF NOT EXISTS vector;
+   ```
+3. Copy your database connection string:
+   ```
+   postgresql://<username>:<password>@<host>/<database>?sslmode=require
+   ```
+
+### 2. Required Environment Variables
+
+| Variable | Target Service | Description | Example / Default |
+| :--- | :--- | :--- | :--- |
+| `DATABASE_URL` | Backend & Fallback UI | PostgreSQL connection string with pgvector | `postgresql://user:pass@host/db?sslmode=require` |
+| `VITE_API_BASE_URL` | React Frontend | Live URL of the FastAPI backend service | `https://college-rag-backend.onrender.com` |
+| `BACKEND_API_URL` | Streamlit Fallback | Live URL of the FastAPI backend service | `https://college-rag-backend.onrender.com` |
+| `CORS_ORIGINS` | Backend | Whitelist of frontend origins (comma-separated) | `https://college-rag-react-frontend.onrender.com` |
+| `SEMANTIC_RETRIEVAL_ENABLED` | Backend | Enable 384-dim ONNX MiniLM semantic retrieval | `true` |
+| `LLM_PROVIDER` | Backend | LLM provider (`gemini`, `mock`) | `gemini` |
+| `LLM_MODEL` | Backend | Model identifier | `gemini-2.5-flash` |
+| `GEMINI_API_KEY` | Backend | Google AI Studio API key | Secret token |
+| `APP_ENV` | Backend | Runtime environment | `production` |
+| `DEBUG` | Backend | Debug mode toggle | `false` |
+
+### 3. Deploying via Render Blueprint (`render.yaml`)
+1. Push this repository to GitHub/GitLab.
+2. In the Render Dashboard, navigate to **Blueprints** -> **New Blueprint Instance**.
+3. Select this repository. Render will automatically detect `render.yaml` and configure:
+   - `college-rag-backend` (FastAPI Docker Web Service)
+   - `college-rag-react-frontend` (React + Vite Static Site)
+   - `college-rag-frontend` (Streamlit Docker Web Service Fallback)
+4. Under Environment Variables for `college-rag-backend`:
+   - Fill in `DATABASE_URL` with your managed PostgreSQL URL.
+   - Fill in `GEMINI_API_KEY` with your Gemini API key.
+5. Click **Apply**. Render will build and deploy all services.
+
+### 4. Remote Database Schema Initialization & Ingestion
+Once the backend service is deployed and connected to your cloud database, run schema creation and document ingestion using the Render Shell or locally pointing `DATABASE_URL` to the cloud DB:
+```bash
+# Initialize schema and tables (documents, chunks, chunks_semantic)
+python -c "from app.core.database import init_db; init_db()"
+
+# Ingest all policy documents from manifest
+python -m app.cli.ingest
+```
+
+### 5. Security & Authentication Notice
+- **Simulated Role Selector**: The role selector in both the React frontend and Streamlit fallback (`student`, `faculty`, `admin`) is a **demonstration interface** simulating institutional RBAC. The backend SQL queries enforce document authorization based on the received role, but do not authenticate the user.
+- **Enterprise Authentication**: For production public deployment, an authentication gateway, reverse proxy, or OAuth2/JWT middleware must extract and verify the user's role from a cryptographic signature before forwarding to `/ask`.
+
+### 6. Rollback Instructions
+If any operational issue arises with semantic retrieval or cloud deployment:
+1. **Disable Semantic Retrieval**: Set `SEMANTIC_RETRIEVAL_ENABLED=false` in the backend environment variables and restart. The backend immediately reverts to legacy retrieval without database alterations.
+2. **Revert Deployment**: In the Render Dashboard, select the service -> **Deploys** -> Select the previous stable commit -> Click **Rollback**.
+
+

@@ -48,3 +48,8 @@ pgvector_data/
 __MACOSX/
 Thumbs.db
 Desktop.ini
+
+# Temporary extraction and scratch directories
+scratch/
+extracted_ui/
+

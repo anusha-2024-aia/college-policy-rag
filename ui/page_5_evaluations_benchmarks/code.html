@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Evaluations &amp; Benchmarks - LexisPolicy AI</title>
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary-container": "#a65900",
+            "primary-container": "#2563eb",
+            "on-surface-variant": "#434655",
+            "surface-variant": "#dae2fd",
+            "on-surface": "#131b2e",
+            "on-secondary-container": "#006f66",
+            "on-error": "#ffffff",
+            "surface-dim": "#d2d9f4",
+            "on-tertiary": "#ffffff",
+            "surface-container": "#eaedff",
+            "surface-container-highest": "#dae2fd",
+            "on-primary-container": "#eeefff",
+            "inverse-surface": "#283044",
+            "on-tertiary-container": "#ffede1",
+            "background": "#faf8ff",
+            "surface-container-high": "#e2e7ff",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed-variant": "#6e3900",
+            "outline": "#737686",
+            "on-secondary-fixed": "#00201d",
+            "tertiary-fixed": "#ffdcc3",
+            "surface-container-lowest": "#ffffff",
+            "secondary": "#006a61",
+            "inverse-primary": "#b4c5ff",
+            "inverse-on-surface": "#eef0ff",
+            "secondary-fixed-dim": "#6bd8cb",
+            "on-tertiary-fixed": "#2f1500",
+            "error": "#ba1a1a",
+            "on-secondary-fixed-variant": "#005049",
+            "on-primary-fixed": "#00174b",
+            "tertiary": "#824500",
+            "secondary-fixed": "#89f5e7",
+            "tertiary-fixed-dim": "#ffb77d",
+            "on-primary-fixed-variant": "#003ea8",
+            "outline-variant": "#c3c6d7",
+            "surface-container-low": "#f2f3ff",
+            "primary": "#004ac6",
+            "primary-fixed-dim": "#b4c5ff",
+            "secondary-container": "#86f2e4",
+            "primary-fixed": "#dbe1ff",
+            "error-container": "#ffdad6",
+            "on-background": "#131b2e",
+            "on-secondary": "#ffffff",
+            "surface-tint": "#0053db",
+            "surface": "#faf8ff",
+            "on-primary": "#ffffff",
+            "surface-bright": "#faf8ff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "margin": "1rem",
+            "gutter-desktop": "1.5rem",
+            "space-xl": "1.5rem",
+            "space-sm": "0.5rem",
+            "space-md": "0.75rem",
+            "space-2xl": "2rem",
+            "margin-desktop": "2rem",
+            "space-lg": "1rem",
+            "space-xs": "0.25rem",
+            "space-3xl": "3rem"
+          },
+          "fontFamily": {
+            "code-inline": ["JetBrains Mono"],
+            "headline-lg": ["Geist"],
+            "body-sm": ["Geist"],
+            "label-sm": ["JetBrains Mono"],
+            "label-md": ["JetBrains Mono"],
+            "body-lg": ["Geist"],
+            "headline-sm": ["Geist"],
+            "headline-md": ["Geist"],
+            "label-lg": ["JetBrains Mono"],
+            "body-md": ["Geist"],
+            "display-lg": ["Geist"],
+            "display-lg-mobile": ["Geist"]
+          },
+          "fontSize": {
+            "code-inline": ["12px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "body-lg": ["15px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "label-lg": ["13px", { "lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "body-md": ["14px", { "lineHeight": "22px", "letterSpacing": "-0.003em", "fontWeight": "400" }],
+            "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+            "display-lg-mobile": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-background text-on-surface h-full flex flex-col antialiased selection:bg-surface-variant selection:text-primary">
+<!-- Application Shell Wrapper -->
+<div class="flex h-screen w-full overflow-hidden">
+<!-- Shared Component: SideNavBar -->
+<aside class="fixed top-0 left-0 h-screen w-64 flex flex-col justify-between border-r border-outline-variant bg-surface-container-lowest z-30">
+<div class="w-64 h-full flex flex-col py-4 px-3">
+<!-- Brand / Header -->
+<div class="px-2 pb-4 mb-2 border-b border-outline-variant flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[18px]">gavel</span>
+</div>
+<div>
+<div class="text-headline-sm font-headline-sm font-bold tracking-tight text-on-surface leading-tight">LexisPolicy AI</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant">Enterprise Intelligence v4.2</div>
+</div>
+</div>
+<!-- Primary Navigation Links -->
+<nav class="space-y-1 flex-1 overflow-y-auto pr-1">
+<!-- Item 1: Dashboard -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150 ease-in-out" href="../page_1_policy_intelligence_dashboard/code.html">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="text-body-sm font-body-sm">Dashboard</span>
+</a>
+<!-- Item 2: Ask Policy -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150 ease-in-out" href="../page_2_ask_policy_workspace/code.html">
+<span class="material-symbols-outlined text-[20px]">chat</span>
+<span class="text-body-sm font-body-sm">Ask Policy</span>
+</a>
+<!-- Item 3: Policy Change Intelligence -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150 ease-in-out" href="../page_3_policy_change_intelligence/code.html">
+<span class="material-symbols-outlined text-[20px]">published_with_changes</span>
+<span class="text-body-sm font-body-sm">Policy Change Intelligence</span>
+</a>
+<!-- Item 4: Document Library -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150 ease-in-out" href="../page_4_document_library/code.html">
+<span class="material-symbols-outlined text-[20px]">folder</span>
+<span class="text-body-sm font-body-sm">Document Library</span>
+</a>
+<!-- Item 5: Evaluations & Benchmarks (ACTIVE) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-surface-container text-primary font-semibold border-l-2 border-primary transition-colors duration-150 ease-in-out" href="code.html">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="text-body-sm font-body-sm font-semibold">Evaluations &amp; Benchmarks</span>
+</a>
+<!-- Item 6: System Health -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150 ease-in-out" href="../page_6_system_health/code.html">
+<span class="material-symbols-outlined text-[20px]">monitor_heart</span>
+<span class="text-body-sm font-body-sm">System Health</span>
+</a>
+<!-- Item 7: About & Architecture -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150 ease-in-out" href="../page_7_about_architecture/code.html">
+<span class="material-symbols-outlined text-[20px]">info</span>
+<span class="text-body-sm font-body-sm">About &amp; Architecture</span>
+</a>
+</nav>
+<!-- Sidebar Footer Action & Sublinks -->
+<div class="pt-3 border-t border-outline-variant space-y-2">
+<button class="w-full h-8 px-3 rounded bg-surface-container-low hover:bg-surface-container border border-outline-variant text-primary text-label-md font-label-md flex items-center justify-center gap-2 transition-colors duration-150">
+<span class="material-symbols-outlined text-[16px]">rule</span>
+            Audit Policy Diff
+          </button>
+<div class="flex items-center justify-between pt-1 px-1">
+<a class="flex items-center gap-1.5 text-on-surface-variant hover:text-on-surface text-label-sm font-label-sm transition-colors" href="#">
+<span class="material-symbols-outlined text-[15px]">settings</span>
+              Settings
+            </a>
+<a class="flex items-center gap-1.5 text-on-surface-variant hover:text-on-surface text-label-sm font-label-sm transition-colors" href="#">
+<span class="material-symbols-outlined text-[15px]">menu_book</span>
+              Documentation
+            </a>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area with Docked Header -->
+<div class="flex-1 flex flex-col ml-64 overflow-hidden">
+<!-- Shared Component: TopNavBar -->
+<header class="docked full-width top-0 h-14 border-b border-outline-variant bg-surface-container-lowest z-20 flex justify-between items-center w-full px-6 flex-shrink-0">
+<!-- Search bar on left -->
+<div class="flex items-center gap-4 flex-1 max-w-md">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[18px] text-outline">search</span>
+<input class="w-full h-8 pl-9 pr-14 bg-background border border-outline-variant rounded text-body-sm font-body-sm text-on-surface placeholder:text-outline focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none" placeholder="Search benchmark logs, queries, run IDs..." type="text"/>
+<span class="absolute right-2 top-1/2 -translate-y-1/2 text-label-sm font-label-sm text-outline border border-outline-variant rounded px-1.5 py-0.2 bg-surface-container-lowest">⌘K</span>
+</div>
+</div>
+<!-- Middle Navigation Links -->
+<div class="hidden lg:flex items-center gap-6">
+<a class="text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface px-2 py-1 rounded text-body-sm font-body-sm transition-all duration-150 ease-in-out" href="#">Statutes</a>
+<a class="text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface px-2 py-1 rounded text-body-sm font-body-sm transition-all duration-150 ease-in-out" href="#">Federal Register</a>
+<a class="text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface px-2 py-1 rounded text-body-sm font-body-sm transition-all duration-150 ease-in-out" href="#">Institutional Code</a>
+</div>
+<!-- Trailing Actions & Profile -->
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5 px-2 py-1 bg-surface-container-low rounded border border-outline-variant text-label-sm font-label-sm text-on-secondary-container">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+            Connected: Live API
+          </div>
+<span class="text-label-sm font-label-sm text-on-surface-variant border border-outline-variant px-2 py-1 rounded">Role: Admin</span>
+<div class="h-4 w-[1px] bg-outline-variant mx-1"></div>
+<div class="flex items-center gap-1">
+<button class="w-7 h-7 flex items-center justify-center rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface" title="Notifications">
+<span class="material-symbols-outlined text-[18px]">notifications</span>
+</button>
+<button class="w-7 h-7 flex items-center justify-center rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface" title="Help">
+<span class="material-symbols-outlined text-[18px]">help</span>
+</button>
+<button class="w-7 h-7 flex items-center justify-center rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface" title="Tune Settings">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+</div>
+<div class="w-7 h-7 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center text-primary font-semibold text-label-sm font-label-sm">
+            AP
+          </div>
+</div>
+</header>
+<!-- Scrollable Canvas Area -->
+<main class="flex-1 overflow-y-auto bg-background p-6 space-y-6">
+<!-- Breadcrumb & Top Bar of Canvas -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-outline-variant pb-4">
+<div>
+<div class="flex items-center gap-2 text-label-sm font-label-sm text-outline mb-1">
+<span>Evaluations &amp; Benchmarks</span>
+<span>/</span>
+<span class="text-primary font-medium">Run #2024-09-EV-42</span>
+</div>
+<h1 class="text-headline-lg font-headline-lg text-on-surface tracking-tight">Evaluations &amp; Benchmarks</h1>
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-label-md font-label-md text-on-surface-variant">
+<span class="flex items-center gap-1.5 text-on-surface font-medium">
+<span class="material-symbols-outlined text-[16px] text-primary">dataset</span>
+                KVIT Golden-QA Benchmark v1.2 (150 Hand-curated Institutional Scenarios)
+              </span>
+<span>•</span>
+<span class="text-outline">Executed 2024-09-18 14:22:04 UTC | Duration: 4m 12s</span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-label-sm font-label-sm bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#0D9488]"></span>
+                Status: PASSED
+              </span>
+</div>
+</div>
+<!-- CTAs -->
+<div class="flex items-center gap-2">
+<button class="h-8 px-3 rounded bg-surface-container-lowest border border-outline-variant hover:bg-surface-container-low text-on-surface text-label-md font-label-md flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[16px]">file_download</span>
+              Export Benchmark JSON
+            </button>
+<button class="h-8 px-3 rounded bg-primary hover:bg-[#003ea8] text-on-primary text-label-md font-label-md flex items-center gap-1.5 shadow-sm transition-colors">
+<span class="material-symbols-outlined text-[16px]">play_arrow</span>
+              Run Evaluation Suite
+            </button>
+</div>
+</div>
+<!-- Section: Governance & Safety Metrics (Bento Row) -->
+<div>
+<div class="flex items-center justify-between mb-3">
+<h2 class="text-headline-sm font-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-secondary">verified_user</span>
+              Governance &amp; Safety Metrics
+            </h2>
+<span class="text-label-sm font-label-sm text-outline">Threshold Target: ≥ 90.0% All Indices</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Card 1: Correct Abstention Rate -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-4 shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between mb-2">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Negative Query Refusal</span>
+<span class="material-symbols-outlined text-[18px] text-[#0D9488]">shield</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg font-display-lg text-on-surface">98.4%</span>
+<span class="text-label-sm font-label-sm text-[#0F766E] font-medium">+1.2% vs prev</span>
+</div>
+<div class="text-headline-sm font-headline-sm text-on-surface mt-1">Correct Abstention Rate</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-2 leading-relaxed">
+                49/50 negative/out-of-corpus queries safely refused without hallucination.
+              </p>
+<div class="mt-3 pt-2 border-t border-[#F1F5F9] flex items-center justify-between text-label-sm font-label-sm text-outline">
+<span>False Affirmations: 1</span>
+<span>Delta: Zero Drift</span>
+</div>
+</div>
+<!-- Card 2: Citation Grounding Precision -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-4 shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between mb-2">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Statutory Alignment</span>
+<span class="material-symbols-outlined text-[18px] text-primary">bookmark_check</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg font-display-lg text-on-surface">97.2%</span>
+<span class="text-label-sm font-label-sm text-[#0F766E] font-medium">+0.4%</span>
+</div>
+<div class="text-headline-sm font-headline-sm text-on-surface mt-1">Citation Grounding Precision</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-2 leading-relaxed">
+                Clauses directly substantiated by golden ground-truth spans across corpora.
+              </p>
+<div class="mt-3 pt-2 border-t border-[#F1F5F9] flex items-center justify-between text-label-sm font-label-sm text-outline">
+<span>Exact Match: 94.6%</span>
+<span>Semantic: 2.6%</span>
+</div>
+</div>
+<!-- Card 3: Version Conflict Resolution -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-4 shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between mb-2">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Temporal Hierarchy</span>
+<span class="material-symbols-outlined text-[18px] text-tertiary">history_edu</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg font-display-lg text-on-surface">94.0%</span>
+<span class="text-label-sm font-label-sm text-tertiary font-medium">Nominal</span>
+</div>
+<div class="text-headline-sm font-headline-sm text-on-surface mt-1">Version Conflict Resolution</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-2 leading-relaxed">
+                Correctly flagged newer amendments over deprecated statutes during evaluation.
+              </p>
+<div class="mt-3 pt-2 border-t border-[#F1F5F9] flex items-center justify-between text-label-sm font-label-sm text-outline">
+<span>Overrides Evaluated: 32</span>
+<span>Misident: 2</span>
+</div>
+</div>
+<!-- Card 4: Stale Citation Drift -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-4 shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between mb-2">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Index Consistency</span>
+<span class="material-symbols-outlined text-[18px] text-[#0D9488]">task_alt</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg font-display-lg text-[#0F766E]">0</span>
+<span class="text-label-sm font-label-sm text-[#0F766E] font-medium">Detected</span>
+</div>
+<div class="text-headline-sm font-headline-sm text-on-surface mt-1">Stale Citation Drift</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-2 leading-relaxed">
+                No cross-reference disconnections or unindexed regulatory codifications found.
+              </p>
+<div class="mt-3 pt-2 border-t border-[#F1F5F9] flex items-center justify-between text-label-sm font-label-sm text-outline">
+<span>Vector Integrity: 100%</span>
+<span>TTL: Valid</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Section: Retrieval Strategy Comparison Matrix -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden shadow-sm">
+<div class="px-5 py-3.5 border-b border-outline-variant flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[#F8FAFC]">
+<div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">compare_arrows</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Retrieval Strategy Comparison Matrix</h3>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">
+                Evaluation across n=150 institutional policy scenarios with varying lexical ambiguity and structural depth.
+              </p>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-label-sm font-label-sm text-outline">K-Depth: 5 Chunks</span>
+<span class="text-label-sm font-label-sm bg-surface-container px-2 py-0.5 rounded text-primary">Cutoff: Reciprocal Rank</span>
+</div>
+</div>
+<!-- Analytical Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#F8FAFC] border-b border-outline-variant text-label-sm font-label-sm uppercase tracking-wider text-outline">
+<th class="py-2.5 px-4 font-semibold">Configuration Pipeline</th>
+<th class="py-2.5 px-3 text-right font-semibold">Recall@1</th>
+<th class="py-2.5 px-3 text-right font-semibold">Recall@3</th>
+<th class="py-2.5 px-3 text-right font-semibold">Recall@5</th>
+<th class="py-2.5 px-3 text-right font-semibold">MRR</th>
+<th class="py-2.5 px-3 text-right font-semibold">Avg Latency</th>
+<th class="py-2.5 px-4 text-right font-semibold">P95 Latency</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant text-body-sm font-body-sm">
+<!-- Row 1: Baseline Lexical -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-4">
+<div class="font-medium text-on-surface">Baseline Lexical</div>
+<div class="text-label-sm font-label-sm text-outline mt-0.5 font-mono">PostgreSQL FTS bm25-equivalent</div>
+</td>
+<td class="py-3 px-3 text-right font-label-md font-label-md text-on-surface tabular-nums">52.4%</td>
+<td class="py-3 px-3 text-right font-label-md font-label-md text-on-surface tabular-nums">68.1%</td>
+<td class="py-3 px-3 text-right font-label-md font-label-md text-on-surface tabular-nums">74.0%</td>
+<td class="py-3 px-3 text-right font-label-md font-label-md text-on-surface tabular-nums">0.612</td>
+<td class="py-3 px-3 text-right font-label-md font-label-md text-[#0F766E] tabular-nums">18ms</td>
+<td class="py-3 px-4 text-right font-label-md font-label-md text-outline tabular-nums">34ms</td>
+</tr>
+<!-- Row 2: Dense Semantic Only -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-4">
+<div class="font-medium text-on-surface">Dense Semantic Only</div>
+<div class="text-label-sm font-label-sm text-outline mt-0.5 font-mono">MiniLM-L6-v2 ONNX 384d pgvector HNSW</div>
+</td>
+<td class="py-3 px-3 text-right font-label-md font-label-md text-on-surface tabular-nums">71.3%</td>
+<td class="py-3 px-3 text-right font-label-md font-label-md text-on-surface tabular-nums">84.6%</td>
+<td class="py-3 px-3 text-right font-label-md font-label-md text-on-surface tabular-nums">89.2%</td>
+<td class="py-3 px-3 text-right font-label-md font-label-md text-on-surface tabular-nums">0.778</td>
+<td class="py-3 px-3 text-right font-label-md font-label-md text-on-surface-variant tabular-nums">42ms</td>
+<td class="py-3 px-4 text-right font-label-md font-label-md text-outline tabular-nums">78ms</td>
+</tr>
+<!-- Row 3: Hybrid RRF + FlashRank Rerank (Production Configuration) -->
+<tr class="bg-surface-container-low/70 border-l-4 border-l-primary hover:bg-surface-container transition-colors">
+<td class="py-3 px-4">
+<div class="flex items-center gap-2">
+<span class="font-semibold text-primary">Hybrid RRF + FlashRank Rerank</span>
+<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-label-sm uppercase tracking-wide bg-primary text-on-primary font-semibold">
+                        Current Production
+                      </span>
+</div>
+<div class="text-label-sm font-label-sm text-outline mt-0.5 font-mono">Dense (HNSW) + Sparse (BM25) with Reciprocal Rank Fusion &amp; MiniLM Reranker</div>
+</td>
+<td class="py-3 px-3 text-right font-label-md font-label-md font-bold text-primary tabular-nums">82.7%</td>
+<td class="py-3 px-3 text-right font-label-md font-label-md font-bold text-primary tabular-nums">91.5%</td>
+<td class="py-3 px-3 text-right font-label-md font-label-md font-bold text-primary tabular-nums">96.4%</td>
+<td class="py-3 px-3 text-right font-label-md font-label-md font-bold text-primary tabular-nums">0.884</td>
+<td class="py-3 px-3 text-right font-label-md font-label-md text-on-surface tabular-nums">64ms</td>
+<td class="py-3 px-4 text-right font-label-md font-label-md text-on-surface tabular-nums">112ms</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-4 py-2.5 bg-surface-container-lowest border-t border-outline-variant flex items-center justify-between text-label-sm font-label-sm text-outline">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-[#0D9488]">check_circle</span>
+              Target SLA: Recall@5 ≥ 95.0% achieved under 150ms P95 limit.
+            </span>
+<span>Reranking batch size: 16 | Fusion weights: k=60</span>
+</div>
+</div>
+<!-- Section: Query-Level Evaluation Log -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden shadow-sm">
+<div class="px-5 py-3.5 border-b border-outline-variant flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+<div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-on-surface">search_insights</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Query-Level Evaluation Log</h3>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">
+                Deep dive inspection into individual test assertions from the golden test corpus.
+              </p>
+</div>
+<div class="flex items-center gap-2">
+<div class="relative">
+<input class="h-7 px-2.5 pl-7 bg-background border border-outline-variant rounded text-label-sm font-label-sm text-on-surface focus:outline-none" placeholder="Filter queries..." type="text"/>
+<span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-[14px] text-outline">filter_list</span>
+</div>
+<span class="text-label-sm font-label-sm text-outline">Displaying 3 of 150</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#F8FAFC] border-b border-outline-variant text-label-sm font-label-sm uppercase tracking-wider text-outline">
+<th class="py-2.5 px-4 font-semibold w-1/4">Evaluated Query</th>
+<th class="py-2.5 px-4 font-semibold w-1/4">Ground Truth Clauses</th>
+<th class="py-2.5 px-4 font-semibold w-1/4">Retrieved Chunks</th>
+<th class="py-2.5 px-3 text-center font-semibold">Verification Score</th>
+<th class="py-2.5 px-4 text-center font-semibold">Verdict</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant text-body-sm font-body-sm">
+<!-- Log 1: Hostel curfew extension protocol -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-4 align-top">
+<div class="font-medium text-on-surface">"Hostel curfew extension protocol"</div>
+<div class="text-label-sm font-label-sm text-outline mt-1 font-mono">ID: Q-HOSTEL-041 • Category: Residence Life</div>
+</td>
+<td class="py-3 px-4 align-top">
+<div class="bg-surface-container-low p-2 rounded border border-outline-variant text-label-sm font-label-sm font-mono text-on-surface-variant">
+<span class="text-primary font-semibold">KVIT-H-SEC.14.3:</span> "Special late-night pass permits signed by Warden before 18:00 hrs for lab access..."
+                    </div>
+</td>
+<td class="py-3 px-4 align-top">
+<div class="space-y-1">
+<div class="flex items-center gap-1.5 text-label-sm font-label-sm font-mono text-on-surface">
+<span class="w-2 h-2 rounded-full bg-[#0D9488]"></span>
+<span>[Rank 1] doc_chunk_8812 (Score: 0.941)</span>
+</div>
+<div class="flex items-center gap-1.5 text-label-sm font-label-sm font-mono text-outline">
+<span class="w-2 h-2 rounded-full bg-outline-variant"></span>
+<span>[Rank 2] doc_chunk_8819 (Score: 0.812)</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-3 align-top text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-label-md font-label-md font-semibold bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1]">
+                      0.982
+                    </span>
+</td>
+<td class="py-3 px-4 align-top text-center">
+<span class="inline-flex items-center gap-1 text-label-sm font-label-sm font-semibold text-[#0F766E]">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+                      Pass
+                    </span>
+</td>
+</tr>
+<!-- Log 2: Minimum credits for dean list -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-4 align-top">
+<div class="font-medium text-on-surface">"Minimum credits for dean list"</div>
+<div class="text-label-sm font-label-sm text-outline mt-1 font-mono">ID: Q-ACAD-119 • Category: Academic Honors</div>
+</td>
+<td class="py-3 px-4 align-top">
+<div class="bg-surface-container-low p-2 rounded border border-outline-variant text-label-sm font-label-sm font-mono text-on-surface-variant">
+<span class="text-primary font-semibold">KVIT-ACAD-REG.8(c):</span> "Undergraduate candidates must maintain ≥ 16 letter-graded credits with GPA ≥ 3.75..."
+                    </div>
+</td>
+<td class="py-3 px-4 align-top">
+<div class="space-y-1">
+<div class="flex items-center gap-1.5 text-label-sm font-label-sm font-mono text-on-surface">
+<span class="w-2 h-2 rounded-full bg-[#0D9488]"></span>
+<span>[Rank 1] doc_chunk_1042 (Score: 0.963)</span>
+</div>
+<div class="flex items-center gap-1.5 text-label-sm font-label-sm font-mono text-outline">
+<span class="w-2 h-2 rounded-full bg-outline-variant"></span>
+<span>[Rank 2] doc_chunk_1045 (Score: 0.790)</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-3 align-top text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-label-md font-label-md font-semibold bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1]">
+                      0.994
+                    </span>
+</td>
+<td class="py-3 px-4 align-top text-center">
+<span class="inline-flex items-center gap-1 text-label-sm font-label-sm font-semibold text-[#0F766E]">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+                      Pass
+                    </span>
+</td>
+</tr>
+<!-- Log 3: Fee refund upon mid-term withdrawal -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-4 align-top">
+<div class="font-medium text-on-surface">"Fee refund upon mid-term withdrawal"</div>
+<div class="text-label-sm font-label-sm text-outline mt-1 font-mono">ID: Q-BURS-005 • Category: Bursar &amp; Tuition</div>
+</td>
+<td class="py-3 px-4 align-top">
+<div class="bg-surface-container-low p-2 rounded border border-outline-variant text-label-sm font-label-sm font-mono text-on-surface-variant">
+<span class="text-primary font-semibold">KVIT-FIN-POL.22.4:</span> "50% tuition forfeiture prior to week 4; 100% liability thereafter, excluding verified medical leaves..."
+                    </div>
+</td>
+<td class="py-3 px-4 align-top">
+<div class="space-y-1">
+<div class="flex items-center gap-1.5 text-label-sm font-label-sm font-mono text-on-surface">
+<span class="w-2 h-2 rounded-full bg-[#0D9488]"></span>
+<span>[Rank 1] doc_chunk_4120 (Score: 0.915)</span>
+</div>
+<div class="flex items-center gap-1.5 text-label-sm font-label-sm font-mono text-outline">
+<span class="w-2 h-2 rounded-full bg-outline-variant"></span>
+<span>[Rank 2] doc_chunk_4121 (Score: 0.884)</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-3 align-top text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-label-md font-label-md font-semibold bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1]">
+                      0.957
+                    </span>
+</td>
+<td class="py-3 px-4 align-top text-center">
+<span class="inline-flex items-center gap-1 text-label-sm font-label-sm font-semibold text-[#0F766E]">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+                      Pass
+                    </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Analytical Disclaimer Callout -->
+<div class="p-3.5 bg-surface-container-low border border-outline-variant rounded-lg flex items-start gap-3">
+<span class="material-symbols-outlined text-outline text-[20px] flex-shrink-0 mt-0.5">info</span>
+<div class="text-body-sm font-body-sm text-on-surface-variant">
+<span class="font-medium text-on-surface">Benchmark Validity Note:</span>
+            Results are benchmarked against the KVIT demonstration golden evaluation dataset; production performance may vary based on OCR quality and query distribution.
+          </div>
+</div>
+</main>
+</div>
+</div>
+</body></html>

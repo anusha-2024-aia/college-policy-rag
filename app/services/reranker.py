@@ -41,25 +41,32 @@ class MockRerankerService(BaseRerankerService):
         if not candidates or top_n <= 0:
             return []
 
-        query_tokens = set(re.findall(r"\w+", query.lower()))
+        stopwords = {
+            "what", "is", "the", "for", "an", "and", "under", "per", "a", "in", "of", "to", "at", "by",
+            "from", "with", "about", "as", "into", "like", "through", "after", "over", "between", "out",
+            "against", "during", "without", "before", "around", "among", "how", "why", "when", "where",
+            "which", "who", "whom", "this", "that", "these", "those", "does", "do", "did", "are", "be",
+            "been", "being", "have", "has", "had", "can", "could", "should", "would", "may", "might",
+            "must", "shall", "will", "much", "many", "more",
+        }
+        all_query_tokens = [w for w in re.findall(r"\w+", query.lower()) if len(w) >= 3]
+        content_query_tokens = [w for w in all_query_tokens if w not in stopwords]
+        tokens_to_match = set(content_query_tokens) if content_query_tokens else set(all_query_tokens)
+
         scored_items: list[tuple[float, FusedChunk]] = []
 
         for candidate in candidates:
             chunk_tokens = set(re.findall(r"\w+", candidate.text.lower()))
-            overlap_count = len(query_tokens.intersection(chunk_tokens))
+            overlap_count = len(tokens_to_match.intersection(chunk_tokens))
+            lexical_ratio = overlap_count / max(len(tokens_to_match), 1)
 
-            # Base lexical overlap score
-            lexical_score = overlap_count / max(len(query_tokens), 1)
-
-            # Exact phrase match bonus
-            phrase_bonus = 0.2 if query.lower() in candidate.text.lower() else 0.0
-
-            # Weight from prior RRF ranking (scaled down)
-            rrf_component = candidate.rrf_score * 5.0
-
-            # Combined score bounded in [0.0, 1.0]
-            raw_score = (lexical_score * 0.7) + phrase_bonus + (rrf_component * 0.1)
-            rerank_score = round(min(max(raw_score, 0.01), 0.99), 4)
+            if lexical_ratio < 0.40:
+                rerank_score = 0.0001
+            else:
+                phrase_bonus = 0.2 if query.lower() in candidate.text.lower() else 0.0
+                rrf_component = candidate.rrf_score * 0.5
+                raw_score = (lexical_ratio * 0.7) + phrase_bonus + rrf_component
+                rerank_score = round(min(max(raw_score, 0.01), 0.9999), 4)
 
             scored_items.append((rerank_score, candidate))
 
