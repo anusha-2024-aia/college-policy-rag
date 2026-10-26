@@ -1,5 +1,8 @@
 """Pytest configuration, shared fixtures, and database setup."""
 
+import os
+os.environ["APP_ENV"] = "test"
+
 import tempfile
 from collections.abc import Generator
 from pathlib import Path
@@ -11,11 +14,15 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.models import Base
 from app.core.config import settings
+from app.core.cache import query_cache
 from app.services.embedding import MockEmbeddingService
 from tests.helpers import write_test_pdf
 
-# Ensure unit/integration test isolation
-settings.APP_ENV = "test"
+
+@pytest.fixture(autouse=True)
+def reset_query_cache():
+    """Reset role-scoped query cache before each test to prevent test crosstalk."""
+    query_cache.clear()
 
 
 @pytest.fixture(scope="module")

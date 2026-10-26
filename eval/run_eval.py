@@ -4,9 +4,12 @@ import argparse
 import datetime
 import json
 import logging
+import os
 from pathlib import Path
 import sys
 from typing import Optional
+
+os.environ.setdefault("APP_ENV", "test")
 from pydantic import ValidationError
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -309,9 +312,10 @@ def main() -> None:
                         "question_text": r.question_text,
                     })
 
+            stale_str = f"{metrics.stale_policy_error_rate * 100:.1f}%" if metrics.stale_policy_error_rate is not None else "N/A"
             print(
                 f"    -> Hit@5: {metrics.hit_rate_at_5:.4f} | MRR: {metrics.mean_reciprocal_rank:.4f} "
-                f"| Stale Policy Err: {metrics.stale_policy_error_rate * 100:.1f}% "
+                f"| Stale Policy Err: {stale_str} "
                 f"| Leak Rate: {metrics.information_leak_rate * 100:.2f}% "
                 f"| Latency: {metrics.average_latency_ms:.1f}ms"
             )

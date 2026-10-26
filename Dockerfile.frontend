@@ -18,9 +18,10 @@ COPY requirements.txt /app/
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy UI code, application models/core (for schemas and optional DB summary), and evaluation reports
+# Copy UI code, application models/core, evaluation reports, and docs
 COPY ui /app/ui
 COPY app /app/app
+COPY data /app/data
 COPY eval /app/eval
 COPY docs /app/docs
 

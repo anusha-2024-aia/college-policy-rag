@@ -18,6 +18,55 @@ services:
       timeout: 5s
       retries: 5
 
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: document_rag_backend
+    restart: unless-stopped
+    depends_on:
+      pgvector:
+        condition: service_healthy
+    ports:
+      # Bound to localhost for security
+      - "127.0.0.1:8000:8000"
+    environment:
+      APP_ENV: production
+      HOST: "0.0.0.0"
+      PORT: "8000"
+      DATABASE_URL: "postgresql+psycopg2://postgres:postgres@pgvector:5432/document_rag"
+      PYTHONPATH: /app
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: document_rag_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      # Bound to localhost for security
+      - "127.0.0.1:8501:8501"
+    environment:
+      BACKEND_URL: "http://backend:8000"
+      PORT: "8501"
+      STREAMLIT_SERVER_HEADLESS: "true"
+      STREAMLIT_SERVER_ENABLE_CORS: "false"
+      STREAMLIT_BROWSER_GATHER_USAGE_STATS: "false"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8501/_stcore/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
 volumes:
   pgvector_data:
     driver: local

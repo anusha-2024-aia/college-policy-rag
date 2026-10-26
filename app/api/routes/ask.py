@@ -5,6 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from app.core.database import get_db
+from app.core.auth import get_current_role
+from app.core.rls import set_session_role
 from app.schemas.qa import AskRequest, AskResponse
 from app.services.retrieval import HybridRetrievalService
 from app.services.llm import (
@@ -21,8 +23,12 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="", tags=["Question Answering"])
 
 
-def get_qa_service(db: Session = Depends(get_db)) -> QAService:
-    """Dependency injection factory for QAService."""
+def get_qa_service(
+    db: Session = Depends(get_db),
+    verified_role: str = Depends(get_current_role),
+) -> QAService:
+    """Dependency injection factory for QAService with transaction role binding."""
+    set_session_role(db, verified_role)
     retrieval_service = HybridRetrievalService(db_session=db)
     llm_service = get_llm_service()
     return QAService(retrieval_service=retrieval_service, llm_service=llm_service)
@@ -41,11 +47,12 @@ def get_qa_service(db: Session = Depends(get_db)) -> QAService:
 )
 async def ask_question(
     request: AskRequest,
+    verified_role: str = Depends(get_current_role),
     qa_service: QAService = Depends(get_qa_service),
 ) -> AskResponse:
     """Answer question with verified citations and abstention support."""
     try:
-        response = qa_service.answer(request)
+        response = qa_service.answer(request, role=verified_role)
         return response
     except LLMAuthenticationError as exc:
         logger.error("LLM authentication failure: %s", exc)
@@ -86,11 +93,12 @@ async def ask_question(
 )
 async def ask_question_stream(
     request: AskRequest,
+    verified_role: str = Depends(get_current_role),
     qa_service: QAService = Depends(get_qa_service),
 ) -> StreamingResponse:
     """Stream answer generation as Server-Sent Events (SSE)."""
     try:
-        generator = qa_service.stream_answer(request)
+        generator = qa_service.stream_answer(request, role=verified_role)
         return StreamingResponse(
             generator,
             media_type="text/event-stream",

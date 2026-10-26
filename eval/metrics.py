@@ -141,11 +141,26 @@ def check_information_leak(
     golden: GoldenQuestion,
 ) -> tuple[bool, Optional[str]]:
     """Verify if unauthorized document chunks or tokens were retrieved or cited."""
-    # Check if this question was an unauthorized probe for this role
+    # 1. Check if response contains any forbidden canary tokens
+    if golden.forbidden_canaries:
+        ans_lower = (result.answer or "").lower()
+        for cnry in golden.forbidden_canaries:
+            if cnry.lower() in ans_lower:
+                return True, f"Canary token '{cnry}' leaked to unauthorized role '{golden.role}'"
+
+    # 2. Check if retrieved candidates or citations contain forbidden sources
+    if golden.forbidden_sources:
+        for c in result.retrieved_candidates:
+            if matches_expected_source(c.file_name, c.page_number, golden.forbidden_sources):
+                return True, f"Restricted chunk '{c.file_name}' leaked to unauthorized role '{golden.role}'"
+        for cite in result.citations:
+            if matches_expected_source(cite.file_name, cite.page_number, golden.forbidden_sources):
+                return True, f"Restricted citation '{cite.file_name}' leaked to unauthorized role '{golden.role}'"
+
+    # 3. Check restricted_for_roles
     if golden.restricted_for_roles and golden.role in golden.restricted_for_roles:
         # If any candidate from expected sources was retrieved or cited, that's an RBAC leak
         if not result.abstained or result.citations or result.retrieved_candidates:
-            # Check if any candidate is from restricted document
             for c in result.retrieved_candidates:
                 if matches_expected_source(c.file_name, c.page_number, golden.expected_sources):
                     return True, f"Restricted chunk '{c.file_name}' leaked to unauthorized role '{golden.role}'"

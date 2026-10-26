@@ -13,6 +13,7 @@ class ScoredChunk(BaseModel):
     title: str
     page_number: int
     text: str
+    clause_ref: Optional[str] = None
     score: float = Field(..., description="Cosine similarity or BM25/ts_rank score")
     rank: int = Field(..., description="1-based rank within this stage")
 
@@ -26,6 +27,7 @@ class FusedChunk(BaseModel):
     title: str
     page_number: int
     text: str
+    clause_ref: Optional[str] = None
     vector_rank: Optional[int] = Field(None, description="1-based rank in vector search, if present")
     keyword_rank: Optional[int] = Field(None, description="1-based rank in keyword search, if present")
     vector_score: Optional[float] = Field(None, description="Original vector similarity score")
@@ -43,6 +45,7 @@ class RerankedChunk(BaseModel):
     title: str
     page_number: int
     text: str
+    clause_ref: Optional[str] = None
     vector_rank: Optional[int] = None
     keyword_rank: Optional[int] = None
     rrf_score: float

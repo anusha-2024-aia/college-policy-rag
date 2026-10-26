@@ -47,20 +47,28 @@ class MockRerankerService(BaseRerankerService):
             "against", "during", "without", "before", "around", "among", "how", "why", "when", "where",
             "which", "who", "whom", "this", "that", "these", "those", "does", "do", "did", "are", "be",
             "been", "being", "have", "has", "had", "can", "could", "should", "would", "may", "might",
-            "must", "shall", "will", "much", "many", "more",
+            "must", "shall", "will", "much", "many", "more", "my", "say", "says", "said", "tell", "still",
+            "true", "false", "senior",
         }
-        all_query_tokens = [w for w in re.findall(r"\w+", query.lower()) if len(w) >= 3]
+        all_query_tokens = [w for w in re.findall(r"\w+", query.lower()) if len(w) >= 2]
         content_query_tokens = [w for w in all_query_tokens if w not in stopwords]
         tokens_to_match = set(content_query_tokens) if content_query_tokens else set(all_query_tokens)
 
         scored_items: list[tuple[float, FusedChunk]] = []
 
         for candidate in candidates:
-            chunk_tokens = set(re.findall(r"\w+", candidate.text.lower()))
-            overlap_count = len(tokens_to_match.intersection(chunk_tokens))
+            chunk_tokens = set(re.findall(r"\w+", f"{candidate.title or ''} {candidate.text}".lower()))
+            matched_tokens = set()
+            for t in tokens_to_match:
+                for ct in chunk_tokens:
+                    if t == ct or (len(t) >= 5 and len(ct) >= 5 and (t.startswith(ct[:4]) or ct.startswith(t[:4]))):
+                        matched_tokens.add(t)
+                        break
+
+            overlap_count = len(matched_tokens)
             lexical_ratio = overlap_count / max(len(tokens_to_match), 1)
 
-            if lexical_ratio < 0.40:
+            if overlap_count == 0 or lexical_ratio < 0.40:
                 rerank_score = 0.0001
             else:
                 phrase_bonus = 0.2 if query.lower() in candidate.text.lower() else 0.0
@@ -83,6 +91,7 @@ class MockRerankerService(BaseRerankerService):
                     title=candidate.title,
                     page_number=candidate.page_number,
                     text=candidate.text,
+                    clause_ref=candidate.clause_ref,
                     vector_rank=candidate.vector_rank,
                     keyword_rank=candidate.keyword_rank,
                     rrf_score=candidate.rrf_score,
@@ -140,6 +149,7 @@ class FlashRankRerankerService(BaseRerankerService):
                     title=candidate.title,
                     page_number=candidate.page_number,
                     text=candidate.text,
+                    clause_ref=candidate.clause_ref,
                     vector_rank=candidate.vector_rank,
                     keyword_rank=candidate.keyword_rank,
                     rrf_score=candidate.rrf_score,
@@ -198,6 +208,7 @@ class CohereRerankerService(BaseRerankerService):
                     title=candidate.title,
                     page_number=candidate.page_number,
                     text=candidate.text,
+                    clause_ref=candidate.clause_ref,
                     vector_rank=candidate.vector_rank,
                     keyword_rank=candidate.keyword_rank,
                     rrf_score=candidate.rrf_score,

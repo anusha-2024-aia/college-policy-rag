@@ -30,6 +30,12 @@ def parse_args() -> argparse.Namespace:
         help=f"Path to manifest CSV (default: {settings.MANIFEST_PATH})",
     )
     parser.add_argument(
+        "--lineage",
+        type=str,
+        default=None,
+        help="Optional path to supersession_register.csv",
+    )
+    parser.add_argument(
         "--force",
         action="store_true",
         help="Force re-chunking and re-embedding even if document hash is unchanged",
@@ -98,7 +104,11 @@ def main() -> None:
         )
 
         print("\n[3/3] Running ingestion pipeline...")
-        report = ingestion_svc.ingest_manifest(manifest_path=manifest_path, force=args.force)
+        report = ingestion_svc.ingest_manifest(
+            manifest_path=manifest_path,
+            force=args.force,
+            lineage_path=args.lineage,
+        )
 
     finally:
         db.close()
@@ -114,6 +124,7 @@ def main() -> None:
     print(f" Skipped:         {report.skipped_count}")
     print(f" Failed:          {report.failed_count}")
     print(f" Chunks Created:  {report.total_chunks_created}")
+    print(f" Lineage Records: {report.lineage_records_created}")
     print(f" Elapsed Time:    {elapsed:.2f}s")
     print("-" * 70)
 

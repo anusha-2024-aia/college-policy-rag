@@ -411,8 +411,9 @@ def test_discover_evaluation_reports_finds_stage3_reports():
     """Verify discover_evaluation_reports discovers Stage 3 reports with newest first."""
     reports = discover_evaluation_reports("eval/results")
     assert len(reports) >= 1
-    # First report should be the final Stage 3 report
-    assert reports[0].name == "eval_report_20261019_082717.md"
+    # Reports should be valid evaluation markdown files, newest first
+    assert reports[0].name.startswith("eval_report_")
+    assert any(r.name == "eval_report_20261019_082717.md" for r in reports)
 
 
 def test_discover_evaluation_reports_missing_or_empty_dir(tmp_path):

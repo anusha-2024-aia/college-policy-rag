@@ -27,6 +27,7 @@ from app.models.document import Document
 from app.schemas.qa import AskRequest, PassageEvidence
 from app.services.retrieval import HybridRetrievalService, ScoredChunk, FusedChunk, RerankedChunk
 from app.services.qa import QAService
+from app.core.cache import query_cache
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +37,8 @@ SUPPORTED_CONFIGS = [
     "hybrid",
     "hybrid_plus_reranking",
     "hybrid_plus_reranking_plus_version_awareness",
+    "no_lineage_expansion",
+    "security_ablated",
 ]
 
 
@@ -233,6 +236,61 @@ class EvaluationRunner:
                 citations.append(
                     CitationItem(index=c.index, file_name=c.file_name, page_number=c.page_number, snippet=c.snippet)
                 )
+
+        elif config_name == "no_lineage_expansion":
+            # Version-aware but without lineage expansion
+            req = AskRequest(
+                question=question.question,
+                role=role,
+                top_k=self.top_k,
+                top_n=self.top_n,
+                version_aware=True,
+                lineage_expansion=False,
+                abstention_threshold=self.abstention_threshold,
+            )
+            resp = self.qa_service.answer(req)
+            abstained = resp.abstained
+            answer_text = resp.answer
+            has_conflict = resp.has_policy_conflict
+
+            for p in resp.passages:
+                candidates.append(
+                    CandidateItem(file_name=p.file_name, page_number=p.page_number, rank=p.index, score=p.score, text=p.text)
+                )
+            for c in resp.citations:
+                citations.append(
+                    CitationItem(index=c.index, file_name=c.file_name, page_number=c.page_number, snippet=c.snippet)
+                )
+
+        elif config_name == "security_ablated":
+            # Security disabled: L1-L4 turned off to measure leak rate
+            from app.core.config import settings
+            orig_security = settings.SECURITY_ENFORCEMENT_ENABLED
+            settings.SECURITY_ENFORCEMENT_ENABLED = False
+            try:
+                req = AskRequest(
+                    question=question.question,
+                    role=role,
+                    top_k=self.top_k,
+                    top_n=self.top_n,
+                    version_aware=True,
+                    abstention_threshold=self.abstention_threshold,
+                )
+                resp = self.qa_service.answer(req)
+                abstained = resp.abstained
+                answer_text = resp.answer
+                has_conflict = resp.has_policy_conflict
+
+                for p in resp.passages:
+                    candidates.append(
+                        CandidateItem(file_name=p.file_name, page_number=p.page_number, rank=p.index, score=p.score, text=p.text)
+                    )
+                for c in resp.citations:
+                    citations.append(
+                        CitationItem(index=c.index, file_name=c.file_name, page_number=c.page_number, snippet=c.snippet)
+                    )
+            finally:
+                settings.SECURITY_ENFORCEMENT_ENABLED = orig_security
         else:
             raise ValueError(f"Unknown configuration name: {config_name}")
 
@@ -291,6 +349,7 @@ class EvaluationRunner:
         failures_count: dict[str, int] = {}
 
         for q in questions:
+            query_cache.clear()
             res = self.run_question_on_config(q, config_name)
             results.append(res)
             if res.failure_classification:

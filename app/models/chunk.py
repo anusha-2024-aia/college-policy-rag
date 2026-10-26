@@ -7,7 +7,9 @@ from sqlalchemy import (
     String,
     Integer,
     Text,
+    Date,
     DateTime,
+    JSON,
     ForeignKey,
     Index,
 )
@@ -54,6 +56,11 @@ class Chunk(Base):
     page_number = Column(Integer, nullable=False, index=True)  # 1-based index
     text = Column(Text, nullable=False)
     token_count = Column(Integer, nullable=False)
+    clause_ref = Column(String(100), nullable=True, index=True)
+    valid_from = Column(Date, nullable=True)
+    valid_to = Column(Date, nullable=True)
+    status = Column(String(50), nullable=False, default="current")
+    allowed_roles = Column(JSON, nullable=False, default=list)
     embedding = Column(Vector(1536), nullable=False)
     tsv = Column(TSVectorType, nullable=True)
     created_at = Column(
@@ -83,6 +90,10 @@ class Chunk(Base):
         Index("idx_chunks_doc_chunk", "document_id", "chunk_index"),
         # Compound index for document page retrieval
         Index("idx_chunks_doc_page", "document_id", "page_number"),
+        # Index for status and clause retrieval
+        Index("idx_chunks_status", "status"),
+        Index("idx_chunks_clause_ref", "clause_ref"),
+        Index("idx_chunks_validity", "valid_from", "valid_to"),
     )
 
     def __repr__(self) -> str:

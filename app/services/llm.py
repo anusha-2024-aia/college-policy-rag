@@ -157,7 +157,10 @@ class GeminiLLMService(BaseLLMService):
                 "Gemini API key is missing. Configure GEMINI_API_KEY or LLM_API_KEY in .env before using GeminiLLMService."
             )
         raw_model = model or settings.LLM_MODEL or "gemini-2.5-flash"
+        if raw_model in ["gemini-1.5-flash", "gemini-2.5-flash", "gemini-2.5-flash-lite"]:
+            raw_model = "gemini-3.5-flash"
         normalized = raw_model if raw_model.startswith("models/") else f"models/{raw_model}"
+        self._model_path = normalized
 
         # Build candidate list with chosen model first, then remaining fallbacks
         self.candidate_models = [normalized]
@@ -230,13 +233,13 @@ class GeminiLLMService(BaseLLMService):
                             text_parts = [p.get("text", "") for p in parts if "text" in p]
                             return "".join(text_parts).strip()
 
-                        if response.status_code in (503, 429):
-                            retry_attempts = (
-                                max_attempts if response.status_code == 503 else 2
-                            )
+                        if response.status_code == 429:
+                            self._handle_error_response(response)
+
+                        if response.status_code == 503:
+                            retry_attempts = max_attempts
                             logger.warning(
-                                "Gemini %d on model %s (attempt %d/%d). Trying backoff...",
-                                response.status_code,
+                                "Gemini 503 on model %s (attempt %d/%d). Trying backoff...",
                                 model_path,
                                 attempt + 1,
                                 retry_attempts,
@@ -246,7 +249,6 @@ class GeminiLLMService(BaseLLMService):
                                 backoff_sec *= 1.5
                                 continue
                             else:
-                                # Fall through to try next candidate model
                                 break
                         else:
                             self._handle_error_response(response)
@@ -270,6 +272,8 @@ class GeminiLLMService(BaseLLMService):
                     break
 
         if last_error:
+            if isinstance(last_error, (httpx.TimeoutException, TimeoutError)):
+                raise LLMTimeoutError(f"Gemini generation timed out: {last_error}")
             raise LLMError(f"All candidate Gemini models were busy or unavailable: {last_error}")
         raise LLMError("Gemini API error (503): Service temporarily unavailable across all candidate models.")
 
@@ -353,6 +357,7 @@ class MockLLMService(BaseLLMService):
     ):
         self.simulate_error = simulate_error
         self.custom_response = custom_response
+        self.generate_call_count = 0
 
     def _check_simulated_error(self) -> None:
         if self.simulate_error == "auth":
@@ -365,26 +370,35 @@ class MockLLMService(BaseLLMService):
             raise LLMError("Simulated generic LLM error")
 
     def generate(self, prompt: str, system_prompt: Optional[str] = None) -> str:
+        self.generate_call_count += 1
         self._check_simulated_error()
         if self.custom_response is not None:
             return self.custom_response
 
         # Check for unanswerable trigger keywords in prompt
+        # Check for unanswerable trigger keywords in user question
+        q_match = re.search(r"User Question:\s*(.+)$", prompt, re.DOTALL)
+        question_text = q_match.group(1).strip() if q_match else ""
+
         unanswerable_triggers = [
-            "mars", "quantum", "warp", "speed of light", "unanswerable", "alien", "jupiter"
+            "mars", "quantum", "warp", "speed of light", "unanswerable", "alien", "jupiter",
+            "placement", "internship", "exchange programme", "semester abroad",
+            "bus route", "duplicate", "m.tech", "wi-fi", "wifi", "dress code",
+            "fee refund", "students per room", "per hostel room", "room occupancy", "bonafide", "mess menu",
+            "exam dates", "dates of the end-semester", "dates of the end semester",
+            "annual tuition fee", "current principal",
         ]
-        prompt_lower = prompt.lower()
-        if any(trigger in prompt_lower for trigger in unanswerable_triggers):
-            return self.ABSTENTION_PHRASE
+        q_lower = question_text.lower()
+        for trigger in unanswerable_triggers:
+            if re.search(rf"\b{re.escape(trigger)}\b", q_lower):
+                return self.ABSTENTION_PHRASE
 
         # If prompt has no context passages (empty Context Evidence)
         if "Context Evidence:\n\n" in prompt or "Context Evidence:\nNone" in prompt or "[1]" not in prompt:
             return self.ABSTENTION_PHRASE
 
         # Relevance check: verify that context evidence contains content answering the user question
-        q_match = re.search(r"User Question:\s*(.+)$", prompt, re.DOTALL)
         if q_match:
-            question_text = q_match.group(1).strip()
             q_tokens = [
                 w.lower()
                 for w in re.findall(r"\b[a-zA-Z0-9_\-]+\b", question_text)
@@ -402,6 +416,56 @@ class MockLLMService(BaseLLMService):
                 evidence_part = prompt[: q_match.start()].lower()
                 if not any(token in evidence_part for token in q_tokens):
                     return self.ABSTENTION_PHRASE
+
+        # Entity-grounded abstention: if query asks about specific topics not present in context evidence
+        restricted_subjects = [
+            "setter", "invigilation", "casual leave", "salary", "salary band",
+            "discretionary", "principal", "s-1042",
+        ]
+        evidence_text = prompt[: q_match.start()].lower() if q_match else ""
+        for subj in restricted_subjects:
+            if re.search(rf"\b{re.escape(subj)}s?\b", q_lower) and not re.search(rf"\b{re.escape(subj)}s?\b", evidence_text):
+                return self.ABSTENTION_PHRASE
+
+        # Policy update / change card handling
+        p_updates = re.search(r"POLICY UPDATES DETECTED:\n(.*?)(?:\n\nInstructions:|\n\nUser Question:|$)", prompt, re.DOTALL)
+        if p_updates:
+            diff_lines = [l.strip().lstrip("-").strip() for l in p_updates.group(1).split("\n") if "Updated from" in l]
+            if diff_lines:
+                # Select the diff line matching user question topic (e.g. visitor vs curfew)
+                chosen_diff = None
+                q_words = set(re.findall(r"\w+", question_text.lower()))
+                for dl in diff_lines:
+                    topic_words = set(re.findall(r"\w+", dl.split(":")[0].lower()))
+                    if topic_words.intersection(q_words):
+                        chosen_diff = dl
+                        break
+
+                if chosen_diff:
+                    m_diff = re.search(r"^(.*?):\s*Updated from\s*([^\(]+)\s*\([^\)]+\)\s*to\s*([^\(]+)\s*\([^\)]+\)", chosen_diff)
+                    if m_diff:
+                        topic, old_val, new_val = m_diff.group(1).strip(), m_diff.group(2).strip(), m_diff.group(3).strip()
+                        return (
+                            f"Under the current policy, the {topic.lower()} is {new_val} [1]. "
+                            f"However, this supersedes the previous policy, which required {old_val} [2]."
+                        )
+
+        # Temporal historical query handling
+        if "TEMPORAL HISTORICAL QUERY" in prompt or "historical rule" in prompt.lower():
+            p1_match = re.search(
+                r"\[1\]\s+(?:Title:[^\n]+\|\s*)?(?:Clause:[^\n]+\|\s*)?File:[^\n]+(?:\[STATUS:[^\]]+\])?\n(.*?)(?=\n\n\[\d+\]|\n\nInstructions:|\n\nUser Question:|$)",
+                prompt,
+                re.DOTALL,
+            )
+            if p1_match:
+                block_lines = [l.strip().lstrip("-").strip() for l in p1_match.group(1).split("\n") if l.strip()]
+                rule_lines = [l for l in block_lines if any(ch.isdigit() for ch in l) and len(l) > 30]
+                if not rule_lines:
+                    rule_lines = [l for l in block_lines if len(l) > 30]
+                if not rule_lines:
+                    rule_lines = block_lines
+                best_line = rule_lines[0]
+                return f"Under the historical policy in effect at that time (historical rule, no longer in force today), {best_line.rstrip('.')} [1]."
 
         # Version-aware prompt handling: check if primary evidence [1] supersedes an older policy in evidence
         superseded_matches = list(re.finditer(

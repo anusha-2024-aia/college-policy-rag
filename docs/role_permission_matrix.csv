@@ -1,0 +1,17 @@
+doc_id,file,student,faculty,admin,reason
+D01,academic_regulations_2024.pdf,Y,Y,Y,public policy document
+D02,student_handbook_2025.pdf,Y,Y,Y,public policy document
+D03,attendance_leave_policy_2023.pdf,Y,Y,Y,public policy document
+D04,attendance_leave_policy_2025.pdf,Y,Y,Y,public policy document
+D05,examination_assessment_rules_2023.pdf,Y,Y,Y,public policy document
+D06,exam_rules_amendment_circular_2025.pdf,Y,Y,Y,public policy document
+D07,library_rules_2025.pdf,Y,Y,Y,public policy document
+D08,hostel_rules_2024.pdf,Y,Y,Y,public policy document
+D09,hostel_rules_2025.pdf,Y,Y,Y,public policy document
+D10,scholarship_guidelines_2025.pdf,Y,Y,Y,public policy document
+R01,faculty_service_rules_2025.pdf,N,Y,Y,internal faculty/exam-cell document
+R02,question_paper_confidentiality_protocol_2025.pdf,N,Y,Y,internal faculty/exam-cell document
+R03,marks_moderation_guidelines_2025.pdf,N,Y,Y,internal faculty/exam-cell document
+R04,disciplinary_committee_case_summaries_2025.pdf,N,N,Y,administration-only document
+R05,admin_fee_waiver_internal_criteria_2025.pdf,N,N,Y,administration-only document
+R06,admin_salary_bands_and_budget_2025.pdf,N,N,Y,administration-only document

@@ -60,10 +60,30 @@ class Settings(BaseSettings):
 
     # Version-Aware Policy Settings
     VERSION_AWARE_ENABLED: bool = True
+    LINEAGE_EXPANSION_ENABLED: bool = True
+
+    # Auth & JWT Settings (Phase 4 Identity & Role Enforcement)
+    JWT_SECRET_KEY: str = "kvit-policy-intelligence-secret-key-2026-production"
+    JWT_ALGORITHM: str = "HS256"
+    JWT_EXPIRE_SECONDS: int = 3600
+
+    # Defence-in-Depth Security Layers (L1-L4)
+    SECURITY_ENFORCEMENT_ENABLED: bool = True
+    L1_SQL_FILTER_ENABLED: bool = True
+    L2_RLS_ENABLED: bool = True
+    L3_RUNTIME_ASSERTION_ENABLED: bool = True
+    L4_OUTPUT_SCAN_ENABLED: bool = True
+
+    # Phase 5 Leak Surface Controls & Caching
+    SHOW_HIDDEN_DOCUMENT_COUNT: bool = True
+    QUERY_CACHE_ENABLED: bool = True
+    CORPUS_VERSION: str = "v1"
 
     @property
     def sync_database_url(self) -> str:
         """Return synchronous database URL for sync sessions/migrations/CLI."""
+        if self.APP_ENV == "test":
+            return "sqlite:///:memory:"
         url = self.DATABASE_URL
         if url.startswith("postgresql+asyncpg://"):
             return url.replace("postgresql+asyncpg://", "postgresql+psycopg2://", 1)

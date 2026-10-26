@@ -5,7 +5,9 @@ import logging
 import re
 from pathlib import Path
 from typing import Optional
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
+
+from app.core.auth import get_current_role
 
 from app.schemas.evaluation_api import (
     EvaluationReportDetail,
@@ -95,8 +97,11 @@ def list_reports() -> EvaluationReportListResponse:
     summary="Get Evaluation Benchmark Report Content",
     description="Returns JSON benchmark data for a specific evaluation run without exposing Stage N prefixes.",
 )
-def get_report(filename: str) -> EvaluationReportDetail:
-    """Read a specific evaluation report safely."""
+def get_report(
+    filename: str,
+    verified_role: str = Depends(get_current_role),
+) -> EvaluationReportDetail:
+    """Read a specific evaluation report safely with role-based canary redaction."""
     clean_name = Path(filename).name
     target_path = RESULTS_DIR / clean_name
 
@@ -129,6 +134,32 @@ def get_report(filename: str) -> EvaluationReportDetail:
         else:
             with open(target_path, "r", encoding="utf-8") as f:
                 markdown_content = f.read()
+
+        # Phase 5 Leak Surface Scoping: Redact confidential canaries and sensitive tokens for non-admin callers
+        if verified_role != "admin":
+            canary_pattern = r"\bKVIT-[A-Z]{3}-CNRY-\d{4}\b"
+            restricted_terms = [
+                r"faculty_service_rules_2025\.pdf",
+                r"question_paper_confidentiality_protocol_2025\.pdf",
+                r"marks_moderation_guidelines_2025\.pdf",
+                r"disciplinary_committee_case_summaries_2025\.pdf",
+                r"admin_fee_waiver_internal_criteria_2025\.pdf",
+                r"admin_salary_bands_and_budget_2025\.pdf",
+                r"faculty\s+service",
+                r"salary\s+bands",
+                r"disciplinary\s+committee",
+                r"fee\s+waiver\s+internal",
+                r"confidentiality\s+protocol",
+                r"marks\s+moderation",
+            ]
+            combined_pattern = re.compile(
+                r"|".join([canary_pattern] + [f"(?:{t})" for t in restricted_terms]),
+                re.IGNORECASE,
+            )
+            if json_export:
+                json_export = combined_pattern.sub("[REDACTED_CONFIDENTIAL]", json_export)
+            if markdown_content:
+                markdown_content = combined_pattern.sub("[REDACTED_CONFIDENTIAL]", markdown_content)
 
         title = clean_benchmark_title(clean_name.replace("_", " ").title(), clean_name)
 

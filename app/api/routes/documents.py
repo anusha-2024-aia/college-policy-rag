@@ -4,11 +4,16 @@ import io
 import logging
 from typing import List, Optional, Tuple
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 import pypdf
 
+from app.core.config import settings
 from app.core.database import get_db
+from app.core.auth import get_current_role
+from app.core.rls import set_session_role
 from app.core.roles import build_role_filter, PERMITTED_ROLES, validate_role, InvalidRoleError
+from app.services.security_scanner import SecurityScanner
 from app.models.document import Document
 from app.schemas.document_api import (
     DocumentCatalogResponse,
@@ -57,9 +62,26 @@ def _build_superseded_by_map(all_docs: list[Document]) -> dict[str, Tuple[str, s
 )
 def list_documents(
     role: Optional[str] = None,
+    verified_role: str = Depends(get_current_role),
     db: Session = Depends(get_db),
 ) -> DocumentCatalogResponse:
     """Retrieve indexed documents from PostgreSQL with strict server-side role enforcement."""
+    # Enforce verified role from token; fall back to validated legacy query param if token was not supplied
+    if role:
+        try:
+            clean_param = validate_role(role)
+        except InvalidRoleError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+        # If authenticated via token with non-student role, token takes precedence
+        clean_role = verified_role if verified_role != "student" else clean_param
+    else:
+        clean_role = verified_role
+
+    set_session_role(db, clean_role)
+
     is_postgres = (
         db.bind is not None and db.bind.dialect.name == "postgresql"
     )
@@ -71,35 +93,17 @@ def list_documents(
     )
     total_in_db = len(all_docs)
 
-    # Validate and filter by role server-side if specified
-    if role:
-        try:
-            clean_role = validate_role(role)
-        except InvalidRoleError as exc:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=str(exc),
-            ) from exc
-
-        role_filter = build_role_filter(Document, clean_role, dialect)
-        visible_docs: list[Document] = (
-            db.query(Document)
-            .filter(role_filter)
-            .order_by(Document.effective_date.desc())
-            .all()
-        )
-    else:
-        # Default or unauthenticated overview: student role is the baseline public role
-        clean_role = "student"
-        role_filter = build_role_filter(Document, clean_role, dialect)
-        visible_docs = (
-            db.query(Document)
-            .filter(role_filter)
-            .order_by(Document.effective_date.desc())
-            .all()
-        )
+    role_filter = build_role_filter(Document, clean_role, dialect)
+    visible_docs: list[Document] = (
+        db.query(Document)
+        .filter(role_filter)
+        .order_by(Document.effective_date.desc())
+        .all()
+    )
 
     hidden_count = total_in_db - len(visible_docs)
+    if not getattr(settings, "SHOW_HIDDEN_DOCUMENT_COUNT", True):
+        hidden_count = 0
 
     # Lineage mapping across visible documents
     superseded_by_map = _build_superseded_by_map(all_docs)
@@ -147,6 +151,63 @@ def list_documents(
     )
 
 
+@router.get(
+    "/{document_id}",
+    response_model=DocumentSummaryItem,
+    status_code=status.HTTP_200_OK,
+    summary="Get Document Detail by ID or Filename",
+    description="Returns metadata of an indexed document. Hidden/unauthorized documents return uniform 404 to prevent existence discovery.",
+)
+def get_document_detail(
+    document_id: str,
+    verified_role: str = Depends(get_current_role),
+    db: Session = Depends(get_db),
+) -> DocumentSummaryItem:
+    """Retrieve document detail with strict role authorization and uniform 404 masking."""
+    set_session_role(db, verified_role)
+    doc = db.query(Document).filter(
+        or_(Document.id == document_id, Document.file_name == document_id)
+    ).first()
+
+    # Uniform 404 response for non-existent and unauthorized documents
+    if not doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Document not found.",
+        )
+
+    roles = doc.allowed_roles if isinstance(doc.allowed_roles, list) else [str(doc.allowed_roles)]
+    clean_roles = [str(r).lower() for r in roles]
+    if verified_role not in clean_roles and "all" not in clean_roles:
+        # Uniform 404 to avoid revealing existence of restricted documents
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Document not found.",
+        )
+
+    all_docs = db.query(Document).all()
+    superseded_by_map = _build_superseded_by_map(all_docs)
+    if doc.file_name in superseded_by_map:
+        display_status, replacing_title = superseded_by_map[doc.file_name]
+        superseded_by_title = f"{display_status} by {replacing_title}"
+    else:
+        display_status = "Active"
+        superseded_by_title = None
+
+    return DocumentSummaryItem(
+        id=doc.id,
+        file_name=doc.file_name,
+        title=doc.title,
+        effective_date=str(doc.effective_date),
+        supersedes=doc.supersedes,
+        superseded_by_title=superseded_by_title,
+        allowed_roles=roles,
+        total_pages=doc.total_pages,
+        total_chunks=doc.total_chunks,
+        status=display_status,
+    )
+
+
 @router.post(
     "/inspect",
     response_model=PDFInspectionResponse,
@@ -156,13 +217,24 @@ def list_documents(
 )
 async def inspect_pdf(
     file: UploadFile = File(...),
+    verified_role: str = Depends(get_current_role),
 ) -> PDFInspectionResponse:
-    """Read-only preview inspection for candidate policy PDF documents."""
+    """Read-only preview inspection for candidate policy PDF documents with role governance."""
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Only PDF files are supported for policy preview.",
         )
+
+    # Restrict previewing confidential document filenames for non-admin
+    scanner = SecurityScanner()
+    if verified_role != "admin" and file.filename in scanner.canary_data:
+        allowed = [r.lower() for r in scanner.canary_data[file.filename].get("allowed_roles", [])]
+        if verified_role not in allowed:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access denied: confidential document preview not permitted.",
+            )
 
     try:
         content = await file.read()
@@ -174,12 +246,23 @@ async def inspect_pdf(
         if num_pages > 0:
             preview_text = reader.pages[0].extract_text() or ""
 
+        # Scan preview text for canaries or confidential statements
+        if preview_text and verified_role != "admin":
+            is_leak, leak_reason = scanner.scan_output(preview_text, verified_role)
+            if is_leak:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Access denied: preview content contains restricted confidential text.",
+                )
+
         return PDFInspectionResponse(
             filename=file.filename,
             num_pages=num_pages,
             file_size_kb=file_size_kb,
             preview_text=preview_text[:1000],
         )
+    except HTTPException:
+        raise
     except Exception as exc:
         logger.error("Failed to inspect PDF: %s", exc)
         raise HTTPException(

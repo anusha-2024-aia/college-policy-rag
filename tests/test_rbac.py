@@ -9,6 +9,7 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 from app.main import app
 from app.core.database import get_db
+from app.core.auth import create_access_token
 from app.core.roles import (
     PERMITTED_ROLES,
     UserRole,
@@ -304,7 +305,8 @@ def test_authorized_faculty_accesses_exam_key_and_syllabus(client: TestClient, r
         "role": "faculty",
         "include_diagnostics": True,
     }
-    response = client.post("/ask", json=payload)
+    token = create_access_token("faculty")
+    response = client.post("/ask", json=payload, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert not data["abstained"]
@@ -320,7 +322,8 @@ def test_authorized_admin_accesses_salaries_and_disciplinary(client: TestClient,
         "role": "admin",
         "include_diagnostics": True,
     }
-    response = client.post("/ask", json=payload)
+    token = create_access_token("admin")
+    response = client.post("/ask", json=payload, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert not data["abstained"]

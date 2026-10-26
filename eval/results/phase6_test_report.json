@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "adversarial_evaluations": 60,
+  "protected_leaks": 0,
+  "negative_control_evaluations": 30,
+  "negative_control_leaks": 17,
+  "token_attacks_passed": true,
+  "route_sweep_leaks": 0,
+  "cache_isolation_passed": true,
+  "authorized_access_passed": "5/5",
+  "unchanged_clauses_passed": "2/2"
+}

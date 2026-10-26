@@ -33,6 +33,7 @@ class GoldenQuestion(BaseModel):
     """Schema for a single verified question in eval/golden.jsonl."""
 
     id: str = Field(description="Unique question identifier (e.g., Q-001)")
+    type: Optional[str] = Field(default=None, description="Question category: normal, stale_trap, unanswerable, restricted_trap")
     question: str = Field(min_length=3, description="Evaluated question text")
     role: str = Field(default="student", description="Intended access role (student, faculty, admin)")
     expected_answer: Optional[str] = Field(default=None, description="Ground truth answer or expected synthesis")
@@ -40,6 +41,9 @@ class GoldenQuestion(BaseModel):
     should_abstain: bool = Field(default=False, description="True if question cannot be answered from corpus")
     is_version_conflict: bool = False
     superseded_sources: list[ExpectedSource] = Field(default_factory=list, description="Historical superseded sources")
+    forbidden_sources: list[ExpectedSource] = Field(default_factory=list, description="Restricted sources barred for caller")
+    forbidden_canaries: list[str] = Field(default_factory=list, description="Restricted canary tokens")
+    restricted_doc_roles: list[str] = Field(default_factory=list, description="Roles permitted to view evidence")
     restricted_for_roles: list[str] = Field(default_factory=list, description="Roles barred from accessing evidence")
     notes: Optional[str] = None
 
@@ -51,6 +55,31 @@ class GoldenQuestion(BaseModel):
             # Ensure role is validated
             role_val = clean.get("role", "student")
             clean["role"] = validate_role(role_val)
+
+            # Map stale_sources to superseded_sources
+            if "superseded_sources" not in clean and "stale_sources" in clean:
+                clean["superseded_sources"] = clean["stale_sources"]
+
+            # Map expected_behavior == "abstain" or type == "unanswerable" to should_abstain
+            if "should_abstain" not in clean:
+                if clean.get("expected_behavior") == "abstain" or clean.get("type") == "unanswerable":
+                    clean["should_abstain"] = True
+                else:
+                    clean["should_abstain"] = False
+
+            # Map type == "stale_trap" to is_version_conflict unless explicitly excluded
+            if "is_version_conflict" not in clean:
+                if clean.get("type") == "stale_trap":
+                    clean["is_version_conflict"] = clean.get("expect_conflict_flag", True) is not False
+                else:
+                    clean["is_version_conflict"] = False
+
+            # Map restricted_doc_roles to restricted_for_roles if caller role is unauthorized
+            if "restricted_for_roles" not in clean and clean.get("restricted_doc_roles"):
+                allowed_roles = [r.lower() for r in clean.get("restricted_doc_roles", [])]
+                if clean["role"] not in allowed_roles:
+                    clean["restricted_for_roles"] = [clean["role"]]
+
             return clean
         return data
 
