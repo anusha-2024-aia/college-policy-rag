@@ -47,6 +47,10 @@ def get_test_session() -> Session:
         import app.models  # noqa: F401
         Base.metadata.create_all(bind=_test_engine)
         _TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=_test_engine)
+        # Seed test users
+        from app.core.user_service import seed_default_users
+        with _TestSessionLocal() as s:
+            seed_default_users(s)
     return _TestSessionLocal()
 
 
@@ -73,6 +77,12 @@ def init_db(target_engine=None) -> None:
             connection.commit()
 
     Base.metadata.create_all(bind=eng)
+
+    # Seed default users idempotently
+    from app.core.user_service import seed_default_users
+    SessionMaker = sessionmaker(bind=eng)
+    with SessionMaker() as seed_session:
+        seed_default_users(seed_session)
 
 
 def get_db() -> Generator[Session, None, None]:

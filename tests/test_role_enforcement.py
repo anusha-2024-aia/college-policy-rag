@@ -28,6 +28,7 @@ import base64
 import json
 import time
 import pytest
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -62,37 +63,53 @@ client = TestClient(app)
 # 1. Identity & Token Attacks
 # ------------------------------------------------------------------------------
 
-def test_demo_login_success():
-    """Verify POST /auth/demo-login issues valid tokens for permitted roles."""
-    for role in ["student", "faculty", "admin"]:
-        response = client.post("/auth/demo-login", json={"role": role})
-        assert response.status_code == 200, f"Failed demo login for role {role}: {response.text}"
+def test_login_success():
+    """Verify POST /auth/login authenticates registered users and issues verified tokens."""
+    credentials = [
+        ("student", "StudentPass2026!"),
+        ("faculty", "FacultyPass2026!"),
+        ("admin", "AdminPass2026!"),
+    ]
+    for username, password in credentials:
+        response = client.post("/auth/login", json={"username": username, "password": password})
+        assert response.status_code == 200, f"Failed login for user {username}: {response.text}"
         data = response.json()
         assert "access_token" in data
         assert data["token_type"] == "bearer"
-        assert data["role"] == role
+        assert data["role"] == username
         assert data["expires_in"] == settings.JWT_EXPIRE_SECONDS
 
         # Verify issued token cryptographically
         payload = verify_access_token(data["access_token"])
-        assert payload["role"] == role
-        assert payload["sub"] == role
+        assert payload["role"] == username
+        assert payload["sub"] == username
         assert payload["exp"] > time.time()
 
 
-def test_demo_login_rejects_invalid_role():
-    """Verify demo login rejects unrecognized roles."""
-    response = client.post("/auth/demo-login", json={"role": "hacker_role"})
-    assert response.status_code == 422
+def test_login_rejects_invalid_credentials():
+    """Verify login rejects wrong passwords and non-existent usernames."""
+    response = client.post("/auth/login", json={"username": "student", "password": "WrongPassword!"})
+    assert response.status_code == 401
+
+    response_nonexistent = client.post("/auth/login", json={"username": "hacker", "password": "AnyPassword123!"})
+    assert response_nonexistent.status_code == 401
 
 
-def test_missing_token_defaults_to_student():
-    """Verify that requests without an Authorization header default to student role."""
-    role = get_current_role(authorization=None)
-    assert role == "student"
+def test_deprecated_passwordless_demo_login_rejected():
+    """Verify that passwordless demo login endpoint is rejected (Phase 2 hardening)."""
+    response = client.post("/auth/demo-login", json={"role": "admin"})
+    assert response.status_code == 400
 
-    role_blank = get_current_role(authorization="")
-    assert role_blank == "student"
+
+def test_missing_token_strictly_rejected_with_401():
+    """Verify that requests without an Authorization header raise 401 Unauthorized (Phase 2)."""
+    with pytest.raises(HTTPException) as exc_info:
+        get_current_role(authorization=None)
+    assert exc_info.value.status_code == 401
+
+    with pytest.raises(HTTPException) as exc_info:
+        get_current_role(authorization="")
+    assert exc_info.value.status_code == 401
 
 
 def test_token_attack_alg_none():
@@ -466,3 +483,104 @@ def test_negative_control_enforcement_bypass():
 
     # Restore default setting
     settings.SECURITY_ENFORCEMENT_ENABLED = True
+
+
+# ------------------------------------------------------------------------------
+# 7. Phase 2 Hardened Security Invariants
+# ------------------------------------------------------------------------------
+
+def test_token_attack_wrong_audience():
+    """Verify that tokens with wrong audience are strictly rejected with 401."""
+    wrong_aud_token = create_access_token("admin", audience="wrong-unauthorized-api")
+    with pytest.raises(AuthenticationError):
+        verify_access_token(wrong_aud_token)
+
+    response = client.post(
+        "/ask",
+        json={"question": "What is the fee waiver pool?"},
+        headers={"Authorization": f"Bearer {wrong_aud_token}"},
+    )
+    assert response.status_code == 401
+
+
+def test_login_rate_limiting():
+    """Verify rate-limiting on POST /auth/login returns 429 after 10 requests."""
+    from app.core.rate_limiter import login_rate_limiter
+    login_rate_limiter.reset()
+
+    try:
+        # First 10 requests should succeed or fail with 401, but NOT 429
+        for _ in range(10):
+            resp = client.post("/auth/login", json={"username": "student", "password": "WrongPassword!"})
+            assert resp.status_code == 401
+
+        # 11th request must trigger 429 Too Many Requests
+        resp_blocked = client.post("/auth/login", json={"username": "student", "password": "WrongPassword!"})
+        assert resp_blocked.status_code == 429
+        assert "too many" in resp_blocked.text.lower()
+    finally:
+        login_rate_limiter.reset()
+
+
+def test_admin_user_role_management():
+    """Verify admin can update user role with audit logging; non-admin is rejected."""
+    admin_token = create_access_token("admin")
+    student_token = create_access_token("student")
+
+    # 1. Non-admin trying to update role is rejected with 403
+    resp_forbidden = client.post(
+        "/admin/security/users/student/role",
+        json={"role": "admin"},
+        headers={"Authorization": f"Bearer {student_token}"},
+    )
+    assert resp_forbidden.status_code == 403
+
+    # 2. Admin successfully updates role
+    resp_success = client.post(
+        "/admin/security/users/student/role",
+        json={"role": "faculty"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert resp_success.status_code == 200
+    assert resp_success.json()["role"] == "faculty"
+
+    # 3. Restore role back to student
+    resp_restore = client.post(
+        "/admin/security/users/student/role",
+        json={"role": "student"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert resp_restore.status_code == 200
+    assert resp_restore.json()["role"] == "student"
+
+
+def test_client_cannot_escalate_via_body_query_or_headers():
+    """Verify client cannot escalate role via request body, query string, or headers."""
+    student_token = create_access_token("student")
+
+    # 1. Query param escalation on /documents is ignored; returns student 10 documents, not 16
+    resp = client.get(
+        "/documents?role=admin",
+        headers={"Authorization": f"Bearer {student_token}"},
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["total_docs"] == 10
+    assert data["hidden_count"] == 6
+
+    # 2. Request body role escalation on /ask is ignored; evaluated strictly under student permissions
+    req_payload = {
+        "question": "What are the administrative salary bands?",
+        "role": "admin",
+    }
+    resp_ask = client.post(
+        "/ask",
+        json=req_payload,
+        headers={"Authorization": f"Bearer {student_token}"},
+    )
+    assert resp_ask.status_code == 200
+    ask_data = resp_ask.json()
+    # Student cannot see salary bands (abstained or 0 salary context)
+    for p in ask_data.get("passages", []):
+        assert "salary" not in p["file_name"].lower()
+

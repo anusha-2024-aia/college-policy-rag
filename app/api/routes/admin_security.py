@@ -19,6 +19,10 @@ from app.schemas.admin_security import (
     LeakTestResultResponse,
 )
 
+from app.schemas.auth import RoleUpdateRequest, UserResponse
+from app.core.user_service import update_user_role
+from app.models.user import User
+
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/admin/security", tags=["Admin Security"])
@@ -163,4 +167,62 @@ def run_leak_sweep(
         last_tested_at=now_str,
         routes_tested=_LAST_LEAK_TEST["routes_tested"],
     )
+
+
+@router.get(
+    "/users",
+    response_model=list[UserResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List Registered System Users",
+    description="Returns user accounts with their authorized roles (admin only).",
+)
+def list_users(
+    admin_role: str = Depends(require_admin),
+    db: Session = Depends(get_db),
+) -> list[UserResponse]:
+    """List all registered system users."""
+    set_session_role(db, admin_role)
+    users = db.query(User).order_by(User.username).all()
+    return [
+        UserResponse(
+            id=u.id,
+            username=u.username,
+            role=u.role,
+            is_active=u.is_active,
+            created_at=u.created_at.isoformat() if u.created_at else None,
+        )
+        for u in users
+    ]
+
+
+@router.post(
+    "/users/{user_id}/role",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update User Role with Audit Log",
+    description="Updates role of target user. Strictly restricted to administrative callers and audit-logged.",
+)
+def change_user_role(
+    user_id: str,
+    payload: RoleUpdateRequest,
+    admin_role: str = Depends(require_admin),
+    db: Session = Depends(get_db),
+) -> UserResponse:
+    """Update role for a user and record audit entry."""
+    set_session_role(db, admin_role)
+    try:
+        updated = update_user_role(db, admin_role, user_id, payload.role)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except PermissionError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+
+    return UserResponse(
+        id=updated.id,
+        username=updated.username,
+        role=updated.role,
+        is_active=updated.is_active,
+        created_at=updated.created_at.isoformat() if updated.created_at else None,
+    )
+
 

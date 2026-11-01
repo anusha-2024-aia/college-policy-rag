@@ -43,7 +43,16 @@ def ensure_test_corpus_mock_indexed():
 
 @pytest.fixture(scope="module")
 def client() -> Generator[TestClient, None, None]:
-    """Provide a TestClient instance for API tests."""
+    """Provide an authenticated TestClient instance (default role: student) for API tests."""
+    from app.core.auth import create_access_token
+    token = create_access_token("student")
+    with TestClient(app, headers={"Authorization": f"Bearer {token}"}) as test_client:
+        yield test_client
+
+
+@pytest.fixture(scope="module")
+def unauthenticated_client() -> Generator[TestClient, None, None]:
+    """Provide an unauthenticated TestClient instance for security and 401 verification tests."""
     with TestClient(app) as test_client:
         yield test_client
 

@@ -362,7 +362,8 @@ class QAService:
         if is_version_aware:
             # Query authorized documents and build version lineage graph
             is_postgres = self.retrieval_service.db.bind is not None and self.retrieval_service.db.bind.dialect.name == "postgresql"
-            role_filter = build_role_filter(Document, clean_role, "postgresql" if is_postgres else "sqlite")
+            enforce_l1 = getattr(settings, "L1_SQL_FILTER_ENABLED", True) and getattr(settings, "SECURITY_ENFORCEMENT_ENABLED", True)
+            role_filter = build_role_filter(Document, clean_role, "postgresql" if is_postgres else "sqlite") if enforce_l1 else True
             docs = self.retrieval_service.db.query(Document).filter(role_filter).all()
             version_statuses = self.version_service.build_version_graph(docs, strict_validation=False)
             status_by_id = {s.document_id: s for s in version_statuses.values()}

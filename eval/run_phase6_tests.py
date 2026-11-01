@@ -219,9 +219,16 @@ def run_phase6_suite() -> dict[str, Any]:
     resp_exp = client.post("/ask", json={"question": "salary bands"}, headers={"Authorization": f"Bearer {expired_tok}"})
     assert resp_exp.status_code == 401
 
-    # missing token on admin-only route
+    # missing token on admin-only route (Phase 2 strict requirement: missing token -> 401)
     resp_missing = client.get("/admin/security/visible-document-counts")
-    assert resp_missing.status_code == 403
+    assert resp_missing.status_code == 401
+
+    # insufficient role (student on admin-only route -> 403)
+    resp_forbidden = client.get(
+        "/admin/security/visible-document-counts",
+        headers={"Authorization": f"Bearer {student_token}"},
+    )
+    assert resp_forbidden.status_code == 403
 
     # --------------------------------------------------------------------------
     # 4. Route Sweep Verification

@@ -149,7 +149,7 @@ def test_negative_control_detects_leaks(adversarial_data):
     assert neg_leaks in (15, 17), f"Expected 15 or 17 negative control leaks, got {neg_leaks}"
 
 
-def test_token_attacks_alg_none_tampered_expired_missing():
+def test_token_attacks_alg_none_tampered_expired_missing(unauthenticated_client, client):
     """Verify cryptographic rejection of malformed, tampered, expired, and missing tokens."""
     # 1. alg=none attack
     h_none = _base64url_encode(json.dumps({"alg": "none", "typ": "JWT"}).encode())
@@ -181,9 +181,13 @@ def test_token_attacks_alg_none_tampered_expired_missing():
     )
     assert resp_expired.status_code == 401
 
-    # 4. Missing token on privileged admin route
-    resp_missing = client.get("/admin/security/visible-document-counts")
-    assert resp_missing.status_code == 403
+    # 4. Missing token on privileged admin route (Phase 2: missing token -> 401)
+    resp_missing = unauthenticated_client.get("/admin/security/visible-document-counts")
+    assert resp_missing.status_code == 401
+
+    # 5. Insufficient role on admin route (student token -> 403)
+    resp_forbidden = client.get("/admin/security/visible-document-counts")
+    assert resp_forbidden.status_code == 403
 
 
 def test_cache_isolation_admin_student():

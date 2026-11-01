@@ -62,10 +62,13 @@ class Settings(BaseSettings):
     VERSION_AWARE_ENABLED: bool = True
     LINEAGE_EXPANSION_ENABLED: bool = True
 
-    # Auth & JWT Settings (Phase 4 Identity & Role Enforcement)
+    # Auth & JWT Settings (Phase 2 Hardened Identity & Role Enforcement)
     JWT_SECRET_KEY: str = "kvit-policy-intelligence-secret-key-2026-production"
     JWT_ALGORITHM: str = "HS256"
-    JWT_EXPIRE_SECONDS: int = 3600
+    JWT_EXPIRE_SECONDS: int = 900  # Pinned short expiry: 15 minutes
+    JWT_ISSUER: str = "lexispolicy-ai"
+    JWT_AUDIENCE: str = "lexispolicy-api"
+    DEMO_MODE: bool = False
 
     # Defence-in-Depth Security Layers (L1-L4)
     SECURITY_ENFORCEMENT_ENABLED: bool = True

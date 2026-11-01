@@ -1,12 +1,13 @@
 """JWT Token Generation, Cryptographic Verification, and Role Extraction.
 
-Enforces Rule 5 and Phase 4 Identity Specification:
-1. User role is derived EXCLUSIVELY from verified cryptographic JWT tokens,
-   never from client-controlled request bodies, query strings, or unverified headers.
-2. Missing token defaults to 'student' (principle of least privilege).
-3. Tampered, expired, or alg=none tokens strictly yield HTTP 401 Unauthorized.
-4. Uses Python standard library (hmac, hashlib, base64, json, time) with zero external dependencies.
+Enforces Phase 2 Hardened Identity Specification:
+1. User role is derived EXCLUSIVELY from verified cryptographic JWT tokens issued from server-side user records.
+2. Missing, empty, tampered, expired, wrong audience, or alg=none tokens strictly yield HTTP 401 Unauthorized.
+3. Tokens include pinned algorithm (HS256), short TTL (exp), unique identifier (jti), issuer (iss), audience (aud), and subject (sub).
+4. Uses Python standard library (hmac, hashlib, base64, json, time, uuid) with zero external dependencies.
 """
+
+from __future__ import annotations
 
 import base64
 import hmac
@@ -14,6 +15,7 @@ import hashlib
 import json
 import logging
 import time
+import uuid
 from typing import Any, Optional
 from fastapi import Header, HTTPException, status
 from app.core.config import settings
@@ -42,17 +44,25 @@ def _base64url_decode(data: str) -> bytes:
 
 def create_access_token(
     role: str,
+    subject: Optional[str] = None,
     expires_in_seconds: Optional[int] = None,
     secret_key: Optional[str] = None,
     algorithm: Optional[str] = None,
+    issuer: Optional[str] = None,
+    audience: Optional[str] = None,
+    jti: Optional[str] = None,
 ) -> str:
-    """Create a signed HMAC-SHA256 JWT access token for a given user role.
+    """Create a cryptographically signed HMAC-SHA256 JWT access token for a given user role.
 
     Args:
         role: Validated role string ('student', 'faculty', 'admin').
+        subject: User identifier or username (defaults to role).
         expires_in_seconds: Token TTL in seconds (defaults to settings.JWT_EXPIRE_SECONDS).
         secret_key: HMAC secret key (defaults to settings.JWT_SECRET_KEY).
         algorithm: Algorithm identifier (defaults to settings.JWT_ALGORITHM, e.g. 'HS256').
+        issuer: Token issuer claim (defaults to settings.JWT_ISSUER).
+        audience: Token audience claim (defaults to settings.JWT_AUDIENCE).
+        jti: Unique JWT ID for replay prevention (defaults to fresh UUID4).
 
     Returns:
         Encoded and signed JWT string ({header}.{payload}.{signature}).
@@ -65,8 +75,11 @@ def create_access_token(
     now = int(time.time())
     header = {"alg": alg, "typ": "JWT"}
     payload = {
-        "sub": clean_role,
+        "sub": subject or clean_role,
         "role": clean_role,
+        "iss": issuer or settings.JWT_ISSUER,
+        "aud": audience or settings.JWT_AUDIENCE,
+        "jti": jti or str(uuid.uuid4()),
         "iat": now,
         "exp": now + ttl,
     }
@@ -84,25 +97,30 @@ def create_access_token(
 def verify_access_token(
     token: str,
     secret_key: Optional[str] = None,
+    expected_issuer: Optional[str] = None,
+    expected_audience: Optional[str] = None,
 ) -> dict[str, Any]:
-    """Verify cryptographic authenticity, signature, and expiration of a JWT access token.
+    """Verify cryptographic authenticity, signature, claims, and expiration of a JWT access token.
 
     Security checks:
     - Rejects tokens with fewer or more than 3 segments.
     - Explicitly rejects tokens using 'alg': 'none' or any algorithm other than HS256.
     - Computes HMAC-SHA256 signature and performs constant-time comparison.
     - Verifies expiration timestamp (exp).
+    - Verifies audience (aud) and issuer (iss) if configured.
     - Validates that the 'role' claim is within permitted roles.
 
     Args:
         token: Raw JWT string.
         secret_key: Expected secret key.
+        expected_issuer: Expected issuer claim (defaults to settings.JWT_ISSUER).
+        expected_audience: Expected audience claim (defaults to settings.JWT_AUDIENCE).
 
     Returns:
         Decoded payload dictionary.
 
     Raises:
-        AuthenticationError: If token is malformed, expired, tampered, or uses prohibited algorithms.
+        AuthenticationError: If token is malformed, expired, tampered, wrong audience, or prohibited algorithms.
     """
     if not token or not isinstance(token, str):
         raise AuthenticationError("Authentication token is missing or empty.")
@@ -150,7 +168,19 @@ def verify_access_token(
     if current_time > int(exp):
         raise AuthenticationError(f"JWT token expired at {exp} (current time: {current_time}).")
 
-    # 5. Role claim validation
+    # 5. Audience check
+    req_aud = expected_audience or settings.JWT_AUDIENCE
+    token_aud = payload.get("aud")
+    if token_aud and req_aud and token_aud != req_aud:
+        raise AuthenticationError(f"JWT audience mismatch: expected '{req_aud}', got '{token_aud}'.")
+
+    # 6. Issuer check
+    req_iss = expected_issuer or settings.JWT_ISSUER
+    token_iss = payload.get("iss")
+    if token_iss and req_iss and token_iss != req_iss:
+        raise AuthenticationError(f"JWT issuer mismatch: expected '{req_iss}', got '{token_iss}'.")
+
+    # 7. Role claim validation
     role = payload.get("role")
     if not role:
         raise AuthenticationError("JWT payload is missing required 'role' claim.")
@@ -169,19 +199,30 @@ def get_current_role(
 ) -> str:
     """FastAPI Dependency: Extract and cryptographically verify caller role from Bearer JWT.
 
-    Enforces Phase 4 specification:
-    - Missing token -> 'student' (principle of least privilege).
+    Strict security enforcement (Phase 2):
+    - Missing or empty token -> HTTP 401 Unauthorized (never defaults to student).
     - Tampered or expired token -> HTTP 401 Unauthorized.
     - alg=none token -> HTTP 401 Unauthorized.
+    - Wrong audience/issuer -> HTTP 401 Unauthorized.
     - Valid token -> verified role claim ('student', 'faculty', 'admin').
     """
     if not authorization or not authorization.strip():
-        # Missing token: default to student least privilege
-        return "student"
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication credentials were not provided. Missing Bearer authorization token.",
+            headers={"WWW-Authenticate": 'Bearer error="missing_token"'},
+        )
 
     token = authorization.strip()
     if token.lower().startswith("bearer "):
         token = token[7:].strip()
+
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Authorization header format. Expected 'Bearer <token>'.",
+            headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
+        )
 
     try:
         payload = verify_access_token(token)
@@ -191,6 +232,5 @@ def get_current_role(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Authentication token verification failed: {exc}",
-            headers={"WWW-Authenticate": "Bearer error=\"invalid_token\""},
+            headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
         ) from exc
-

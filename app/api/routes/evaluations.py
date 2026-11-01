@@ -56,7 +56,9 @@ def clean_benchmark_title(raw_title: str, filename: str) -> str:
     summary="List Evaluation Benchmark Reports",
     description="Returns metadata of generated evaluation JSON reports and benchmarks in eval/results/.",
 )
-def list_reports() -> EvaluationReportListResponse:
+def list_reports(
+    verified_role: str = Depends(get_current_role),
+) -> EvaluationReportListResponse:
     """Discover all benchmark JSON report files in reverse-chronological order."""
     if not RESULTS_DIR.exists() or not RESULTS_DIR.is_dir():
         return EvaluationReportListResponse(reports=[], total_count=0)

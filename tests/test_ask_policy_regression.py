@@ -14,10 +14,17 @@ Verifies:
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
+from app.core.auth import create_access_token
 from app.schemas.qa import AskRequest, AskResponse, Citation, PassageEvidence, PolicyConflict
 from app.schemas.retrieval import RetrievalDiagnostics
 
 client = TestClient(app)
+
+
+def auth_header(role: str = "student") -> dict[str, str]:
+    """Helper to generate JWT bearer authorization header for a role."""
+    token = create_access_token(role)
+    return {"Authorization": f"Bearer {token}"}
 
 
 def test_ask_request_roles_supported():
@@ -56,6 +63,7 @@ def test_ask_endpoint_student_role_live():
     response = client.post(
         "/ask",
         json={"question": "What is the minimum grade required to pass a core course?", "role": "student"},
+        headers=auth_header("student"),
     )
     assert response.status_code == 200
     data = response.json()
@@ -71,6 +79,7 @@ def test_ask_endpoint_faculty_role_live():
     response = client.post(
         "/ask",
         json={"question": "What are faculty office hours requirements?", "role": "faculty"},
+        headers=auth_header("faculty"),
     )
     assert response.status_code == 200
     data = response.json()
@@ -83,6 +92,7 @@ def test_ask_endpoint_admin_role_live():
     response = client.post(
         "/ask",
         json={"question": "What is the grade replacement policy?", "role": "admin"},
+        headers=auth_header("admin"),
     )
     assert response.status_code == 200
     data = response.json()
@@ -95,6 +105,7 @@ def test_ask_endpoint_rejects_invalid_role():
     response = client.post(
         "/ask",
         json={"question": "What is the policy?", "role": "invalid_role"},
+        headers=auth_header("student"),
     )
     assert response.status_code == 422
 
@@ -104,12 +115,14 @@ def test_ask_endpoint_rejects_empty_question():
     response = client.post(
         "/ask",
         json={"question": "", "role": "student"},
+        headers=auth_header("student"),
     )
     assert response.status_code == 422
 
     response_missing = client.post(
         "/ask",
         json={"role": "student"},
+        headers=auth_header("student"),
     )
     assert response_missing.status_code == 422
 
@@ -120,6 +133,7 @@ def test_abstention_does_not_fabricate_citations():
     response = client.post(
         "/ask",
         json={"question": "What is the policy regarding deep sea submarine piloting?", "role": "student"},
+        headers=auth_header("student"),
     )
     assert response.status_code == 200
     data = response.json()
@@ -133,6 +147,7 @@ def test_grounded_answer_includes_real_citations():
     response = client.post(
         "/ask",
         json={"question": "What is the minimum grade required to pass a core course?", "role": "student"},
+        headers=auth_header("student"),
     )
     assert response.status_code == 200
     data = response.json()

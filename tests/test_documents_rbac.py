@@ -10,6 +10,7 @@ Verifies:
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
+from app.core.auth import create_access_token
 
 client = TestClient(app)
 
@@ -36,7 +37,8 @@ CONFIDENTIAL_TITLE_KEYWORDS = [
 
 def test_student_must_not_see_restricted_titles():
     """Verify item 1: student role receives only authorized documents and an accurate hidden count."""
-    response = client.get("/documents?role=student")
+    token = create_access_token("student")
+    response = client.get("/documents", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
     data = response.json()
 
@@ -68,7 +70,8 @@ def test_student_must_not_see_restricted_titles():
 
 def test_faculty_role_document_filtering():
     """Verify faculty sees student + faculty policies, with 3 admin policies hidden."""
-    response = client.get("/documents?role=faculty")
+    token = create_access_token("faculty")
+    response = client.get("/documents", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
     data = response.json()
 
@@ -91,10 +94,10 @@ def test_faculty_role_document_filtering():
 
 def test_admin_role_document_filtering():
     """Verify admin role has complete visibility across all 16 corpus documents."""
-    response = client.get("/documents?role=admin")
+    token = create_access_token("admin")
+    response = client.get("/documents", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
     data = response.json()
-
     assert data["total_docs"] == 16
     assert data["hidden_count"] == 0
     returned_filenames = {d["file_name"] for d in data["documents"]}
@@ -103,7 +106,8 @@ def test_admin_role_document_filtering():
 
 def test_document_manifest_status_and_lineage():
     """Verify item 3: Library status and lineage reflect manifest relationships."""
-    response = client.get("/documents?role=admin")
+    token = create_access_token("admin")
+    response = client.get("/documents", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
     data = response.json()
     docs_by_name = {d["file_name"]: d for d in data["documents"]}
@@ -131,8 +135,12 @@ def test_document_manifest_status_and_lineage():
     assert doc_active["status"] == "Active"
 
 
-def test_invalid_role_rejected_with_400():
-    """Verify unauthorized or malformed role requests receive HTTP 400 Bad Request."""
-    response = client.get("/documents?role=hacker_role")
-    assert response.status_code == 400
-    assert "invalid role" in response.text.lower()
+def test_invalid_or_missing_role_rejected():
+    """Verify unauthenticated requests receive HTTP 401 and query param spoofing fails."""
+    # 1. Missing token must receive 401 Unauthorized
+    response_missing = client.get("/documents")
+    assert response_missing.status_code == 401
+
+    # 2. Query param role spoofing without token must receive 401 Unauthorized
+    response_spoof = client.get("/documents?role=admin")
+    assert response_spoof.status_code == 401

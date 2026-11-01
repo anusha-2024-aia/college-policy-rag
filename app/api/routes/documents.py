@@ -61,25 +61,11 @@ def _build_superseded_by_map(all_docs: list[Document]) -> dict[str, Tuple[str, s
     ),
 )
 def list_documents(
-    role: Optional[str] = None,
     verified_role: str = Depends(get_current_role),
     db: Session = Depends(get_db),
 ) -> DocumentCatalogResponse:
     """Retrieve indexed documents from PostgreSQL with strict server-side role enforcement."""
-    # Enforce verified role from token; fall back to validated legacy query param if token was not supplied
-    if role:
-        try:
-            clean_param = validate_role(role)
-        except InvalidRoleError as exc:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=str(exc),
-            ) from exc
-        # If authenticated via token with non-student role, token takes precedence
-        clean_role = verified_role if verified_role != "student" else clean_param
-    else:
-        clean_role = verified_role
-
+    clean_role = verified_role
     set_session_role(db, clean_role)
 
     is_postgres = (

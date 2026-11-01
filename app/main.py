@@ -11,6 +11,22 @@ from app.core.config import settings
 
 def create_application() -> FastAPI:
     """Application factory for FastAPI Document RAG service."""
+    # Startup Security Invariant (Phase 2): Refuse startup on default/missing JWT secret in non-test envs
+    if settings.APP_ENV not in ("test", "testing"):
+        insecure_keys = (
+            "kvit-policy-intelligence-secret-key-2026-production",
+            "changeme",
+            "secret",
+            "default",
+            "",
+        )
+        if not settings.JWT_SECRET_KEY or settings.JWT_SECRET_KEY.strip() in insecure_keys:
+            raise RuntimeError(
+                "FATAL SECURITY FAILURE: Insecure or default JWT_SECRET_KEY detected. "
+                "In development or production environments, a cryptographically strong secret "
+                "must be explicitly configured via the JWT_SECRET_KEY environment variable."
+            )
+
     application = FastAPI(
         title=settings.APP_NAME,
         version="0.1.0",

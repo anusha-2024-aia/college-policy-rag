@@ -6,6 +6,7 @@ from app.models.chunk_semantic import ChunkSemantic
 from app.models.lineage import DocumentLineage
 from app.models.audit import AccessAudit
 from app.models.index_metadata import EmbeddingIndexMetadata
+from app.models.user import User
 from app.core.database import Base
 
 __all__ = [
@@ -15,6 +16,7 @@ __all__ = [
     "DocumentLineage",
     "AccessAudit",
     "EmbeddingIndexMetadata",
+    "User",
     "TSVectorType",
     "Base",
 ]

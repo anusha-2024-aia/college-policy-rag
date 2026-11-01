@@ -3,8 +3,10 @@
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
+from app.core.auth import create_access_token
 
-client = TestClient(app)
+token = create_access_token("student")
+client = TestClient(app, headers={"Authorization": f"Bearer {token}"})
 
 
 def test_system_stats_endpoint():
