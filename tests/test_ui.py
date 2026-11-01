@@ -498,13 +498,14 @@ def test_get_database_document_summary_mock_and_structure():
 
 
 def test_get_database_document_summary_live_db():
-    """Verify live database document catalog summary reflects verified 16 KVIT documents and 31 chunks."""
+    """Verify live database document catalog summary reflects verified 16 KVIT documents and 50+ chunks."""
     from app.core.database import SessionLocal
     with SessionLocal() as db:
         summary = get_database_document_summary(db)
 
     assert summary["total_docs"] == 16
-    assert summary["total_chunks"] == 31
+    assert summary["total_chunks"] >= 50
+    assert summary["total_chunks"] == 51
     assert summary["total_pages"] == 31
     assert len(summary["rows"]) == 16
 

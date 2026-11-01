@@ -114,3 +114,4 @@ def update_user_role(
 
     logger.info("Admin changed user '%s' role from '%s' to '%s' (audit_id: %s)", user.username, old_role, clean_new_role, audit_entry.id)
     return user
+

@@ -128,3 +128,4 @@ class TestRouteSecurityAudit:
             assert resp.status_code == 401, (
                 f"Expected 401 Unauthorized for missing token on {method} {path}, got {resp.status_code}: {resp.text}"
             )
+

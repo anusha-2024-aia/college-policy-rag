@@ -11,16 +11,16 @@ def test_valid_manifest_row_parsing():
     """Verify DocumentManifestRow correctly validates and cleans valid data."""
     row = DocumentManifestRow(
         file="data/raw_pdfs/handbook.pdf",
-        title="Employee Handbook",
+        title="Student Academic Handbook",
         effective_date=date(2025, 1, 1),
         supersedes="Handbook 2024",
-        allowed_roles="admin;hr;legal",
+        allowed_roles="student;faculty;admin",
     )
     assert row.file == "data/raw_pdfs/handbook.pdf"
-    assert row.title == "Employee Handbook"
+    assert row.title == "Student Academic Handbook"
     assert row.effective_date == date(2025, 1, 1)
     assert row.supersedes == "Handbook 2024"
-    assert row.allowed_roles == ["admin", "hr", "legal"]
+    assert row.allowed_roles == ["student", "faculty", "admin"]
 
 
 def test_manifest_roles_with_comma_and_spaces():
@@ -29,9 +29,9 @@ def test_manifest_roles_with_comma_and_spaces():
         file="test.pdf",
         title="Test",
         effective_date=date(2025, 1, 1),
-        allowed_roles="admin, legal , hr ",
+        allowed_roles="admin, student , faculty ",
     )
-    assert row.allowed_roles == ["admin", "legal", "hr"]
+    assert row.allowed_roles == ["admin", "student", "faculty"]
 
 
 def test_manifest_clean_empty_supersedes():

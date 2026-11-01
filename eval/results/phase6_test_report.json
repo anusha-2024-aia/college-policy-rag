@@ -3,7 +3,7 @@
   "adversarial_evaluations": 60,
   "protected_leaks": 0,
   "negative_control_evaluations": 30,
-  "negative_control_leaks": 17,
+  "negative_control_leaks": 16,
   "token_attacks_passed": true,
   "route_sweep_leaks": 0,
   "cache_isolation_passed": true,

@@ -35,14 +35,14 @@ def test_end_to_end_ingestion(test_db: Session, sample_pdf_workspace: Path, mock
     policy_doc = next(d for d in docs if d.file_name == "policy_v2.pdf")
     assert policy_doc.title == "Policy V2"
     assert policy_doc.supersedes == "Policy V1"
-    assert "legal" in policy_doc.allowed_roles
+    assert "admin" in policy_doc.allowed_roles
     assert policy_doc.status == "ingested"
     assert policy_doc.total_pages == 2
 
     valid_doc = next(d for d in docs if d.file_name == "valid_doc.pdf")
     assert valid_doc.title == "Corporate Architecture"
     assert valid_doc.supersedes is None
-    assert "engineering" in valid_doc.allowed_roles
+    assert "student" in valid_doc.allowed_roles
     assert valid_doc.total_pages == 3
 
     # 3. Verify Chunk Records and Manual Chunk Inspection

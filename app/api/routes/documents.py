@@ -26,28 +26,58 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
 
-def _build_superseded_by_map(all_docs: list[Document]) -> dict[str, Tuple[str, str]]:
+def _build_superseded_by_map(
+    all_docs: list[Document],
+    visible_filenames: Optional[set[str]] = None,
+) -> dict[str, Tuple[str, str]]:
     """Build a mapping from file_name -> (status_label, replacing_doc_title).
 
     Parses the manifest `supersedes` field across documents to determine whether
     an older document has been fully superseded or partially amended by a newer one.
+    Masks replacing titles as '[Restricted Policy]' if replacing doc is unauthorized.
     """
     superseded_by: dict[str, Tuple[str, str]] = {}
     for doc in all_docs:
         if not doc.supersedes:
             continue
         raw = doc.supersedes.strip()
+        replacing_title = doc.title
+        if visible_filenames is not None and doc.file_name not in visible_filenames:
+            replacing_title = "[Restricted Policy]"
+
         if raw.lower().startswith("partial:"):
             # Format: "partial: Clause X and Clause Y only:old_file.pdf"
             parts = raw.split(":")
             old_file = parts[-1].strip() if parts else ""
             if old_file:
-                superseded_by[old_file] = ("Partially amended", doc.title)
+                superseded_by[old_file] = ("Partially amended", replacing_title)
         else:
             old_file = raw.strip()
             if old_file:
-                superseded_by[old_file] = ("Superseded", doc.title)
+                superseded_by[old_file] = ("Superseded", replacing_title)
     return superseded_by
+
+
+def _mask_supersedes_for_role(
+    supersedes: Optional[str],
+    visible_filenames: set[str],
+) -> Optional[str]:
+    """Mask superseded document reference if caller does not have authorization to view it."""
+    if not supersedes:
+        return None
+    raw = supersedes.strip()
+    if raw.lower().startswith("partial:"):
+        parts = raw.split(":")
+        old_file = parts[-1].strip() if parts else ""
+        if old_file and old_file not in visible_filenames:
+            prefix = ":".join(parts[:-1])
+            return f"{prefix}:[Restricted Policy]"
+        return supersedes
+    else:
+        old_file = raw
+        if old_file and old_file not in visible_filenames:
+            return "[Restricted Policy]"
+        return supersedes
 
 
 @router.get(
@@ -92,7 +122,8 @@ def list_documents(
         hidden_count = 0
 
     # Lineage mapping across visible documents
-    superseded_by_map = _build_superseded_by_map(all_docs)
+    visible_filenames = {d.file_name for d in visible_docs}
+    superseded_by_map = _build_superseded_by_map(all_docs, visible_filenames)
 
     items: list[DocumentSummaryItem] = []
     for d in visible_docs:
@@ -110,13 +141,15 @@ def list_documents(
             display_status = "Active"
             superseded_by_title = None
 
+        masked_supersedes = _mask_supersedes_for_role(d.supersedes, visible_filenames)
+
         items.append(
             DocumentSummaryItem(
                 id=d.id,
                 file_name=d.file_name,
                 title=d.title,
                 effective_date=str(d.effective_date),
-                supersedes=d.supersedes,
+                supersedes=masked_supersedes,
                 superseded_by_title=superseded_by_title,
                 allowed_roles=roles,
                 total_pages=d.total_pages,
@@ -171,8 +204,13 @@ def get_document_detail(
             detail="Document not found.",
         )
 
+    is_postgres = db.bind is not None and db.bind.dialect.name == "postgresql"
+    dialect = "postgresql" if is_postgres else "sqlite"
+    visible_docs = db.query(Document).filter(build_role_filter(Document, verified_role, dialect)).all()
+    visible_filenames = {d.file_name for d in visible_docs}
+
     all_docs = db.query(Document).all()
-    superseded_by_map = _build_superseded_by_map(all_docs)
+    superseded_by_map = _build_superseded_by_map(all_docs, visible_filenames)
     if doc.file_name in superseded_by_map:
         display_status, replacing_title = superseded_by_map[doc.file_name]
         superseded_by_title = f"{display_status} by {replacing_title}"
@@ -180,12 +218,14 @@ def get_document_detail(
         display_status = "Active"
         superseded_by_title = None
 
+    masked_supersedes = _mask_supersedes_for_role(doc.supersedes, visible_filenames)
+
     return DocumentSummaryItem(
         id=doc.id,
         file_name=doc.file_name,
         title=doc.title,
         effective_date=str(doc.effective_date),
-        supersedes=doc.supersedes,
+        supersedes=masked_supersedes,
         superseded_by_title=superseded_by_title,
         allowed_roles=roles,
         total_pages=doc.total_pages,

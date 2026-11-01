@@ -50,3 +50,4 @@ class InMemoryRateLimiter:
 
 # Default rate limiter for login route: 10 requests per minute
 login_rate_limiter = InMemoryRateLimiter(max_requests=10, window_seconds=60)
+

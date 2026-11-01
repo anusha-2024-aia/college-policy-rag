@@ -23,7 +23,7 @@ HEADER_FOOTER_PATTERNS = [
 
 # Regex to detect clause boundaries for chunk splitting
 CLAUSE_SPLIT_REGEX = re.compile(
-    r"(?m)(?=^[\s\-*•]*(?:(?:Amendment\s+to\s+)?Clause\s*\d+(?:\.\d+)?|Section\s*\d+(?:\.\d+)?))"
+    r"(?m)(?=^[\s\-*•]*(?:(?:Amendment\s+to\s+)?Clause\s*\d+(?:\.\d+)?|Section\s*\d+(?:\.\d+)?|\d+\.\s+[A-Za-z]|(?:[A-Z][A-Za-z\s]{2,20}:)))"
 )
 
 # Regex to extract normalized clause reference (e.g. "Clause 4.2")
@@ -84,10 +84,16 @@ class ChunkerService:
         return re.sub(r"\n{3,}", "\n\n", cleaned).strip()
 
     def extract_clause_ref(self, text: str) -> Optional[str]:
-        """Extract normalized clause reference (e.g. 'Clause 4.2') from text."""
+        """Extract normalized clause reference (e.g. 'Clause 4.2' or 'Section 2') from text."""
         m = CLAUSE_EXTRACT_REGEX.search(text)
         if m:
             return f"Clause {m.group(1)}"
+        m_sec = re.search(r"(?:Section\s*(\d+(?:\.\d+)?))", text, re.IGNORECASE)
+        if m_sec:
+            return f"Section {m_sec.group(1)}"
+        m_num = re.search(r"^\s*(\d+(?:\.\d+)?)\.\s+[A-Za-z]", text, re.MULTILINE)
+        if m_num:
+            return f"Clause {m_num.group(1)}"
         return None
 
     def chunk_page(
@@ -105,13 +111,24 @@ class ChunkerService:
         if not cleaned_text:
             return []
 
-        # Check if page has explicit clause boundaries
-        has_clauses = bool(CLAUSE_EXTRACT_REGEX.search(cleaned_text))
+        # Check if page has explicit clause boundaries or numbered sections
+        has_clauses = bool(CLAUSE_EXTRACT_REGEX.search(cleaned_text)) or bool(
+            re.search(r"(?m)^[\s\-*•]*(?:Section|\d+\.\s+[A-Za-z]|[A-Z][A-Za-z\s]{2,20}:)", cleaned_text)
+        )
 
         if has_clauses:
             chunks: list[DocumentChunk] = []
             current_chunk_idx = start_chunk_index
             raw_splits = [s.strip() for s in CLAUSE_SPLIT_REGEX.split(cleaned_text) if s.strip()]
+
+            # Merge very small split fragments (< 12 tokens) into the subsequent block so headings aren't orphaned
+            merged_splits = []
+            for s in raw_splits:
+                if merged_splits and self.count_tokens(merged_splits[-1]) < 12:
+                    merged_splits[-1] = merged_splits[-1] + "\n\n" + s
+                else:
+                    merged_splits.append(s)
+            raw_splits = merged_splits
 
             # If leading block has no clause ref (e.g. heading), prepend to first clause
             if len(raw_splits) > 1 and self.extract_clause_ref(raw_splits[0]) is None:

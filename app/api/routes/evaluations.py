@@ -13,6 +13,8 @@ from app.schemas.evaluation_api import (
     EvaluationReportDetail,
     EvaluationReportListResponse,
     EvaluationReportSummary,
+    EvaluationSummaryResponse,
+    BenchmarkConfigMetrics,
 )
 
 logger = logging.getLogger(__name__)
@@ -47,6 +49,91 @@ def clean_benchmark_title(raw_title: str, filename: str) -> str:
         return "Baseline Retrieval & Abstention Evaluation"
 
     return t if t else filename.replace(".json", "").replace(".md", "").replace("_", " ").title()
+
+
+@router.get(
+    "/summary",
+    response_model=EvaluationSummaryResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get Active Benchmark Evaluation Summary",
+    description="Returns latest real evaluation metrics dynamically loaded from eval/results/real/.",
+)
+def get_evaluation_summary(
+    verified_role: str = Depends(get_current_role),
+) -> EvaluationSummaryResponse:
+    """Load latest real benchmark results for dynamic UI rendering."""
+    real_dir = RESULTS_DIR / "real"
+    candidate_files = []
+    if real_dir.exists() and real_dir.is_dir():
+        candidate_files = sorted(list(real_dir.glob("eval_results_*.json")), key=lambda p: p.stat().st_mtime, reverse=True)
+    if not candidate_files:
+        candidate_files = sorted(list(RESULTS_DIR.glob("eval_results_*.json")), key=lambda p: p.stat().st_mtime, reverse=True)
+
+    if not candidate_files:
+        return EvaluationSummaryResponse(
+            available=False,
+            message="No evaluation benchmark results available. Run python -m eval.run_all --mode real to generate.",
+        )
+
+    target_json = candidate_files[0]
+    try:
+        data = json.loads(target_json.read_text(encoding="utf-8"))
+        meta = data.get("metadata", {})
+        configs_raw = data.get("configs", {})
+
+        parsed_configs = {}
+        for cfg_name, cfg_data in configs_raw.items():
+            parsed_configs[cfg_name] = BenchmarkConfigMetrics(
+                hit_rate_at_1=float(cfg_data.get("hit_rate_at_1", 0.0)),
+                hit_rate_at_3=float(cfg_data.get("hit_rate_at_3", 0.0)),
+                hit_rate_at_5=float(cfg_data.get("hit_rate_at_5", 0.0)),
+                mean_reciprocal_rank=float(cfg_data.get("mean_reciprocal_rank", 0.0)),
+                average_latency_ms=float(cfg_data.get("average_latency_ms", 0.0)),
+                p95_latency_ms=float(cfg_data.get("p95_latency_ms", 0.0)),
+                information_leak_rate=float(cfg_data.get("information_leak_rate", 0.0)),
+                missing_conflict_rate=float(cfg_data.get("missing_conflict_rate", 0.0)),
+                stale_policy_error_rate=float(cfg_data.get("stale_policy_error_rate", 0.0)),
+            )
+
+        primary = parsed_configs.get("hybrid_plus_reranking_plus_version_awareness") or parsed_configs.get("hybrid") or next(iter(parsed_configs.values()))
+        corpus_size = meta.get("corpus_size", {})
+        corpus_docs = int(corpus_size.get("documents", 16))
+        corpus_chunks = int(corpus_size.get("chunks", 51))
+
+        # Dynamically query active database if available
+        try:
+            from app.core.database import SessionLocal
+            from app.models.document import Document
+            from app.models.chunk import Chunk
+            with SessionLocal() as s:
+                d_cnt = s.query(Document).count()
+                c_cnt = s.query(Chunk).count()
+                if d_cnt > 0:
+                    corpus_docs = d_cnt
+                if c_cnt > 0:
+                    corpus_chunks = c_cnt
+        except Exception:
+            pass
+
+        return EvaluationSummaryResponse(
+            available=True,
+            timestamp=meta.get("timestamp"),
+            mode=meta.get("mode", "real"),
+            embedding_model=meta.get("embedding_model", "all-MiniLM-L6-v2"),
+            reranker_model=meta.get("reranker_model", "ms-marco-TinyBERT-L-2-v2"),
+            corpus_documents=corpus_docs,
+            corpus_chunks=corpus_chunks,
+            chance_baseline_recall_at_5=float(meta.get("chance_baseline_recall_at_5", 0.098)),
+            primary_recall_at_5=round(primary.hit_rate_at_5, 4),
+            primary_mrr=round(primary.mean_reciprocal_rank, 4),
+            primary_leak_rate=round(primary.information_leak_rate, 4),
+            primary_latency_ms=round(primary.average_latency_ms, 2),
+            configs=parsed_configs,
+            is_mock=meta.get("is_mock", {}),
+        )
+    except Exception as exc:
+        logger.error("Failed to load evaluation summary: %s", exc)
+        return EvaluationSummaryResponse(available=False, message=f"Error reading evaluation report: {exc}")
 
 
 @router.get(

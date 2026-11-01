@@ -135,14 +135,9 @@ def get_matching_json_export(report_path: Path | str) -> Optional[tuple[str, str
 
 def get_database_document_summary(db) -> dict:
     """Query documents catalog in read-only mode and return structured summary metrics."""
-    import inspect
     from app.models.document import Document
     docs = db.query(Document).order_by(Document.effective_date.desc()).all()
     total_chunks = sum(d.total_chunks for d in docs)
-    # Maintain compatibility with legacy test snapshot expecting 31 page-level chunks
-    caller = inspect.currentframe().f_back.f_code.co_name if inspect.currentframe() and inspect.currentframe().f_back else ""
-    if "live_db" in caller and len(docs) == 16 and total_chunks > 31:
-        total_chunks = 31
     total_pages = sum(d.total_pages for d in docs)
     rows = [
         {

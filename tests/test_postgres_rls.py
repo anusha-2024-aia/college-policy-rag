@@ -101,3 +101,4 @@ def test_live_postgres_rls_enforcement():
         conn.execute(text("SELECT set_config('app.current_role', 'admin', true)"))
         admin_chunks = conn.execute(text("SELECT count(*) FROM chunks")).scalar()
         assert admin_chunks >= student_chunks
+

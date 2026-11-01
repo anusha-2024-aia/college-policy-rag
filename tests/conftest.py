@@ -122,8 +122,8 @@ def sample_pdf_workspace() -> Generator[Path, None, None]:
         manifest_path = base / "documents_manifest.csv"
         manifest_content = (
             "file,title,effective_date,supersedes,allowed_roles\n"
-            "raw_pdfs/valid_doc.pdf,Corporate Architecture,2025-01-15,,engineering;admin;student;faculty\n"
-            "raw_pdfs/policy_v2.pdf,Policy V2,2025-06-01,Policy V1,legal;security;executive;student;faculty;admin\n"
+            "raw_pdfs/valid_doc.pdf,Corporate Architecture,2025-01-15,,student;faculty;admin\n"
+            "raw_pdfs/policy_v2.pdf,Policy V2,2025-06-01,Policy V1,student;faculty;admin\n"
         )
         with open(manifest_path, "w", encoding="utf-8") as f:
             f.write(manifest_content)
