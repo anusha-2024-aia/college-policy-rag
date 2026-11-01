@@ -10,6 +10,7 @@ from sqlalchemy import func
 from app.models.document import Document
 from app.models.chunk import Chunk
 from app.models.chunk_semantic import ChunkSemantic
+from app.models.index_metadata import EmbeddingIndexMetadata
 from app.schemas.retrieval import (
     ScoredChunk,
     FusedChunk,
@@ -17,7 +18,12 @@ from app.schemas.retrieval import (
     RetrievalDiagnostics,
     RetrievalResponse,
 )
-from app.services.embedding import BaseEmbeddingService, get_embedding_service
+from app.services.embedding import (
+    BaseEmbeddingService,
+    EmbeddingProvider,
+    ModelMismatchError,
+    get_embedding_service,
+)
 from app.services.embedding_onnx import ONNXEmbeddingService
 from app.services.reranker import BaseRerankerService, get_reranker_service
 from app.core.config import settings
@@ -113,14 +119,35 @@ class HybridRetrievalService:
             return []
 
         clean_role = validate_role(role)
-        # Operational feature-flag enforcement:
-        # 1. Global operational flag (self.semantic_retrieval_enabled) controls availability.
-        #    If disabled (False), semantic retrieval is strictly OFF; request-level True cannot bypass it.
-        # 2. If enabled (True), request-level False allows explicit per-request opt-out.
-        if not self.semantic_retrieval_enabled:
+
+        # Invariant: Query and indexed document embedding models must match exactly
+        try:
+            index_meta = self.db.query(EmbeddingIndexMetadata).filter_by(id="default").first()
+        except Exception:
+            index_meta = None
+
+        # Auto-detect semantic search if embedding_service is 384-dim ONNX
+        active_service_dim = getattr(self.embedding_service, "dim", getattr(self.embedding_service, "dimension", 1536))
+        active_service_model = getattr(self.embedding_service, "model_id", "")
+        if active_service_dim == 384 or active_service_model == "all-MiniLM-L6-v2":
+            is_semantic = True
+        elif not self.semantic_retrieval_enabled:
             is_semantic = False
         else:
             is_semantic = (use_semantic is not False)
+
+        if index_meta is not None:
+            active_provider = self.semantic_embedding_service if is_semantic else self.embedding_service
+            active_model_id = getattr(active_provider, "model_id", None)
+            active_dim = getattr(active_provider, "dim", getattr(active_provider, "dimension", None))
+
+            if active_model_id and (active_model_id != index_meta.model_id or (active_dim and active_dim != index_meta.dim)):
+                raise ModelMismatchError(
+                    f"Embedding model mismatch: Active query provider model '{active_model_id}' (dim={active_dim}) "
+                    f"does not match indexed corpus model '{index_meta.model_id}' (dim={index_meta.dim}). "
+                    f"Documents and queries must always use the exact same embedding model. "
+                    f"Please reindex using: python -m app.cli.reindex --model {active_model_id}"
+                )
 
         self._last_semantic_active = False
 
@@ -147,7 +174,12 @@ class HybridRetrievalService:
         self, query: str, k: int, role: str
     ) -> list[ScoredChunk]:
         """Execute vector search using 384-dimensional ONNX embeddings on chunks_semantic."""
-        query_vec = self.semantic_embedding_service.embed_query(query)
+        embedder = (
+            self.embedding_service
+            if getattr(self.embedding_service, "dim", getattr(self.embedding_service, "dimension", 1536)) == 384
+            else self.semantic_embedding_service
+        )
+        query_vec = embedder.embed_query(query)
         if len(query_vec) != 384:
             raise ValueError(
                 f"Query embedding dimension mismatch: expected 384, got {len(query_vec)}"

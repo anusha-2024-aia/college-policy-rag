@@ -1,0 +1,93 @@
+{
+  "metadata": {
+    "timestamp": "2026-11-01T01:33:45.391223+00:00",
+    "mode": "real",
+    "seed": 42,
+    "git_commit": "10329c61e02624972175e993f083dbc055aa66d1",
+    "dataset_sha256": "d22559b1b17f2bf17ee91d1d172513c1f3d5b9ef4f5ca26cf116d42ba6ede242",
+    "dataset_size": 100,
+    "corpus_size": {
+      "documents": 16,
+      "chunks": 43
+    },
+    "chance_baseline_recall_at_5": 0.1163,
+    "corpus_warning": "Corpus contains only 43 chunks (< 150). The chance baseline for Recall@5 is 11.63%. High recall is substantially easier to achieve at this corpus size.",
+    "embedding_model": "all-MiniLM-L6-v2",
+    "embedding_dim": 384,
+    "reranker_model": "ms-marco-TinyBERT-L-2-v2",
+    "llm_model": "none (retrieval-only)",
+    "is_mock": {
+      "embedding": false,
+      "reranker": false,
+      "llm": false,
+      "any": false
+    }
+  },
+  "configs": {
+    "vector_only": {
+      "hit_rate_at_1": 0.8,
+      "hit_rate_at_3": 0.9867,
+      "hit_rate_at_5": 0.9867,
+      "mean_reciprocal_rank": 0.8844,
+      "stale_policy_error_rate": 0.0,
+      "missing_conflict_rate": 1.0,
+      "information_leak_rate": 0.0,
+      "average_latency_ms": 20.96,
+      "p95_latency_ms": 38.38,
+      "evaluated_queries": 100,
+      "retrieval_queries": 75
+    },
+    "keyword_only": {
+      "hit_rate_at_1": 0.68,
+      "hit_rate_at_3": 0.9867,
+      "hit_rate_at_5": 0.9867,
+      "mean_reciprocal_rank": 0.8222,
+      "stale_policy_error_rate": 0.0,
+      "missing_conflict_rate": 1.0,
+      "information_leak_rate": 0.0,
+      "average_latency_ms": 8.56,
+      "p95_latency_ms": 11.44,
+      "evaluated_queries": 100,
+      "retrieval_queries": 75
+    },
+    "hybrid": {
+      "hit_rate_at_1": 0.8267,
+      "hit_rate_at_3": 1.0,
+      "hit_rate_at_5": 1.0,
+      "mean_reciprocal_rank": 0.9067,
+      "stale_policy_error_rate": 0.0,
+      "missing_conflict_rate": 1.0,
+      "information_leak_rate": 0.0,
+      "average_latency_ms": 26.24,
+      "p95_latency_ms": 30.74,
+      "evaluated_queries": 100,
+      "retrieval_queries": 75
+    },
+    "hybrid_plus_reranking": {
+      "hit_rate_at_1": 0.7867,
+      "hit_rate_at_3": 1.0,
+      "hit_rate_at_5": 1.0,
+      "mean_reciprocal_rank": 0.8867,
+      "stale_policy_error_rate": 0.0,
+      "missing_conflict_rate": 1.0,
+      "information_leak_rate": 0.0,
+      "average_latency_ms": 124.25,
+      "p95_latency_ms": 192.16,
+      "evaluated_queries": 100,
+      "retrieval_queries": 75
+    },
+    "hybrid_plus_reranking_plus_version_awareness": {
+      "hit_rate_at_1": 0.8533,
+      "hit_rate_at_3": 0.9467,
+      "hit_rate_at_5": 0.96,
+      "mean_reciprocal_rank": 0.9033,
+      "stale_policy_error_rate": 0.0,
+      "missing_conflict_rate": 0.0833,
+      "information_leak_rate": 0.0,
+      "average_latency_ms": 147.27,
+      "p95_latency_ms": 238.81,
+      "evaluated_queries": 100,
+      "retrieval_queries": 75
+    }
+  }
+}

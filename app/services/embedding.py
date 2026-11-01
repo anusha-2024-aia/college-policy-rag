@@ -1,4 +1,6 @@
-"""Embedding service for generating text vector representations."""
+"""Embedding service and provider interfaces for text vector representations."""
+
+from __future__ import annotations
 
 import abc
 import hashlib
@@ -11,38 +13,96 @@ from app.core.config import settings
 logger = logging.getLogger(__name__)
 
 
-class BaseEmbeddingService(abc.ABC):
-    """Abstract base class for embedding generation services."""
+class ModelMismatchError(Exception):
+    """Raised when active query embedding model does not match indexed document model."""
+    pass
+
+
+class EmbeddingProvider(abc.ABC):
+    """Abstract base interface for text embedding providers.
+
+    All embedding providers (real or mock) must declare:
+    - model_id: Unique string identifier for the model.
+    - dim: Vector dimensionality.
+    - normalized: Whether output vectors are unit L2-normalized.
+    - is_mock: Whether the provider is a synthetic/mock generator.
+    - embed_documents(texts): Batch embedding generation for documents.
+    - embed_query(text): Single query embedding generation.
+    """
 
     @property
     @abc.abstractmethod
-    def dimension(self) -> int:
+    def model_id(self) -> str:
+        """Identifier for the model (e.g., 'all-MiniLM-L6-v2', 'mock-sha256')."""
+        pass
+
+    @property
+    @abc.abstractmethod
+    def dim(self) -> int:
         """Vector dimensionality."""
         pass
 
+    @property
+    def dimension(self) -> int:
+        """Backwards compatibility alias for dim."""
+        return self.dim
+
+    @property
     @abc.abstractmethod
-    def embed_texts(self, texts: list[str]) -> list[list[float]]:
-        """Generate embeddings for a list of texts."""
+    def normalized(self) -> bool:
+        """Whether vectors produced by this provider are unit L2-normalized."""
         pass
 
-    def embed_query(self, query: str) -> list[float]:
+    @property
+    @abc.abstractmethod
+    def is_mock(self) -> bool:
+        """True if the provider produces synthetic mock vectors, False if real model."""
+        pass
+
+    @abc.abstractmethod
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        """Generate embeddings for a list of document texts."""
+        pass
+
+    def embed_texts(self, texts: list[str]) -> list[list[float]]:
+        """Backwards compatibility alias for embed_documents."""
+        return self.embed_documents(texts)
+
+    def embed_query(self, text: str) -> list[float]:
         """Generate embedding for a single query string."""
-        results = self.embed_texts([query])
+        results = self.embed_documents([text])
         return results[0]
 
 
-class MockEmbeddingService(BaseEmbeddingService):
+# Backwards compatibility alias for BaseEmbeddingService
+BaseEmbeddingService = EmbeddingProvider
+
+
+class MockEmbeddingService(EmbeddingProvider):
     """Deterministic, offline embedding service for testing and CI environments.
 
-    Produces unit-normalized vectors of the specified dimension based on SHA-256 hash.
+    Produces unit-normalized vectors based on SHA-256 hash.
     """
 
-    def __init__(self, dimension: int = 1536):
+    def __init__(self, dimension: int = 1536, model_id: str = "mock-sha256"):
         self._dimension = dimension
+        self._model_id = model_id
 
     @property
-    def dimension(self) -> int:
+    def model_id(self) -> str:
+        return self._model_id
+
+    @property
+    def dim(self) -> int:
         return self._dimension
+
+    @property
+    def normalized(self) -> bool:
+        return True
+
+    @property
+    def is_mock(self) -> bool:
+        return True
 
     def _generate_vector(self, text: str) -> list[float]:
         """Generate a deterministic unit-normalized vector for given text."""
@@ -60,12 +120,16 @@ class MockEmbeddingService(BaseEmbeddingService):
 
         return [round(v / norm, 6) for v in raw_vals]
 
-    def embed_texts(self, texts: list[str]) -> list[list[float]]:
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
         """Generate deterministic embeddings for all input texts."""
         return [self._generate_vector(t) for t in texts]
 
 
-class OpenAIEmbeddingService(BaseEmbeddingService):
+# Alias for explicit provider naming
+MockEmbeddingProvider = MockEmbeddingService
+
+
+class OpenAIEmbeddingService(EmbeddingProvider):
     """OpenAI API-backed embedding service."""
 
     def __init__(
@@ -83,10 +147,22 @@ class OpenAIEmbeddingService(BaseEmbeddingService):
         self.client = OpenAI(api_key=self._api_key)
 
     @property
-    def dimension(self) -> int:
+    def model_id(self) -> str:
+        return self._model
+
+    @property
+    def dim(self) -> int:
         return self._dimension
 
-    def embed_texts(self, texts: list[str]) -> list[list[float]]:
+    @property
+    def normalized(self) -> bool:
+        return True
+
+    @property
+    def is_mock(self) -> bool:
+        return False
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
         """Generate embeddings in batches using OpenAI API."""
         if not texts:
             return []
@@ -108,7 +184,7 @@ class OpenAIEmbeddingService(BaseEmbeddingService):
         return all_embeddings
 
 
-class GeminiEmbeddingService(BaseEmbeddingService):
+class GeminiEmbeddingService(EmbeddingProvider):
     """Google Gemini API embedding service using text-embedding-004 (768 dimensions)."""
 
     def __init__(
@@ -133,10 +209,22 @@ class GeminiEmbeddingService(BaseEmbeddingService):
         self.base_url = "https://generativelanguage.googleapis.com/v1beta"
 
     @property
-    def dimension(self) -> int:
+    def model_id(self) -> str:
+        return self._model
+
+    @property
+    def dim(self) -> int:
         return self._dimension
 
-    def embed_texts(self, texts: list[str]) -> list[list[float]]:
+    @property
+    def normalized(self) -> bool:
+        return True
+
+    @property
+    def is_mock(self) -> bool:
+        return False
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
         """Generate embeddings in batches using Google Gemini REST API."""
         if not texts:
             return []
@@ -177,45 +265,59 @@ class GeminiEmbeddingService(BaseEmbeddingService):
         return all_embeddings
 
 
-def get_embedding_service(force_mock: bool = False) -> BaseEmbeddingService:
-    """Factory creating configured embedding service.
+def get_embedding_provider(
+    model_id: Optional[str] = None,
+    force_mock: bool = False,
+) -> EmbeddingProvider:
+    """Factory creating configured embedding provider.
 
-    Defaults to MockEmbeddingService when running without configured API keys, in test mode, or provider=mock.
+    Options:
+    - 'all-MiniLM-L6-v2': Local real ONNX model (384 dimensions, normalized, is_mock=False).
+    - 'openai': Hosted OpenAI embedding API.
+    - 'gemini': Hosted Google Gemini embedding API.
+    - 'mock' or 'mock-sha256': Deterministic unit-normalized mock provider for testing.
+
+    If model_id is not specified, defaults to local ONNX 'all-MiniLM-L6-v2' when available
+    in non-mock execution, or MockEmbeddingService when force_mock=True or in test environment.
     """
-    provider = (settings.EMBEDDING_PROVIDER or "openai").lower()
-    key = settings.EMBEDDING_API_KEY or settings.LLM_API_KEY
-    is_placeholder = not key or "your_" in key.lower() or key in ("test", "dummy")
+    requested = (model_id or settings.EMBEDDING_PROVIDER or "").lower()
 
-    if force_mock or is_placeholder or settings.APP_ENV == "test" or provider == "mock":
-        logger.info(
-            "Using deterministic MockEmbeddingService (dimension=%d)",
-            settings.EMBEDDING_DIMENSION,
-        )
-        return MockEmbeddingService(dimension=settings.EMBEDDING_DIMENSION)
+    if force_mock or requested in ("mock", "mock-sha256"):
+        logger.info("Using deterministic MockEmbeddingService (dimension=%d)", settings.EMBEDDING_DIMENSION)
+        return MockEmbeddingService(dimension=settings.EMBEDDING_DIMENSION, model_id="mock-sha256")
 
-    if provider == "gemini":
-        logger.info(
-            "Using GeminiEmbeddingService (model=%s, dimension=%d)",
-            settings.EMBEDDING_MODEL,
-            settings.EMBEDDING_DIMENSION,
-        )
-        return GeminiEmbeddingService(
-            api_key=key,
-            model=settings.EMBEDDING_MODEL,
-            dimension=settings.EMBEDDING_DIMENSION,
-        )
+    if requested == "all-minilm-l6-v2" or requested == "onnx":
+        from app.services.embedding_onnx import ONNXEmbeddingService
+        logger.info("Using local ONNXEmbeddingService (all-MiniLM-L6-v2, 384d)")
+        return ONNXEmbeddingService()
 
-    if provider == "openai":
-        logger.info(
-            "Using OpenAIEmbeddingService (model=%s, dimension=%d)",
-            settings.EMBEDDING_MODEL,
-            settings.EMBEDDING_DIMENSION,
-        )
-        return OpenAIEmbeddingService(
-            api_key=key,
-            model=settings.EMBEDDING_MODEL,
-            dimension=settings.EMBEDDING_DIMENSION,
-        )
+    if requested == "gemini":
+        key = settings.GEMINI_API_KEY or settings.EMBEDDING_API_KEY or settings.LLM_API_KEY
+        if key and "your_" not in key.lower() and key not in ("test", "dummy"):
+            logger.info("Using GeminiEmbeddingService (model=%s)", settings.EMBEDDING_MODEL)
+            return GeminiEmbeddingService(api_key=key, model=settings.EMBEDDING_MODEL, dimension=settings.EMBEDDING_DIMENSION)
+        logger.warning("Gemini API key missing, falling back to local ONNX model")
+        from app.services.embedding_onnx import ONNXEmbeddingService
+        return ONNXEmbeddingService()
 
-    logger.warning("Unrecognized embedding provider '%s', using MockEmbeddingService", provider)
+    if requested == "openai":
+        key = settings.EMBEDDING_API_KEY or settings.LLM_API_KEY
+        if key and "your_" not in key.lower() and key not in ("test", "dummy"):
+            logger.info("Using OpenAIEmbeddingService (model=%s)", settings.EMBEDDING_MODEL)
+            return OpenAIEmbeddingService(api_key=key, model=settings.EMBEDDING_MODEL, dimension=settings.EMBEDDING_DIMENSION)
+        logger.warning("OpenAI API key missing, falling back to local ONNX model")
+        from app.services.embedding_onnx import ONNXEmbeddingService
+        return ONNXEmbeddingService()
+
+    # Default fallback: if local ONNX model exists, use real ONNX model!
+    from pathlib import Path
+    if Path("models/embeddings/all-MiniLM-L6-v2/model.onnx").exists():
+        from app.services.embedding_onnx import ONNXEmbeddingService
+        return ONNXEmbeddingService()
+
     return MockEmbeddingService(dimension=settings.EMBEDDING_DIMENSION)
+
+
+def get_embedding_service(force_mock: bool = False) -> EmbeddingProvider:
+    """Backwards compatibility alias for get_embedding_provider."""
+    return get_embedding_provider(force_mock=force_mock)

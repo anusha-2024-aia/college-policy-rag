@@ -43,6 +43,18 @@ class LLMTimeoutError(LLMError):
 class BaseLLMService(abc.ABC):
     """Abstract interface for LLM text generation and streaming."""
 
+    @property
+    @abc.abstractmethod
+    def model_name(self) -> str:
+        """Identifier for the LLM model."""
+        pass
+
+    @property
+    @abc.abstractmethod
+    def is_mock(self) -> bool:
+        """Whether this service is a synthetic/mock generator."""
+        pass
+
     @abc.abstractmethod
     def generate(self, prompt: str, system_prompt: Optional[str] = None) -> str:
         """Generate complete answer text from prompt."""
@@ -72,6 +84,14 @@ class OpenAILLMService(BaseLLMService):
             )
         self.model = model or settings.LLM_MODEL
         self.timeout_seconds = timeout_seconds
+
+    @property
+    def model_name(self) -> str:
+        return self.model
+
+    @property
+    def is_mock(self) -> bool:
+        return False
 
         try:
             self.client = OpenAI(api_key=self._api_key, timeout=self.timeout_seconds)
@@ -170,6 +190,14 @@ class GeminiLLMService(BaseLLMService):
 
         self.timeout_seconds = timeout_seconds
         self.base_url = "https://generativelanguage.googleapis.com/v1beta"
+
+    @property
+    def model_name(self) -> str:
+        return self._model_path
+
+    @property
+    def is_mock(self) -> bool:
+        return False
 
     def _build_payload(self, prompt: str, system_prompt: Optional[str] = None) -> dict:
         payload: dict = {
@@ -358,6 +386,14 @@ class MockLLMService(BaseLLMService):
         self.simulate_error = simulate_error
         self.custom_response = custom_response
         self.generate_call_count = 0
+
+    @property
+    def model_name(self) -> str:
+        return "mock-regex-synthesizer"
+
+    @property
+    def is_mock(self) -> bool:
+        return True
 
     def _check_simulated_error(self) -> None:
         if self.simulate_error == "auth":

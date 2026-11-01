@@ -81,9 +81,33 @@ class ONNXEmbeddingService(BaseEmbeddingService):
         )
 
     @property
-    def dimension(self) -> int:
+    def model_id(self) -> str:
+        """Identifier for the ONNX MiniLM model."""
+        return "all-MiniLM-L6-v2"
+
+    @property
+    def dim(self) -> int:
         """Vector dimensionality (384 for all-MiniLM-L6-v2)."""
         return self._dimension
+
+    @property
+    def dimension(self) -> int:
+        """Backwards compatibility alias for dim."""
+        return self._dimension
+
+    @property
+    def normalized(self) -> bool:
+        """Whether vectors produced by this provider are unit L2-normalized."""
+        return True
+
+    @property
+    def is_mock(self) -> bool:
+        """True if synthetic mock, False if real model."""
+        return False
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        """Generate 384-dimensional dense semantic embeddings for a list of document texts."""
+        return self.embed_texts(texts)
 
     def _mean_pooling(
         self,

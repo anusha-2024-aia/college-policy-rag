@@ -25,6 +25,22 @@ def reset_query_cache():
     query_cache.clear()
 
 
+@pytest.fixture(scope="session", autouse=True)
+def ensure_test_corpus_mock_indexed():
+    """Ensure data/test_kvit.db index metadata matches mock-sha256 for unit test suite."""
+    from app.core.database import get_test_session
+    from app.models.index_metadata import EmbeddingIndexMetadata
+    db = get_test_session()
+    meta = db.query(EmbeddingIndexMetadata).filter_by(id="default").first()
+    if meta is not None:
+        meta.model_id = "mock-sha256"
+        meta.dim = 1536
+        meta.normalized = True
+        meta.is_mock = True
+        db.commit()
+    db.close()
+
+
 @pytest.fixture(scope="module")
 def client() -> Generator[TestClient, None, None]:
     """Provide a TestClient instance for API tests."""

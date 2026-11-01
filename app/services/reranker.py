@@ -13,6 +13,18 @@ logger = logging.getLogger(__name__)
 class BaseRerankerService(abc.ABC):
     """Abstract interface for reranking candidate passages."""
 
+    @property
+    @abc.abstractmethod
+    def model_name(self) -> str:
+        """Identifier for the reranker model."""
+        pass
+
+    @property
+    @abc.abstractmethod
+    def is_mock(self) -> bool:
+        """Whether this reranker is a synthetic/heuristic mock."""
+        pass
+
     @abc.abstractmethod
     def rerank(
         self,
@@ -30,6 +42,14 @@ class MockRerankerService(BaseRerankerService):
     Scores candidate passages using query-document lexical overlap, exact phrase bonuses,
     and prior RRF fusion signals, returning normalized scores without requiring GPU models.
     """
+
+    @property
+    def model_name(self) -> str:
+        return "mock-lexical-overlap"
+
+    @property
+    def is_mock(self) -> bool:
+        return True
 
     def rerank(
         self,
@@ -118,6 +138,14 @@ class FlashRankRerankerService(BaseRerankerService):
             logger.error("Failed to initialize FlashRank with model '%s': %s", self._model, exc)
             raise
 
+    @property
+    def model_name(self) -> str:
+        return self._model
+
+    @property
+    def is_mock(self) -> bool:
+        return False
+
     def rerank(
         self,
         query: str,
@@ -179,6 +207,14 @@ class CohereRerankerService(BaseRerankerService):
             self.client = cohere.Client(self._api_key)
         except ImportError as exc:
             raise ImportError("cohere package is required for CohereRerankerService. Install with `pip install cohere`.") from exc
+
+    @property
+    def model_name(self) -> str:
+        return self._model
+
+    @property
+    def is_mock(self) -> bool:
+        return False
 
     def rerank(
         self,
