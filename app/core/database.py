@@ -55,8 +55,20 @@ def get_test_session() -> Session:
 
 
 def init_db(target_engine=None) -> None:
-    """Initialize database extensions, run idempotent migrations, and create all declared tables."""
+    """Initialize database extensions and seed default data.
+    
+    In production, database schema, pgvector indexes, and RLS policies are strictly
+    managed via Alembic migrations (`alembic upgrade head`). `Base.metadata.create_all`
+    is prohibited in production startup to guarantee deterministic migration reliability.
+    In development and testing environments, fallback table creation and user seeding is permitted.
+    """
     import app.models  # noqa: F401 - ensure models are registered on Base.metadata
+
+    if settings.APP_ENV in ("production", "prod"):
+        # Strict Production Reliability: Prohibit runtime create_all DDL.
+        # Schema creation and initial seeding are strictly managed via migrations (alembic upgrade head).
+        return
+
     if settings.APP_ENV == "test" and target_engine is None:
         target_engine = get_test_session().bind
 
@@ -65,15 +77,6 @@ def init_db(target_engine=None) -> None:
     if eng.dialect.name == "postgresql":
         with eng.connect() as connection:
             connection.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
-            # Idempotent migrations for existing tables
-            connection.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS doc_version VARCHAR(50);"))
-            connection.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS expires_date DATE;"))
-            connection.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS supersedes_doc_id VARCHAR(36);"))
-            connection.execute(text("ALTER TABLE chunks ADD COLUMN IF NOT EXISTS clause_ref VARCHAR(100);"))
-            connection.execute(text("ALTER TABLE chunks ADD COLUMN IF NOT EXISTS valid_from DATE;"))
-            connection.execute(text("ALTER TABLE chunks ADD COLUMN IF NOT EXISTS valid_to DATE;"))
-            connection.execute(text("ALTER TABLE chunks ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'current';"))
-            connection.execute(text("ALTER TABLE chunks ADD COLUMN IF NOT EXISTS allowed_roles JSONB DEFAULT '[]'::jsonb;"))
             connection.commit()
 
     Base.metadata.create_all(bind=eng)
