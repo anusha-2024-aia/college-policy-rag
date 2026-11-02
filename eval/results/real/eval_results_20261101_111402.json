@@ -1,0 +1,860 @@
+{
+  "metadata": {
+    "timestamp": "2026-11-01T11:14:02.158924+00:00",
+    "mode": "real",
+    "seed": 42,
+    "git_commit": "9bfcbe62cbe351ec2c74cca576f2c836db2abe49",
+    "dataset_sha256": "d22559b1b17f2bf17ee91d1d172513c1f3d5b9ef4f5ca26cf116d42ba6ede242",
+    "dataset_size": 100,
+    "corpus_size": {
+      "documents": 16,
+      "chunks": 51
+    },
+    "chance_baseline_recall_at_5": 0.098,
+    "corpus_warning": "Corpus contains only 51 chunks (< 150). The chance baseline for Recall@5 is 9.80%. High recall is substantially easier to achieve at this corpus size.",
+    "embedding_model": "all-MiniLM-L6-v2",
+    "embedding_dim": 384,
+    "reranker_model": "ms-marco-TinyBERT-L-2-v2",
+    "llm_model": "none (retrieval-only)",
+    "is_mock": {
+      "embedding": false,
+      "reranker": false,
+      "llm": false,
+      "any": false
+    }
+  },
+  "configs": {
+    "vector_only": {
+      "hit_rate_at_1": 0.7733,
+      "hit_rate_at_3": 0.9733,
+      "hit_rate_at_5": 0.9867,
+      "mean_reciprocal_rank": 0.8678,
+      "stale_policy_error_rate": 0.0,
+      "missing_conflict_rate": 1.0,
+      "information_leak_rate": 0.0,
+      "average_latency_ms": 22.27,
+      "p95_latency_ms": 37.98,
+      "evaluated_queries": 100,
+      "retrieval_queries": 75
+    },
+    "keyword_only": {
+      "hit_rate_at_1": 0.6933,
+      "hit_rate_at_3": 0.9733,
+      "hit_rate_at_5": 1.0,
+      "mean_reciprocal_rank": 0.8349,
+      "stale_policy_error_rate": 0.0,
+      "missing_conflict_rate": 1.0,
+      "information_leak_rate": 0.0,
+      "average_latency_ms": 8.85,
+      "p95_latency_ms": 11.1,
+      "evaluated_queries": 100,
+      "retrieval_queries": 75
+    },
+    "hybrid": {
+      "hit_rate_at_1": 0.7867,
+      "hit_rate_at_3": 0.9867,
+      "hit_rate_at_5": 1.0,
+      "mean_reciprocal_rank": 0.8856,
+      "stale_policy_error_rate": 0.0,
+      "missing_conflict_rate": 1.0,
+      "information_leak_rate": 0.0,
+      "average_latency_ms": 27.34,
+      "p95_latency_ms": 31.51,
+      "evaluated_queries": 100,
+      "retrieval_queries": 75
+    },
+    "hybrid_plus_reranking": {
+      "hit_rate_at_1": 0.8267,
+      "hit_rate_at_3": 0.9733,
+      "hit_rate_at_5": 1.0,
+      "mean_reciprocal_rank": 0.9067,
+      "stale_policy_error_rate": 0.0,
+      "missing_conflict_rate": 1.0,
+      "information_leak_rate": 0.0,
+      "average_latency_ms": 111.0,
+      "p95_latency_ms": 166.26,
+      "evaluated_queries": 100,
+      "retrieval_queries": 75
+    },
+    "hybrid_plus_reranking_plus_version_awareness": {
+      "hit_rate_at_1": 0.8667,
+      "hit_rate_at_3": 0.96,
+      "hit_rate_at_5": 0.9733,
+      "mean_reciprocal_rank": 0.9144,
+      "stale_policy_error_rate": 0.0,
+      "missing_conflict_rate": 0.0833,
+      "information_leak_rate": 0.0,
+      "average_latency_ms": 128.72,
+      "p95_latency_ms": 185.55,
+      "evaluated_queries": 100,
+      "retrieval_queries": 75
+    }
+  },
+  "ablation_matrix": {
+    "v_off__lineage_off__role_off": {
+      "version_aware": false,
+      "lineage_expansion": false,
+      "role_enforcement": false,
+      "hit_rate_at_1": 0.7867,
+      "hit_rate_at_3": 0.9467,
+      "hit_rate_at_5": 0.9733,
+      "mean_reciprocal_rank": 0.8733,
+      "stale_policy_error_rate": 0.0,
+      "missing_conflict_rate": 1.0,
+      "information_leak_rate": 0.43,
+      "average_latency_ms": 133.74,
+      "p95_latency_ms": 200.49
+    },
+    "v_off__lineage_off__role_on": {
+      "version_aware": false,
+      "lineage_expansion": false,
+      "role_enforcement": true,
+      "hit_rate_at_1": 0.8,
+      "hit_rate_at_3": 0.9467,
+      "hit_rate_at_5": 0.9733,
+      "mean_reciprocal_rank": 0.88,
+      "stale_policy_error_rate": 0.0,
+      "missing_conflict_rate": 1.0,
+      "information_leak_rate": 0.0,
+      "average_latency_ms": 112.0,
+      "p95_latency_ms": 163.03
+    },
+    "v_off__lineage_on__role_off": {
+      "version_aware": false,
+      "lineage_expansion": true,
+      "role_enforcement": false,
+      "hit_rate_at_1": 0.7867,
+      "hit_rate_at_3": 0.9467,
+      "hit_rate_at_5": 0.9733,
+      "mean_reciprocal_rank": 0.8733,
+      "stale_policy_error_rate": 0.0,
+      "missing_conflict_rate": 1.0,
+      "information_leak_rate": 0.43,
+      "average_latency_ms": 142.72,
+      "p95_latency_ms": 213.48
+    },
+    "v_off__lineage_on__role_on": {
+      "version_aware": false,
+      "lineage_expansion": true,
+      "role_enforcement": true,
+      "hit_rate_at_1": 0.8,
+      "hit_rate_at_3": 0.9467,
+      "hit_rate_at_5": 0.9733,
+      "mean_reciprocal_rank": 0.88,
+      "stale_policy_error_rate": 0.0,
+      "missing_conflict_rate": 1.0,
+      "information_leak_rate": 0.0,
+      "average_latency_ms": 124.71,
+      "p95_latency_ms": 183.21
+    },
+    "v_on__lineage_off__role_off": {
+      "version_aware": true,
+      "lineage_expansion": false,
+      "role_enforcement": false,
+      "hit_rate_at_1": 0.8667,
+      "hit_rate_at_3": 0.96,
+      "hit_rate_at_5": 0.9733,
+      "mean_reciprocal_rank": 0.9122,
+      "stale_policy_error_rate": 0.0,
+      "missing_conflict_rate": 0.0,
+      "information_leak_rate": 0.43,
+      "average_latency_ms": 124.93,
+      "p95_latency_ms": 190.09
+    },
+    "v_on__lineage_off__role_on": {
+      "version_aware": true,
+      "lineage_expansion": false,
+      "role_enforcement": true,
+      "hit_rate_at_1": 0.8667,
+      "hit_rate_at_3": 0.96,
+      "hit_rate_at_5": 0.9733,
+      "mean_reciprocal_rank": 0.9144,
+      "stale_policy_error_rate": 0.0,
+      "missing_conflict_rate": 0.0833,
+      "information_leak_rate": 0.0,
+      "average_latency_ms": 118.59,
+      "p95_latency_ms": 170.8
+    },
+    "v_on__lineage_on__role_off": {
+      "version_aware": true,
+      "lineage_expansion": true,
+      "role_enforcement": false,
+      "hit_rate_at_1": 0.8667,
+      "hit_rate_at_3": 0.96,
+      "hit_rate_at_5": 0.9733,
+      "mean_reciprocal_rank": 0.9122,
+      "stale_policy_error_rate": 0.0,
+      "missing_conflict_rate": 0.0,
+      "information_leak_rate": 0.43,
+      "average_latency_ms": 131.7,
+      "p95_latency_ms": 191.77
+    },
+    "v_on__lineage_on__role_on": {
+      "version_aware": true,
+      "lineage_expansion": true,
+      "role_enforcement": true,
+      "hit_rate_at_1": 0.8667,
+      "hit_rate_at_3": 0.96,
+      "hit_rate_at_5": 0.9733,
+      "mean_reciprocal_rank": 0.9144,
+      "stale_policy_error_rate": 0.0,
+      "missing_conflict_rate": 0.0833,
+      "information_leak_rate": 0.0,
+      "average_latency_ms": 128.58,
+      "p95_latency_ms": 198.47
+    }
+  },
+  "detailed_metrics": {
+    "recall_at_1": {
+      "k": 65,
+      "n": 75,
+      "ci": [
+        0.7867,
+        0.9333
+      ]
+    },
+    "recall_at_3": {
+      "k": 72,
+      "n": 75,
+      "ci": [
+        0.9067,
+        1.0
+      ]
+    },
+    "recall_at_5": {
+      "k": 73,
+      "n": 75,
+      "ci": [
+        0.9333,
+        1.0
+      ]
+    },
+    "mrr": {
+      "value": 0.9144,
+      "ci": [
+        0.86,
+        0.9633
+      ]
+    },
+    "citation_correctness": {
+      "k": 73,
+      "n": 73,
+      "ci": [
+        1.0,
+        1.0
+      ]
+    },
+    "answer_correctness": {
+      "k": 14,
+      "n": 75,
+      "ci": [
+        0.1067,
+        0.28
+      ]
+    },
+    "correct_abstention_rate": {
+      "k": 25,
+      "n": 25,
+      "ci": [
+        1.0,
+        1.0
+      ]
+    },
+    "stale_answer_rate": {
+      "k": 0,
+      "n": 12,
+      "ci": [
+        0.0,
+        0.0
+      ]
+    },
+    "conflict_precision": {
+      "k": 11,
+      "n": 22,
+      "value": 0.5,
+      "ci": [
+        0.5,
+        0.5
+      ]
+    },
+    "conflict_recall": {
+      "k": 11,
+      "n": 12,
+      "value": 0.9166666666666666,
+      "ci": [
+        0.9167,
+        0.9167
+      ]
+    },
+    "false_flag_rate_unchanged": {
+      "k": 0,
+      "n": 1,
+      "value": 0.0,
+      "ci": [
+        0.0,
+        0.0
+      ]
+    },
+    "information_leak_count": {
+      "k": 0,
+      "n": 100
+    },
+    "average_tokens_per_query": {
+      "input": 1163.3,
+      "output": 84.9
+    },
+    "estimated_cost_per_query_usd": 0.000112,
+    "failure_count": 61
+  },
+  "failures": [
+    {
+      "id": "N01",
+      "question": "What is the minimum number of credits required to earn the B.Tech degree?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "160 credits.",
+      "got": "According to the documentation, Academic Regulations for Undergraduate Programmes [1]. According to the documentation, 2...",
+      "cause": "Synthesized answer missing required key facts: ['160 credits.']"
+    },
+    {
+      "id": "N02",
+      "question": "How many credits can I register for in a semester?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Minimum 16 and maximum 24 credits; the normal load is 20 credits.",
+      "got": "According to the documentation, Academic Regulations for Undergraduate Programmes [1]. According to the documentation, 2...",
+      "cause": "Synthesized answer missing required key facts: ['Minimum 16 and maximum 24 credits; the normal load is 20 credits.']"
+    },
+    {
+      "id": "N03",
+      "question": "How many grade points does an A+ grade carry?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "9 grade points (80 to 89 marks).",
+      "got": "According to the documentation, 2. Grading and CGPA [1]. According to the documentation, 3. Progression, withdrawal and ...",
+      "cause": "Synthesized answer missing required key facts: ['9 grade points (80 to 89 marks).']"
+    },
+    {
+      "id": "N04",
+      "question": "What is the minimum CGPA required for the award of the degree?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "A minimum CGPA of 5.0.",
+      "got": "According to the documentation, 2. Renewal, documents and decisions [1]. According to the documentation, Scholarship Gui...",
+      "cause": "Synthesized answer missing required key facts: ['A minimum CGPA of 5.0.']"
+    },
+    {
+      "id": "N05",
+      "question": "How many backlog courses can I carry into the next academic year?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "A maximum of 6 active backlog courses; more than that blocks promotion.",
+      "got": "According to the documentation, 3. Progression, withdrawal and duration [1]. According to the documentation, Academic Re...",
+      "cause": "Synthesized answer missing required key facts: ['A maximum of 6 active backlog courses; more than that blocks promotion.']"
+    },
+    {
+      "id": "N06",
+      "question": "Until when can I withdraw from a course without a grade penalty?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Within 14 days of the start of the semester.",
+      "got": "According to the documentation, 3. Progression, withdrawal and duration [1]. According to the documentation, 2. Fines, r...",
+      "cause": "Synthesized answer missing required key facts: ['Within 14 days of the start of the semester.']"
+    },
+    {
+      "id": "N07",
+      "question": "What is the maximum time allowed to complete the B.Tech programme?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "6 academic years from the date of admission.",
+      "got": "According to the documentation, Academic Regulations for Undergraduate Programmes [1]. According to the documentation, 3...",
+      "cause": "Synthesized answer missing required key facts: ['6 academic years from the date of admission.']"
+    },
+    {
+      "id": "N08",
+      "question": "What happens if my CGPA is below 5.0 at the end of an academic year?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "The student is placed on academic probation for the following year.",
+      "got": "According to the documentation, 3. Progression, withdrawal and duration [1]. According to the documentation, 2. Grading ...",
+      "cause": "Synthesized answer missing required key facts: ['The student is placed on academic probation for the following year.']"
+    },
+    {
+      "id": "N09",
+      "question": "How much is the replacement fee for a lost ID card?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Rs. 300.",
+      "got": "According to the documentation, Student Handbook [1]. According to the documentation, 2. Fines, renewals and conduct [2]...",
+      "cause": "Synthesized answer missing required key facts: ['Rs. 300.']"
+    },
+    {
+      "id": "N10",
+      "question": "What are the opening and closing times of the campus gates?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "6:00 AM to 10:00 PM.",
+      "got": "According to the documentation, Student Handbook [1]. According to the documentation, 3. Grievances and student life [2]...",
+      "cause": "Synthesized answer missing required key facts: ['6:00 AM to 10:00 PM.']"
+    },
+    {
+      "id": "N11",
+      "question": "Are mobile phones allowed inside examination halls?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "No, mobile phones are not permitted inside examination halls.",
+      "got": "According to the documentation, 2. Code of conduct [1]. According to the documentation, Hostel Rules [2].",
+      "cause": "Synthesized answer missing required key facts: ['No, mobile phones are not permitted inside examination halls.']"
+    },
+    {
+      "id": "N13",
+      "question": "How quickly does the Student Grievance Cell acknowledge a complaint?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Within 3 working days (resolution aimed within 15 working days).",
+      "got": "According to the documentation, 3. Grievances and student life [1]. According to the documentation, - Clause 3.2. No stu...",
+      "cause": "Synthesized answer missing required key facts: ['Within 3 working days (resolution aimed within 15 working days).']"
+    },
+    {
+      "id": "N14",
+      "question": "What is needed to register a student club?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "At least 15 members and a faculty advisor.",
+      "got": "According to the documentation, 3. Grievances and student life [1]. According to the documentation, Student Handbook [2]...",
+      "cause": "Synthesized answer missing required key facts: ['At least 15 members and a faculty advisor.']"
+    },
+    {
+      "id": "N15",
+      "question": "When is the Counselling Centre open and is it free?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Monday to Saturday, 9:00 AM to 5:00 PM; free and confidential.",
+      "got": "According to the documentation, 3. Grievances and student life [1]. According to the documentation, Student Handbook [2]...",
+      "cause": "Synthesized answer missing required key facts: ['Monday to Saturday, 9:00 AM to 5:00 PM; free and confidential.']"
+    },
+    {
+      "id": "N16",
+      "question": "How can I report ragging, and can I do it anonymously?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Contact the Anti-Ragging Committee via helpline extension 1100; anonymous complaints are allowed.",
+      "got": "According to the documentation, 2. Code of conduct [1]. According to the documentation, 3. Grievances and student life [...",
+      "cause": "Synthesized answer missing required key facts: ['Contact the Anti-Ragging Committee via helpline extension 1100; anonymous complaints are allowed.']"
+    },
+    {
+      "id": "N17",
+      "question": "How long do I have to appeal a grievance decision to the Dean of Student Affairs?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Within 7 days of receiving the decision.",
+      "got": "According to the documentation, 3. Grievances and student life [1]. According to the documentation, 2. Renewal, document...",
+      "cause": "Synthesized answer missing required key facts: ['Within 7 days of receiving the decision.']"
+    },
+    {
+      "id": "N20",
+      "question": "What aggregate mark do I need to pass a theory course?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "At least 40 out of 100 (CIA plus ESE).",
+      "got": "According to the documentation, - Amendment to Clause 4.2: the minimum ESE mark required to pass a theory course is redu...",
+      "cause": "Synthesized answer missing required key facts: ['At least 40 out of 100 (CIA plus ESE).']"
+    },
+    {
+      "id": "N22",
+      "question": "What is the penalty for a first offence of using unfair means in an exam?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "The answer paper of that course is cancelled.",
+      "got": "According to the documentation, 3. Unfair means and supplementary examinations [1]. According to the documentation, - Cl...",
+      "cause": "Synthesized answer missing required key facts: ['The answer paper of that course is cancelled.']"
+    },
+    {
+      "id": "N25",
+      "question": "If my answer script is re-evaluated, can my marks go down?",
+      "role": "student",
+      "category": "abstain_error",
+      "expected": "No. Re-evaluated marks replace the original marks only if they are higher.",
+      "got": "I do not have sufficient information in the provided documents to answer this question.",
+      "cause": "Falsely abstained on an answerable query."
+    },
+    {
+      "id": "N26",
+      "question": "How many books can an undergraduate borrow from the library and for how long?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "4 books for 14 days.",
+      "got": "According to the documentation, Library Rules [1]. According to the documentation, 2. Fines, renewals and conduct [2].",
+      "cause": "Synthesized answer missing required key facts: ['4 books for 14 days.']"
+    },
+    {
+      "id": "N27",
+      "question": "What are the library opening hours?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "8:30 AM to 8:00 PM, Monday to Saturday; open until midnight during end-semester exams.",
+      "got": "According to the documentation, Library Rules [1]. According to the documentation, Hostel Rules [2].",
+      "cause": "Synthesized answer missing required key facts: ['8:30 AM to 8:00 PM, Monday to Saturday; open until midnight during end-semester exams.']"
+    },
+    {
+      "id": "N30",
+      "question": "What must I do if I lose a library book?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Replace it with the same edition or pay twice the price of the book.",
+      "got": "According to the documentation, 2. Fines, renewals and conduct [1]. According to the documentation, Library Rules [2].",
+      "cause": "Synthesized answer missing required key facts: ['Replace it with the same edition or pay twice the price of the book.']"
+    },
+    {
+      "id": "N31",
+      "question": "Can I take reference books home?",
+      "role": "student",
+      "category": "abstain_error",
+      "expected": "No. Reference books, journals and past question papers must be used inside the library.",
+      "got": "I do not have sufficient information in the provided documents to answer this question.",
+      "cause": "Falsely abstained on an answerable query."
+    },
+    {
+      "id": "N32",
+      "question": "Which scholarship gives a 50% tuition waiver and who qualifies?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "The Merit Scholarship: top 5% of the programme by CGPA with a minimum CGPA of 8.5.",
+      "got": "According to the documentation, Scholarship Guidelines [1]. According to the documentation, - Sports Scholarship: studen...",
+      "cause": "Synthesized answer missing required key facts: ['The Merit Scholarship: top 5% of the programme by CGPA with a minimum CGPA of 8.5.']"
+    },
+    {
+      "id": "N33",
+      "question": "What family income limit applies to the need-based scholarship, and how much is waived?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Family annual income below Rs. 4,00,000; 30% of tuition fees waived.",
+      "got": "According to the documentation, Scholarship Guidelines [1]. According to the documentation, 2. Renewal, documents and de...",
+      "cause": "Synthesized answer missing required key facts: ['Family annual income below Rs. 4,00,000; 30% of tuition fees waived.']"
+    },
+    {
+      "id": "N34",
+      "question": "What is the deadline to apply for scholarships?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "31 August each year, on the scholarship portal.",
+      "got": "According to the documentation, 2. Renewal, documents and decisions [1]. According to the documentation, - Sports Schola...",
+      "cause": "Synthesized answer missing required key facts: ['31 August each year, on the scholarship portal.']"
+    },
+    {
+      "id": "N35",
+      "question": "Can I hold two scholarships at the same time?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "No. Only one scholarship at a time; waivers cannot be combined.",
+      "got": "According to the documentation, - Sports Scholarship: students who have represented their state or country at an officia...",
+      "cause": "Synthesized answer missing required key facts: ['No. Only one scholarship at a time; waivers cannot be combined.']"
+    },
+    {
+      "id": "N36",
+      "question": "Which documents do I need for a scholarship application?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Income certificate (need-based), previous semester marksheet and a copy of the bank passbook.",
+      "got": "According to the documentation, 2. Renewal, documents and decisions [1]. According to the documentation, - Sports Schola...",
+      "cause": "Synthesized answer missing required key facts: ['Income certificate (need-based), previous semester marksheet and a copy of the bank passbook.']"
+    },
+    {
+      "id": "N37",
+      "question": "What minimum CGPA do I need to renew my scholarship?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "A CGPA of at least 7.5 (plus meeting the minimum attendance requirement).",
+      "got": "According to the documentation, 2. Renewal, documents and decisions [1]. According to the documentation, Scholarship Gui...",
+      "cause": "Synthesized answer missing required key facts: ['A CGPA of at least 7.5 (plus meeting the minimum attendance requirement).']"
+    },
+    {
+      "id": "N38",
+      "question": "What attendance percentage must I maintain to renew my scholarship under the current rules?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "At least 75%, the minimum attendance under the current (2025) Attendance and Leave Policy, together with a CGPA of at least 7.5.",
+      "got": "Under the current policy, the minimum course attendance requirement is 75% [1]. However, this supersedes the previous po...",
+      "cause": "Synthesized answer missing required key facts: ['At least 75%, the minimum attendance under the current (2025) Attendance and Leave Policy, together with a CGPA of at least 7.5.']"
+    },
+    {
+      "id": "N39",
+      "question": "How long do I have to appeal a scholarship decision?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Within 10 days of the announcement.",
+      "got": "According to the documentation, 2. Renewal, documents and decisions [1]. According to the documentation, - Sports Schola...",
+      "cause": "Synthesized answer missing required key facts: ['Within 10 days of the announcement.']"
+    },
+    {
+      "id": "N40",
+      "question": "How much is the hostel security deposit and is it refundable?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Rs. 10,000, refundable.",
+      "got": "According to the documentation, 2. Fees, mess and discipline [1]. According to the documentation, Hostel Rules [2].",
+      "cause": "Synthesized answer missing required key facts: ['Rs. 10,000, refundable.']"
+    },
+    {
+      "id": "N41",
+      "question": "Can I use an electric kettle or induction stove in my hostel room?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "No. Cooking appliances such as induction stoves, heaters and electric kettles are not allowed in rooms.",
+      "got": "According to the documentation, 2. Fees, mess and discipline [1]. According to the documentation, Hostel Rules [2].",
+      "cause": "Synthesized answer missing required key facts: ['No. Cooking appliances such as induction stoves, heaters and electric kettles are not allowed in rooms.']"
+    },
+    {
+      "id": "N42",
+      "question": "What is the fine for violating hostel rules?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Up to Rs. 2,000, and it may lead to suspension from the hostel.",
+      "got": "Under the current policy, the hostel curfew timing is 10:30 PM [1]. However, this supersedes the previous policy, which ...",
+      "cause": "Synthesized answer missing required key facts: ['Up to Rs. 2,000, and it may lead to suspension from the hostel.']"
+    },
+    {
+      "id": "N43",
+      "question": "Are overnight guests allowed in the hostel?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "No, overnight guests are not permitted.",
+      "got": "Under the current policy, the hostel curfew timing is 10:30 PM [1]. However, this supersedes the previous policy, which ...",
+      "cause": "Synthesized answer missing required key facts: ['No, overnight guests are not permitted.']"
+    },
+    {
+      "id": "N45",
+      "question": "Can I get a mess rebate if I am away from the hostel?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Yes, if absent for 3 or more consecutive days: a rebate of Rs. 80 per day.",
+      "got": "According to the documentation, 2. Fees, mess and discipline [1]. According to the documentation, Hostel Rules [2].",
+      "cause": "Synthesized answer missing required key facts: ['Yes, if absent for 3 or more consecutive days: a rebate of Rs. 80 per day.']"
+    },
+    {
+      "id": "N46",
+      "question": "When does the student portal send me an attendance warning?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "An automatic warning email is sent when attendance in any course falls below 80%.",
+      "got": "According to the documentation, 2. Leave procedure and monitoring [1]. According to the documentation, 2025. From that d...",
+      "cause": "Synthesized answer missing required key facts: ['An automatic warning email is sent when attendance in any course falls below 80%.']"
+    },
+    {
+      "id": "N47",
+      "question": "How much on-duty leave counts as present attendance?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Approved on-duty classes count as present, capped at 10% of the classes conducted in the course.",
+      "got": "According to the documentation, 2. Leave procedure and monitoring [1]. According to the documentation, Attendance and Le...",
+      "cause": "Synthesized answer missing required key facts: ['Approved on-duty classes count as present, capped at 10% of the classes conducted in the course.']"
+    },
+    {
+      "id": "N48",
+      "question": "What proof do I need for medical leave?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "A certificate from a registered medical practitioner.",
+      "got": "According to the documentation, 2. Leave procedure and monitoring [1]. According to the documentation, 2. Leave procedur...",
+      "cause": "Synthesized answer missing required key facts: ['A certificate from a registered medical practitioner.']"
+    },
+    {
+      "id": "N51",
+      "question": "How many library books can faculty members borrow and for how long?",
+      "role": "faculty",
+      "category": "generation_error",
+      "expected": "10 books at a time for 60 days.",
+      "got": "According to the documentation, Library Rules [1]. According to the documentation, Faculty Service Rules [2].",
+      "cause": "Synthesized answer missing required key facts: ['10 books at a time for 60 days.']"
+    },
+    {
+      "id": "N52",
+      "question": "Who can condone a student's attendance shortage?",
+      "role": "faculty",
+      "category": "generation_error",
+      "expected": "The Dean of Academics.",
+      "got": "Under the current policy, the minimum course attendance requirement is 75% [1]. However, this supersedes the previous po...",
+      "cause": "Synthesized answer missing required key facts: ['The Dean of Academics.']"
+    },
+    {
+      "id": "N54",
+      "question": "How many grade points does a D grade carry, and is F a pass?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "D (40 to 49 marks) carries 5 grade points. F (below 40) carries 0 grade points and is a fail.",
+      "got": "According to the documentation, 2. Grading and CGPA [1]. According to the documentation, 3. Progression, withdrawal and ...",
+      "cause": "Synthesized answer missing required key facts: ['D (40 to 49 marks) carries 5 grade points. F (below 40) carries 0 grade points and is a fail.']"
+    },
+    {
+      "id": "N55",
+      "question": "How many books can a postgraduate student borrow and for how many days?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "6 books for 21 days.",
+      "got": "According to the documentation, Library Rules [1]. According to the documentation, Academic Regulations for Undergraduat...",
+      "cause": "Synthesized answer missing required key facts: ['6 books for 21 days.']"
+    },
+    {
+      "id": "S01",
+      "question": "What is the minimum attendance I need in each course to write the end-semester exam?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "75% (2025 policy, effective 1 July 2025).",
+      "got": "Under the current policy, the minimum course attendance requirement is 75% [1]. However, this supersedes the previous po...",
+      "cause": "Synthesized answer missing required key facts: ['75% (2025 policy, effective 1 July 2025).']"
+    },
+    {
+      "id": "S03",
+      "question": "What is the lowest attendance percentage that can still be condoned?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "65%. Below 65% cannot be condoned.",
+      "got": "Under the current policy, the minimum course attendance requirement is 75% [1]. However, this supersedes the previous po...",
+      "cause": "Synthesized answer missing required key facts: ['65%. Below 65% cannot be condoned.']"
+    },
+    {
+      "id": "S04",
+      "question": "How many days after returning to class can I submit my leave application?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Within 5 days, through the student portal.",
+      "got": "According to the documentation, 2. Leave procedure and monitoring [1]. According to the documentation, 2. Leave procedur...",
+      "cause": "Synthesized answer missing required key facts: ['Within 5 days, through the student portal.']"
+    },
+    {
+      "id": "S05",
+      "question": "What is the minimum ESE score needed to pass a theory course?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "21 out of 60 (35%), as amended by Circular KVIT/ACAD/2025/014 effective 1 July 2025.",
+      "got": "According to the documentation, - Amendment to Clause 4.2: the minimum ESE mark required to pass a theory course is redu...",
+      "cause": "Synthesized answer missing required key facts: ['21 out of 60 (35%), as amended by Circular KVIT/ACAD/2025/014 effective 1 July 2025.']"
+    },
+    {
+      "id": "S06",
+      "question": "What is the re-evaluation fee per paper?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Rs. 600 per paper (amended; effective 1 July 2025).",
+      "got": "According to the documentation, - Amendment to Clause 6.1: the re-evaluation application window is extended from 5 worki...",
+      "cause": "Synthesized answer missing required key facts: ['Rs. 600 per paper (amended; effective 1 July 2025).']"
+    },
+    {
+      "id": "S07",
+      "question": "How many working days do I have to apply for re-evaluation after results are published?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "7 working days (amended; effective 1 July 2025).",
+      "got": "According to the documentation, - Amendment to Clause 6.1: the re-evaluation application window is extended from 5 worki...",
+      "cause": "Synthesized answer missing required key facts: ['7 working days (amended; effective 1 July 2025).']"
+    },
+    {
+      "id": "S08",
+      "question": "What is the hostel curfew time?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "10:30 PM (2025 rules).",
+      "got": "Under the current policy, the hostel curfew timing is 10:30 PM [1]. However, this supersedes the previous policy, which ...",
+      "cause": "Synthesized answer missing required key facts: ['10:30 PM (2025 rules).']"
+    },
+    {
+      "id": "S09",
+      "question": "Until what time are visitors allowed in the hostel visitors' room?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Until 7:00 PM (2025 rules).",
+      "got": "Under the current policy, the hostel curfew timing is 10:30 PM [1]. However, this supersedes the previous policy, which ...",
+      "cause": "Synthesized answer missing required key facts: ['Until 7:00 PM (2025 rules).']"
+    },
+    {
+      "id": "S10",
+      "question": "Can I enter the hostel after curfew if I am running late?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "Yes. Each resident gets up to 4 late passes per month, approved by the warden on the hostel app, allowing entry up to 11:30 PM.",
+      "got": "Under the current policy, the hostel curfew timing is 10:30 PM [1]. However, this supersedes the previous policy, which ...",
+      "cause": "Synthesized answer missing required key facts: ['Yes. Each resident gets up to 4 late passes per month, approved by the warden on the hostel app, allowing entry up to 11:30 PM.']"
+    },
+    {
+      "id": "S11",
+      "question": "Which attendance and leave policy is currently in force?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "The 2025 Attendance and Leave Policy, effective 1 July 2025, which replaced the policy dated 1 August 2023.",
+      "got": "Under the current policy, the minimum course attendance requirement is 75% [1]. However, this supersedes the previous po...",
+      "cause": "Synthesized answer missing required key facts: ['The 2025 Attendance and Leave Policy, effective 1 July 2025, which replaced the policy dated 1 August 2023.']"
+    },
+    {
+      "id": "S12",
+      "question": "My senior says 80% attendance is mandatory. Is that still true?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "No. Since 1 July 2025 the minimum is 75% per course; the 80% rule was in the superseded 2023 policy.",
+      "got": "Under the current policy, the minimum course attendance requirement is 75% [1]. However, this supersedes the previous po...",
+      "cause": "Synthesized answer missing required key facts: ['No. Since 1 July 2025 the minimum is 75% per course; the 80% rule was in the superseded 2023 policy.']"
+    },
+    {
+      "id": "S13",
+      "question": "From which date do the amended pass-mark and re-evaluation rules apply?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "From 1 July 2025 (Circular KVIT/ACAD/2025/014, approved by the Academic Council on 28 May 2025).",
+      "got": "According to the documentation, - Amendment to Clause 6.1: the re-evaluation application window is extended from 5 worki...",
+      "cause": "Synthesized answer missing required key facts: ['From 1 July 2025 (Circular KVIT/ACAD/2025/014, approved by the Academic Council on 28 May 2025).']"
+    },
+    {
+      "id": "S14",
+      "question": "Did the 2025 circular change the aggregate pass mark of 40 out of 100 for theory courses?",
+      "role": "student",
+      "category": "generation_error",
+      "expected": "No. The aggregate requirement of 40 out of 100 is unchanged; only the minimum ESE mark was reduced.",
+      "got": "According to the documentation, - Amendment to Clause 4.2: the minimum ESE mark required to pass a theory course is redu...",
+      "cause": "Synthesized answer missing required key facts: ['No. The aggregate requirement of 40 out of 100 is unchanged; only the minimum ESE mark was reduced.']"
+    },
+    {
+      "id": "R11",
+      "question": "How many days of casual leave am I entitled to per year?",
+      "role": "faculty",
+      "category": "generation_error",
+      "expected": "12 days per calendar year, with no more than 4 consecutive days at a time.",
+      "got": "According to the documentation, Faculty Service Rules [1]. According to the documentation, - Earned leave: 30 days per c...",
+      "cause": "Synthesized answer missing required key facts: ['12 days per calendar year, with no more than 4 consecutive days at a time.']"
+    },
+    {
+      "id": "R12",
+      "question": "When can marks moderation be applied and how many marks can it add?",
+      "role": "faculty",
+      "category": "generation_error",
+      "expected": "When the class average ESE score is below 45%; it may add up to 5 marks for the whole class, subject to Moderation Committee approval.",
+      "got": "According to the documentation, Marks Moderation Guidelines [1]. According to the documentation, 2. Confidentiality [2].",
+      "cause": "Synthesized answer missing required key facts: ['When the class average ESE score is below 45%; it may add up to 5 marks for the whole class, subject to Moderation Committee approval.']"
+    },
+    {
+      "id": "R13",
+      "question": "How many days before the end-semester exam must I submit my question papers?",
+      "role": "faculty",
+      "category": "generation_error",
+      "expected": "At least 21 days before the start of the end-semester examinations.",
+      "got": "According to the documentation, Question Paper Confidentiality Protocol [1]. According to the documentation, Library Rul...",
+      "cause": "Synthesized answer missing required key facts: ['At least 21 days before the start of the end-semester examinations.']"
+    },
+    {
+      "id": "R14",
+      "question": "How many disciplinary cases were heard between January and June 2025, and of what kinds?",
+      "role": "admin",
+      "category": "generation_error",
+      "expected": "9 cases: 4 plagiarism, 3 examination malpractice and 2 hostel violations.",
+      "got": "Under the historical policy in effect at that time (historical rule, no longer in force today), 1. Summary of cases, Jan...",
+      "cause": "Synthesized answer missing required key facts: ['9 cases: 4 plagiarism, 3 examination malpractice and 2 hostel violations.']"
+    },
+    {
+      "id": "R15",
+      "question": "What is the size of the discretionary fee waiver pool and the Principal's approval limit?",
+      "role": "admin",
+      "category": "generation_error",
+      "expected": "Rs. 25,00,000 for 2025-26; the Principal can approve up to Rs. 50,000 per student without a committee.",
+      "got": "According to the documentation, Discretionary Fee Waiver: Internal Criteria [1]. According to the documentation, Scholar...",
+      "cause": "Synthesized answer missing required key facts: ['Rs. 25,00,000 for 2025-26; the Principal can approve up to Rs. 50,000 per student without a committee.']"
+    }
+  ]
+}

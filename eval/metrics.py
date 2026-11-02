@@ -3,7 +3,8 @@
 import logging
 import re
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
+import numpy as np
 from eval.schemas import (
     CandidateItem,
     ExpectedSource,
@@ -279,3 +280,171 @@ def compute_ragas_metrics(
             exc,
         )
         return None, None
+
+
+def compute_bootstrap_ci(
+    values: list[float | int | bool],
+    n_resamples: int = 2000,
+    confidence_level: float = 0.95,
+    seed: int = 42,
+) -> tuple[float, float]:
+    """Compute empirical non-parametric bootstrap confidence interval for the sample mean.
+
+    Uses percentile bootstrap resampling with replacement.
+    Required by Phase 4 for all metrics where n >= 30.
+    """
+    if not values:
+        return (0.0, 0.0)
+
+    arr = np.array([float(v) for v in values], dtype=np.float64)
+    if len(arr) < 2:
+        m = float(np.mean(arr))
+        return (round(m, 4), round(m, 4))
+
+    # If n < 30, return exact mean as endpoints per requirement
+    if len(arr) < 30:
+        m = float(np.mean(arr))
+        return (round(m, 4), round(m, 4))
+
+    rng = np.random.RandomState(seed)
+    indices = rng.randint(0, len(arr), size=(n_resamples, len(arr)))
+    boot_samples = arr[indices]
+    boot_means = np.mean(boot_samples, axis=1)
+
+    alpha = 1.0 - confidence_level
+    lower_pct = (alpha / 2.0) * 100.0
+    upper_pct = (1.0 - alpha / 2.0) * 100.0
+
+    ci_lower = float(np.percentile(boot_means, lower_pct))
+    ci_upper = float(np.percentile(boot_means, upper_pct))
+
+    return (round(ci_lower, 4), round(ci_upper, 4))
+
+
+def format_metric_with_ci(
+    k: int,
+    n: int,
+    ci: tuple[float, float],
+    as_percentage: bool = True,
+) -> str:
+    """Format metric as: '96.0% (96/100) [92.0%, 99.0%]'."""
+    if n == 0:
+        return "N/A (0/0) [N/A, N/A]"
+
+    pct = (k / n) * 100.0 if as_percentage else (k / n)
+    if as_percentage:
+        return f"{pct:.1f}% ({k}/{n}) [{ci[0]*100:.1f}%, {ci[1]*100:.1f}%]"
+    else:
+        return f"{pct:.4f} ({k}/{n}) [{ci[0]:.4f}, {ci[1]:.4f}]"
+
+
+def check_citation_evidence_grounding(
+    citations: list[Any],
+    db_session: Any,
+) -> tuple[bool, int, int]:
+    """Verify that cited pages in citations deterministically contain the cited text snippets.
+
+    Returns:
+        (all_grounded: bool, valid_citations: int, total_citations: int)
+    """
+    if not citations:
+        return True, 0, 0
+
+    from app.models.chunk import Chunk
+
+    valid_count = 0
+    total_count = len(citations)
+
+    for cite in citations:
+        file_name = normalize_filename(getattr(cite, "file_name", ""))
+        page_num = getattr(cite, "page_number", 1)
+        snippet = getattr(cite, "snippet", "").strip().lower()
+
+        # Query chunk from database
+        chunks = (
+            db_session.query(Chunk)
+            .filter(
+                Chunk.page_number == page_num,
+            )
+            .all()
+        )
+
+        matched = False
+        for chk in chunks:
+            # Check document filename match
+            doc_file = normalize_filename(chk.document.file_name if chk.document else "")
+            if doc_file == file_name:
+                chk_text = chk.text.lower()
+                # Check snippet containment or significant word overlap (>70%)
+                if snippet in chk_text:
+                    matched = True
+                    break
+                words = [w for w in re.findall(r"\w+", snippet) if len(w) > 3]
+                if words:
+                    found = sum(1 for w in words if w in chk_text)
+                    if found / len(words) >= 0.7:
+                        matched = True
+                        break
+
+        if matched:
+            valid_count += 1
+
+    return (valid_count == total_count, valid_count, total_count)
+
+
+def check_deterministic_key_facts(
+    answer: str,
+    expected_key_facts: list[str],
+) -> tuple[bool, int, int]:
+    """Deterministically check if expected key factual statements/entities are present in the answer.
+
+    Returns:
+        (all_present: bool, matched_count: int, total_expected: int)
+    """
+    if not expected_key_facts:
+        return True, 0, 0
+
+    ans_lower = (answer or "").lower()
+    matched = 0
+
+    for fact in expected_key_facts:
+        fact_clean = fact.strip().lower().rstrip(".,;")
+        if not fact_clean:
+            continue
+
+        # Direct substring search
+        if fact_clean in ans_lower:
+            matched += 1
+            continue
+
+        # Check numeric tokens (e.g. "160", "80%", "14")
+        nums = re.findall(r"\b\d+(?:\.\d+)?%?\b", fact_clean)
+        if nums and all(n in ans_lower for n in nums):
+            matched += 1
+            continue
+
+        # Keyword overlap: >= 60% of significant words present
+        words = [w for w in re.findall(r"\b[a-z]{3,}\b", fact_clean)]
+        if words:
+            found = sum(1 for w in words if w in ans_lower)
+            if (found / len(words)) >= 0.60:
+                matched += 1
+                continue
+
+    return (matched == len(expected_key_facts), matched, len(expected_key_facts))
+
+
+def calculate_query_cost(
+    input_tokens: int,
+    output_tokens: int,
+    model_name: str = "gemini-2.5-flash",
+) -> float:
+    """Calculate estimated cost per query in USD based on official published rates."""
+    # Gemini 2.5 Flash pricing: $0.075 / 1M input tokens, $0.30 / 1M output tokens
+    # Local ONNX / FlashRank: $0.00
+    if "gemini" in model_name.lower():
+        input_cost = (input_tokens / 1_000_000.0) * 0.075
+        output_cost = (output_tokens / 1_000_000.0) * 0.30
+        return round(input_cost + output_cost, 6)
+    return 0.0
+

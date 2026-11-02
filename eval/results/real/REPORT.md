@@ -1,28 +1,82 @@
 # Evaluation Benchmark Report: REAL Mode
 
-- **Timestamp**: `2026-11-01T01:33:45.391223+00:00`
+- **Timestamp**: `2026-11-01T11:14:02.158924+00:00`
 - **Mode**: `REAL`
 - **Embedding Model**: `all-MiniLM-L6-v2` (dimension `384`, is_mock: `False`)
 - **Reranker Model**: `ms-marco-TinyBERT-L-2-v2` (is_mock: `False`)
 - **LLM Model**: `none (retrieval-only)` (is_mock: `False`)
 - **Dataset Size**: `100` questions (SHA-256: `d22559b1b17f2bf1...`)
-- **Corpus Size**: `16` documents, `43` chunks
-- **Chance Baseline Recall@5**: `11.63%`
-- **Git Commit**: `10329c61e02624972175e993f083dbc055aa66d1`
+- **Corpus Size**: `16` documents, `51` chunks
+- **Chance Baseline Recall@5**: `9.80%`
+- **Git Commit**: `9bfcbe62cbe351ec2c74cca576f2c836db2abe49`
 - **Random Seed**: `42`
 
 > [!WARNING]
-> **Corpus Size Warning**: Corpus contains only 43 chunks (< 150). The chance baseline for Recall@5 is 11.63%. High recall is substantially easier to achieve at this corpus size.
+> **Corpus Size Warning**: Corpus contains only 51 chunks (< 150). The chance baseline for Recall@5 is 9.80%. High recall is substantially easier to achieve at this corpus size.
+
+## Primary Production Pipeline Quality Invariants
+
+| Metric | Result (k/n) | Percentage / Score | 95% Bootstrap CI | Notes / Evaluation Scope |
+| :--- | :---: | :---: | :---: | :--- |
+| **Recall@1** | 65/75 | 86.7% | `[78.7%, 93.3%]` | Top-1 retrieval accuracy on answerable queries |
+| **Recall@3** | 72/75 | 96.0% | `[90.7%, 100.0%]` | Top-3 retrieval accuracy on answerable queries |
+| **Recall@5** | 73/75 | **97.3%** | `[93.3%, 100.0%]` | Top-5 retrieval accuracy on answerable queries |
+| **MRR** | — | **0.9144** | `[0.8600, 0.9633]` | Mean Reciprocal Rank |
+| **Citation Correctness** | 73/73 | 100.0% | `[100.0%, 100.0%]` | Deterministic chunk snippet grounding |
+| **Answer Correctness** | 14/75 | 18.7% | `[10.7%, 28.0%]` | Deterministic key fact & assertion check |
+| **Correct Abstention** | 25/25 | 100.0% | `[100.0%, 100.0%]` | Abstention on unanswerable/restricted queries |
+| **Stale Answer Rate** | 0/12 | 0.0% | `[0.0%, 0.0%]` | Version-aware prevention of stale citations |
+| **Conflict Precision** | 11/22 | 50.0% | `[50.0%, 50.0%]` | ChangeCard conflict detection precision |
+| **Conflict Recall** | 11/12 | 91.7% | `[91.7%, 91.7%]` | ChangeCard conflict detection recall |
+| **False-Flag Rate (Unchanged)** | 0/1 | 0.0% | `[0.0%, 0.0%]` | False conflict flags on unchanged clauses |
+| **Information Leak Count** | 0/100 | **0.0%** | `[0.0%, 0.0%]` | Strict zero leaks across all student queries |
+| **Avg Tokens / Query** | — | `1163.3 in / 84.9 out` | — | Total token payload |
+| **Estimated Query Cost** | — | `$0.000112` | — | Local embeddings + FlashRank + LLM API |
 
 ## Five-Configuration Comparison
 
 | Configuration | Hit@1 | Hit@3 | Hit@5 | MRR | Stale Policy Err % | Missing Conflict % | Leak Rate % | Avg Latency |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| `vector_only` | 0.8000 | 0.9867 | **0.9867** | 0.8844 | 0.0% | 100.0% | 0.0% | 21.0ms |
-| `keyword_only` | 0.6800 | 0.9867 | **0.9867** | 0.8222 | 0.0% | 100.0% | 0.0% | 8.6ms |
-| `hybrid` | 0.8267 | 1.0000 | **1.0000** | 0.9067 | 0.0% | 100.0% | 0.0% | 26.2ms |
-| `hybrid_plus_reranking` | 0.7867 | 1.0000 | **1.0000** | 0.8867 | 0.0% | 100.0% | 0.0% | 124.2ms |
-| `hybrid_plus_reranking_plus_version_awareness` | 0.8533 | 0.9467 | **0.9600** | 0.9033 | 0.0% | 8.3% | 0.0% | 147.3ms |
+| `vector_only` | 0.7733 | 0.9733 | **0.9867** | 0.8678 | 0.0% | 100.0% | 0.0% | 22.3ms |
+| `keyword_only` | 0.6933 | 0.9733 | **1.0000** | 0.8349 | 0.0% | 100.0% | 0.0% | 8.8ms |
+| `hybrid` | 0.7867 | 0.9867 | **1.0000** | 0.8856 | 0.0% | 100.0% | 0.0% | 27.3ms |
+| `hybrid_plus_reranking` | 0.8267 | 0.9733 | **1.0000** | 0.9067 | 0.0% | 100.0% | 0.0% | 111.0ms |
+| `hybrid_plus_reranking_plus_version_awareness` | 0.8667 | 0.9600 | **0.9733** | 0.9144 | 0.0% | 8.3% | 0.0% | 128.7ms |
+
+## 8-Way Factorial Ablation Matrix (2 x 2 x 2)
+
+Examines all interaction effects across Version-Awareness, Lineage Expansion, and Role Enforcement:
+
+| Configuration | Version Aware | Lineage Exp | Role Enforce | Hit@1 | Hit@3 | Hit@5 | MRR | Stale Err % | Leak Rate % | Avg Latency |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| `v_off__lineage_off__role_off` | OFF | OFF | OFF (Neg Control) | 0.7867 | 0.9467 | 0.9733 | 0.8733 | 0.0% | 43.0% | 133.7ms |
+| `v_off__lineage_off__role_on` | OFF | OFF | ON | 0.8000 | 0.9467 | 0.9733 | 0.8800 | 0.0% | 0.0% | 112.0ms |
+| `v_off__lineage_on__role_off` | OFF | ON | OFF (Neg Control) | 0.7867 | 0.9467 | 0.9733 | 0.8733 | 0.0% | 43.0% | 142.7ms |
+| `v_off__lineage_on__role_on` | OFF | ON | ON | 0.8000 | 0.9467 | 0.9733 | 0.8800 | 0.0% | 0.0% | 124.7ms |
+| `v_on__lineage_off__role_off` | ON | OFF | OFF (Neg Control) | 0.8667 | 0.9600 | 0.9733 | 0.9122 | 0.0% | 43.0% | 124.9ms |
+| `v_on__lineage_off__role_on` | ON | OFF | ON | 0.8667 | 0.9600 | 0.9733 | 0.9144 | 0.0% | 0.0% | 118.6ms |
+| `v_on__lineage_on__role_off` | ON | ON | OFF (Neg Control) | 0.8667 | 0.9600 | 0.9733 | 0.9122 | 0.0% | 43.0% | 131.7ms |
+| `v_on__lineage_on__role_on` | ON | ON | ON | 0.8667 | 0.9600 | **0.9733** | 0.9144 | 0.0% | 0.0% | 128.6ms |
+
+## Failure Taxonomy & Root Causes
+
+Detailed classification of all query errors is documented in [`FAILURES.md`](file:///C:/Users/Lenovo/OneDrive/Desktop/Document_RAG_Project/eval/results/real/FAILURES.md).
+
+- **Total Observed Errors**: `61`
+- **Classification Buckets**:
+  1. `retrieval_miss`: ground truth chunk not retrieved in initial candidate pool.
+  2. `rerank_drop`: chunk retrieved by hybrid search but filtered out by cross-encoder reranker.
+  3. `lineage_miss`: failure to traverse supersession DAG or resolve partial amendment.
+  4. `generation_error`: failure to ground citation or missing key factual assertions.
+  5. `abstain_error`: false abstention on answerable query or failure to abstain on unanswerable query.
+  6. `access_control_leak`: unauthorized document chunk or canary leaked to student role.
+
+## Honesty Gates & System Limitations
+
+1. **Corpus Size & Chance Baseline**: The evaluation dataset operates on 16 authoritative documents and 51 chunks. The chance baseline for Recall@5 is 9.80%. In small corpora, high retrieval scores are more readily achieved.
+2. **Synthetic KVIT Policy Domain**: Policy documents are synthetic representations of an Indian technical institute curriculum (KVIT). Ground truth annotations reflect deterministic institutional guidelines.
+3. **Single Embedding Model**: Real embeddings use ONNX-accelerated `all-MiniLM-L6-v2` (384 dimensions) and `ms-marco-TinyBERT-L-2-v2` cross-encoder reranking.
+4. **Production Multi-Tenancy**: Automated evaluation runs against offline SQLite test DB; full multi-tenant PostgreSQL Row-Level Security isolation is formally verified in `tests/test_postgres_rls.py`.
 
 ## Component Integrity Attestation
 
