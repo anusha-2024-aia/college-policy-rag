@@ -16,11 +16,10 @@ Strict Constraints:
 import datetime
 import json
 import logging
-import math
 import sys
 import time
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
@@ -351,7 +350,7 @@ def run_evaluation() -> dict:
         f.write("# Stage 5 Semantic Retrieval Comparative Evaluation Report (Audited)\n\n")
         f.write(f"- **Timestamp**: {datetime.datetime.now().isoformat()}\n")
         f.write(f"- **Golden Benchmark**: `{GOLDEN_PATH}` (33 institutional policy queries)\n")
-        f.write(f"- **Corpus**: 20 documents, 40 chunks, 40 semantic rows\n")
+        f.write("- **Corpus**: 20 documents, 40 chunks, 40 semantic rows\n")
         f.write("- **Execution Mode**: Strictly Offline (ONNX all-MiniLM-L6-v2, FlashRank TinyBERT, Mock LLM)\n")
         f.write("- **Methodology**: Warm-up queries included, isolated service per config, distinct retrieval vs. pipeline metrics\n\n")
 

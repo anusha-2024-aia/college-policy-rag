@@ -2,7 +2,6 @@
 
 import logging
 import time
-from typing import Any, Optional
 from sqlalchemy.orm import Session
 from eval.metrics import (
     calculate_hit_at_k,
@@ -21,11 +20,9 @@ from eval.schemas import (
     ConfigMetrics,
     GoldenQuestion,
     QuestionEvalResult,
-    EvaluationSummaryReport,
 )
-from app.models.document import Document
 from app.schemas.qa import AskRequest, PassageEvidence
-from app.services.retrieval import HybridRetrievalService, ScoredChunk, FusedChunk, RerankedChunk
+from app.services.retrieval import HybridRetrievalService
 from app.services.qa import QAService
 from app.core.cache import query_cache
 

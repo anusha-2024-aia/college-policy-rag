@@ -64,7 +64,7 @@ def build_role_filter(doc_model: Any, role: str, dialect_name: str = "sqlite"):
         # Native PostgreSQL JSONB containment operator (@>)
         return or_(
             cast(doc_model.allowed_roles, JSONB).op("@>")(f'["{clean_role}"]'),
-            cast(doc_model.allowed_roles, JSONB).op("@>")(f'["all"]'),
+            cast(doc_model.allowed_roles, JSONB).op("@>")('["all"]'),
         )
     else:
         # SQLite json_each table-valued query for in-memory testing

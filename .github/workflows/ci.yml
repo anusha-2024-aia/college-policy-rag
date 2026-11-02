@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI & Security Pipeline
 
 on:
   push:
@@ -9,11 +9,15 @@ on:
 
 env:
   PYTHONUNBUFFERED: "1"
-  APP_ENV: "testing"
+  APP_ENV: "test"
+  SECRET_KEY: "ci-secret-key-do-not-use-in-production-1234567890"
 
 jobs:
-  lint-and-validate:
-    name: Code Quality & Syntax Validation
+  # ============================================================================
+  # 1. LINT: Code formatting, ruff rules, and Python syntax compilation
+  # ============================================================================
+  lint:
+    name: Lint & Code Quality (Ruff)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -25,45 +29,132 @@ jobs:
           python-version: "3.11"
           cache: "pip"
 
-      - name: Install Dependencies
+      - name: Install Linting Tools
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install ruff>=0.8.0
 
-      - name: Validate Python Syntax (Compile Check)
+      - name: Run Ruff Lint Checks
+        run: |
+          ruff check app/ eval/ scripts/ tests/
+
+      - name: Validate Python Syntax Bytecode Compilation
         run: |
           python -m py_compile $(find app eval scripts tests -name "*.py")
 
+  # ============================================================================
+  # 2. TEST: Pytest against live PostgreSQL 16 + pgvector container
+  # ============================================================================
   test:
-    name: Pytest Automated Suite (${{ matrix.python-version }})
+    name: Pytest & PostgreSQL pgvector Suite
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.11"]
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: document_rag
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.11"
           cache: "pip"
 
-      - name: Install System Dependencies (libpq)
+      - name: Install System Dependencies (libpq, psql client)
         run: |
-          sudo apt-get update && sudo apt-get install -y libpq-dev
+          sudo apt-get update
+          sudo apt-get install -y libpq-dev postgresql-client
 
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Pytest Test Suite
+      - name: Execute Alembic Migrations & PostgreSQL RLS Setup
+        env:
+          PGPASSWORD: postgres
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/document_rag
         run: |
-          pytest -v --tb=short
+          psql -h localhost -U postgres -d document_rag -c "CREATE EXTENSION IF NOT EXISTS vector;"
+          alembic upgrade head
+          psql -h localhost -U postgres -d document_rag -f scripts/setup_postgres_rls.sql
 
+      - name: Run Full Pytest Test Suite
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/document_rag
+          POSTGRES_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/document_rag
+          APP_ENV: test
+        run: |
+          pytest -v --tb=short -rs
+
+      - name: Verify Zero Skipped Tests for Missing Database
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/document_rag
+          POSTGRES_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/document_rag
+          APP_ENV: test
+        run: |
+          pytest tests/test_migrations.py tests/test_postgres_rls.py -v | tee /tmp/db_test_results.txt
+          if grep -i "skipped" /tmp/db_test_results.txt; then
+            echo "ERROR: PostgreSQL migration or RLS tests were skipped due to missing database!"
+            exit 1
+          fi
+          echo "Verified: Live PostgreSQL tests executed and passed with 0 skips."
+
+  # ============================================================================
+  # 3. SECURITY: pip-audit, gitleaks, and tracked secrets check
+  # ============================================================================
+  security:
+    name: Security Scanning (pip-audit, gitleaks, secret tracking)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository (Full History for Secret Scan)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Audit Python Dependencies for Known Vulnerabilities (pip-audit)
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-audit>=2.7.0
+          pip-audit -r requirements.txt
+
+      - name: Run Gitleaks Secret Scanner
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify No Sensitive Files Tracked in Git (.env, .pem, .key, .cert)
+        run: |
+          TRACKED_SENSITIVE=$(git ls-files | grep -E '(\.env$|\.pem$|\.key$|\.cert$)' || true)
+          if [ -n "$TRACKED_SENSITIVE" ]; then
+            echo "SECURITY VIOLATION: Sensitive credentials or key files are tracked in git:"
+            echo "$TRACKED_SENSITIVE"
+            exit 1
+          fi
+          echo "Verified: No sensitive credentials (.env, .pem, .key, .cert) are tracked in git."
+
+  # ============================================================================
+  # 3b. SECURITY-AUDIT: Adversarial attack evaluation and RBAC regression tests
+  # ============================================================================
   security-audit:
     name: Adversarial Security & 4-Layer RBAC Audit
     runs-on: ubuntu-latest
@@ -91,6 +182,37 @@ jobs:
         run: |
           pytest tests/test_phase6_suite.py tests/test_rbac.py -v
 
+  # ============================================================================
+  # 4. EVAL-SMOKE: Fast mock pipeline integrity check (20 questions)
+  # ============================================================================
+  eval-smoke:
+    name: CI Smoke Evaluation (20 Questions - MOCK Mode)
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Execute CI Smoke Evaluation (MOCK Mode)
+        env:
+          APP_ENV: test
+        run: |
+          python -m eval.smoke
+
+  # ============================================================================
+  # 5. EVALUATION-BENCHMARK: Benchmark assertions suite
+  # ============================================================================
   evaluation-benchmark:
     name: 7-Configuration Ablation Benchmark
     runs-on: ubuntu-latest
@@ -114,10 +236,13 @@ jobs:
         run: |
           pytest tests/test_evaluation_benchmark.py -v
 
+  # ============================================================================
+  # 6. DOCKER-BUILD: Production container build validation
+  # ============================================================================
   docker-build:
     name: Production Container Build Validation
     runs-on: ubuntu-latest
-    needs: [test, security-audit]
+    needs: [test, security]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -140,4 +265,3 @@ jobs:
           file: ./Dockerfile.frontend
           push: false
           tags: document-rag-frontend:ci-test
-

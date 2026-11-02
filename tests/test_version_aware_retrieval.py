@@ -8,7 +8,7 @@ from app.services.reranker import FlashRankRerankerService
 from app.services.llm import MockLLMService
 from app.services.qa import QAService
 from app.services.temporal import detect_temporal_intent
-from app.services.conflict import detect_deterministic_change_cards, extract_chunk_metrics
+from app.services.conflict import detect_deterministic_change_cards
 from app.schemas.qa import AskRequest, PassageEvidence
 
 

@@ -3,7 +3,7 @@
 from typing import Optional
 from pydantic import BaseModel, Field, field_validator
 from app.schemas.retrieval import RetrievalDiagnostics
-from app.core.roles import PERMITTED_ROLES, validate_role
+from app.core.roles import PERMITTED_ROLES
 
 
 class PolicyConflict(BaseModel):

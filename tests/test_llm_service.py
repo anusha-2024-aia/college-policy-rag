@@ -6,7 +6,6 @@ from app.services.llm import (
     LLMAuthenticationError,
     LLMRateLimitError,
     LLMTimeoutError,
-    LLMError,
     get_llm_service,
 )
 

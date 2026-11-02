@@ -11,7 +11,7 @@ CRITICAL GUARDRAIL:
 
 import logging
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Optional
 import numpy as np
 import onnxruntime as ort
 from tokenizers import Tokenizer

@@ -14,8 +14,6 @@ Verifies all Done-When criteria for Phase 4:
 from __future__ import annotations
 
 import json
-import os
-import sqlite3
 import pytest
 from pathlib import Path
 from eval.schemas import GoldenQuestion

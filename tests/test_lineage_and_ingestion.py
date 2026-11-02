@@ -122,7 +122,7 @@ def test_lineage_and_partial_supersession(test_db: Session):
     lineages = test_db.query(DocumentLineage).all()
     assert len(lineages) == 3
 
-    exam_lineage = next(l for l in lineages if l.scope == "partial")
+    exam_lineage = next(lin for lin in lineages if lin.scope == "partial")
     assert "Clause 4.2" in exam_lineage.amended_clauses
     assert "Clause 6.1" in exam_lineage.amended_clauses
 

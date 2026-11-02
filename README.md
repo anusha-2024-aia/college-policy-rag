@@ -3,8 +3,8 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16%20%2B%20pgvector-336791.svg)](https://github.com/pgvector/pgvector)
-[![Pytest](https://img.shields.io/badge/tests-289%20passed%20(100%25)-brightgreen.svg)](tests/)
-[![CI](https://img.shields.io/badge/CI%2FCD-passing-success.svg)](.github/workflows/ci.yml)
+[![Pytest](https://img.shields.io/badge/tests-338%20passed%20(100%25)-brightgreen.svg)](tests/)
+[![CI Pipeline](https://github.com/anusha-2024-aia/college-policy-rag/actions/workflows/ci.yml/badge.svg)](https://github.com/anusha-2024-aia/college-policy-rag/actions/workflows/ci.yml)
 [![Security](https://img.shields.io/badge/leak%20rate-0.00%25%20(L1--L4)-success.svg)](eval/)
 [![Accuracy](https://img.shields.io/badge/Hit%405-1.0000%20(100%25)-success.svg)](eval/results/)
 

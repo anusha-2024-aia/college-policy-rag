@@ -28,8 +28,6 @@ from app.main import app
 from app.core.config import settings
 from app.core.auth import (
     create_access_token,
-    verify_access_token,
-    AuthenticationError,
     _base64url_encode,
 )
 from app.core.cache import query_cache

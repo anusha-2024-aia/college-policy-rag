@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
 import logging
-import sys
 import time
 from pathlib import Path
 from typing import Optional
@@ -19,9 +18,7 @@ from app.models.chunk import Chunk
 from app.models.chunk_semantic import ChunkSemantic
 from app.models.index_metadata import EmbeddingIndexMetadata
 from app.services.embedding import (
-    EmbeddingProvider,
     get_embedding_provider,
-    MockEmbeddingService,
 )
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")

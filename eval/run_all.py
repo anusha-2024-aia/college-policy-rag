@@ -64,7 +64,6 @@ from app.models.index_metadata import EmbeddingIndexMetadata
 from app.services.embedding import (
     EmbeddingProvider,
     MockEmbeddingService,
-    get_embedding_provider,
 )
 from app.services.embedding_onnx import ONNXEmbeddingService
 from app.services.reranker import (
@@ -76,17 +75,13 @@ from app.services.llm import (
     BaseLLMService,
     GeminiLLMService,
     MockLLMService,
-    OpenAILLMService,
 )
-from app.services.retrieval import HybridRetrievalService, ScoredChunk
+from app.services.retrieval import HybridRetrievalService
 from app.services.qa import QAService
-from app.schemas.qa import AskRequest, PassageEvidence
+from app.schemas.qa import AskRequest
 from eval.schemas import (
     CandidateItem,
-    CitationItem,
-    ExpectedSource,
     GoldenQuestion,
-    QuestionEvalResult,
 )
 from eval.metrics import (
     calculate_hit_at_k,
@@ -851,7 +846,7 @@ def run_evaluation(
     if corpus_warning:
         print(f" Warning:         {corpus_warning}")
     print("-" * 100)
-    print(f" PRIMARY METRICS SUMMARY (with 95% Bootstrap Confidence Intervals):")
+    print(" PRIMARY METRICS SUMMARY (with 95% Bootstrap Confidence Intervals):")
     m = detailed_metrics
     print(f" - Recall@1:                  {format_metric_with_ci(m['recall_at_1']['k'], m['recall_at_1']['n'], m['recall_at_1']['ci'])}")
     print(f" - Recall@3:                  {format_metric_with_ci(m['recall_at_3']['k'], m['recall_at_3']['n'], m['recall_at_3']['ci'])}")

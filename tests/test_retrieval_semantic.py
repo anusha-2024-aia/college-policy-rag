@@ -15,14 +15,12 @@ Validates:
 
 import datetime as dt
 import math
-from unittest.mock import MagicMock, patch
-import pytest
+from unittest.mock import MagicMock
 from sqlalchemy.orm import Session
 
 from app.models.document import Document
 from app.models.chunk import Chunk
 from app.models.chunk_semantic import ChunkSemantic
-from app.schemas.retrieval import RetrievalResponse, ScoredChunk
 from app.schemas.qa import AskRequest
 from app.services.embedding import MockEmbeddingService
 from app.services.embedding_onnx import ONNXEmbeddingService
@@ -31,7 +29,6 @@ from app.services.retrieval import HybridRetrievalService
 from app.services.qa import QAService
 from app.services.llm import MockLLMService
 from app.services.versioning import DocumentVersionService
-from app.core.config import settings
 
 
 class DeterministicSemanticService:

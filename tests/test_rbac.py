@@ -1,6 +1,5 @@
 """Tests for Phase 5: Role-Based Access Control (RBAC), SQL-level filtering, and adversarial leak testing."""
 
-import json
 from pathlib import Path
 import pytest
 from fastapi import status
@@ -11,22 +10,16 @@ from app.main import app
 from app.core.database import get_db
 from app.core.auth import create_access_token
 from app.core.roles import (
-    PERMITTED_ROLES,
     UserRole,
     InvalidRoleError,
     validate_role,
-    build_role_filter,
 )
-from app.models.document import Document
-from app.models.chunk import Chunk
 from app.schemas.qa import AskRequest
 from app.services.manifest import ManifestService
 from app.services.ingestion import IngestionService
 from app.services.embedding import MockEmbeddingService
 from app.services.reranker import MockRerankerService
 from app.services.retrieval import HybridRetrievalService
-from app.services.llm import MockLLMService
-from app.services.qa import QAService
 from tests.helpers import write_test_pdf
 
 

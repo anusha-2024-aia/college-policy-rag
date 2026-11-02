@@ -466,7 +466,7 @@ class MockLLMService(BaseLLMService):
         # Policy update / change card handling
         p_updates = re.search(r"POLICY UPDATES DETECTED:\n(.*?)(?:\n\nInstructions:|\n\nUser Question:|$)", prompt, re.DOTALL)
         if p_updates:
-            diff_lines = [l.strip().lstrip("-").strip() for l in p_updates.group(1).split("\n") if "Updated from" in l]
+            diff_lines = [line_str.strip().lstrip("-").strip() for line_str in p_updates.group(1).split("\n") if "Updated from" in line_str]
             if diff_lines:
                 # Select the diff line matching user question topic (e.g. visitor vs curfew)
                 chosen_diff = None
@@ -494,10 +494,10 @@ class MockLLMService(BaseLLMService):
                 re.DOTALL,
             )
             if p1_match:
-                block_lines = [l.strip().lstrip("-").strip() for l in p1_match.group(1).split("\n") if l.strip()]
-                rule_lines = [l for l in block_lines if any(ch.isdigit() for ch in l) and len(l) > 30]
+                block_lines = [line_str.strip().lstrip("-").strip() for line_str in p1_match.group(1).split("\n") if line_str.strip()]
+                rule_lines = [line_str for line_str in block_lines if any(ch.isdigit() for ch in line_str) and len(line_str) > 30]
                 if not rule_lines:
-                    rule_lines = [l for l in block_lines if len(l) > 30]
+                    rule_lines = [line_str for line_str in block_lines if len(line_str) > 30]
                 if not rule_lines:
                     rule_lines = block_lines
                 best_line = rule_lines[0]

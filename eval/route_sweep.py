@@ -11,7 +11,6 @@ Calls every endpoint as 'student' (and unauthenticated) to verify that:
 import os
 os.environ["APP_ENV"] = "test"
 
-import json
 import logging
 import sys
 from typing import Any
@@ -207,8 +206,8 @@ def main():
     leak_count, leaks = run_sweep()
     if leak_count > 0:
         logger.error("LEAKS DETECTED (%d):", leak_count)
-        for l in leaks:
-            logger.error("  - %s", l)
+        for leak_item in leaks:
+            logger.error("  - %s", leak_item)
         sys.exit(1)
     else:
         logger.info("SUCCESS: 0 leaks found across all routes for student persona.")

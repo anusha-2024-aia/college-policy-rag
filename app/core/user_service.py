@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.models.user import User
 from app.models.audit import AccessAudit
 from app.core.security import hash_password, verify_password
-from app.core.roles import validate_role, InvalidRoleError
+from app.core.roles import validate_role
 
 logger = logging.getLogger(__name__)
 

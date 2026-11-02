@@ -176,3 +176,36 @@ The API exposes endpoints for monitoring uptime, versioning, and database statis
   }
   ```
 
+---
+
+## 7. Continuous Integration & Benchmark Policy
+
+The project enforces automated continuous integration via GitHub Actions (`.github/workflows/ci.yml`).
+
+### 7.1 CI Pipeline Jobs:
+1. **`lint`**:
+   - Runs `ruff check app/ eval/ scripts/ tests/` for PEP 8 compliance and static code quality.
+   - Executes syntax bytecode compilation across all source directories (`python -m py_compile`).
+2. **`test`**:
+   - Runs `pytest` against an active PostgreSQL 16 container with the `pgvector` extension (`pgvector/pgvector:pg16`).
+   - Executes Alembic database migrations (`alembic upgrade head`) and sets up Row-Level Security policies (`scripts/setup_postgres_rls.sql`).
+   - Enforces a zero-skip policy: fails immediately if any database test is skipped due to an unreachable database.
+3. **`security`**:
+   - Executes `pip-audit -r requirements.txt` to verify zero known vulnerabilities in project dependencies.
+   - Executes `gitleaks` secret scanning across full commit history.
+   - Enforces sensitive file tracking rules: fails immediately if `.env`, `.pem`, `.key`, or `.cert` files are committed.
+4. **`eval-smoke`**:
+   - Executes `python -m eval.smoke`, evaluating a 20-question golden subset in deterministic `MOCK` mode.
+   - Validates that Hit@5 >= 0.90, MRR >= 0.80, information leak count == 0, and citation grounding >= 0.95.
+
+### 7.2 Why Real Benchmarks Are NOT Run in CI:
+Full benchmark suites are deliberately isolated from continuous integration for the following architectural reasons:
+1. **Elimination of Flakiness & External Dependencies**: Real generative benchmarks evaluate against external LLM providers (e.g., Google Gemini). External APIs introduce network latency, transient gateway errors, and provider rate-limiting that would cause false-positive CI pipeline failures.
+2. **Cost & Quota Efficiency**: Running hundreds of LLM calls across multiple configurations on every pull request or commit would exhaust API quotas and incur recurring operational expense.
+3. **Speed of Developer Feedback**: CI feedback must remain sub-3-minutes. Downloading large neural models and running multi-iteration bootstrap confidence intervals (1,000 resamples across 220 queries) exceeds typical CI turnaround budgets.
+4. **Offline Benchmarking Protocol**: All canonical metrics published in `eval/results/real/REPORT.md` and referenced in UI dashboards must be generated offline in a controlled, reproducible environment with fixed seeds using:
+   ```bash
+   python -m eval.run_all --mode real --seed 42
+   ```
+
+

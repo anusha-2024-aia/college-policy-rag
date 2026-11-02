@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.database import get_db
-from app.core.auth import create_access_token, get_current_role, verify_access_token
+from app.core.auth import create_access_token, get_current_role
 from app.core.user_service import authenticate_user, DEMO_ACCOUNTS
 from app.core.rate_limiter import login_rate_limiter
 from app.schemas.auth import (
@@ -14,7 +14,6 @@ from app.schemas.auth import (
     TokenResponse,
     DemoAccountsResponse,
     DemoAccountInfo,
-    UserResponse,
 )
 
 logger = logging.getLogger(__name__)

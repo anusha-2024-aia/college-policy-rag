@@ -7,12 +7,10 @@ Missing token means HTTP 401 Unauthorized.
 
 from __future__ import annotations
 
-import pytest
 from fastapi.routing import APIRoute
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.core.auth import get_current_role, create_access_token
 
 
 def _get_all_api_routes(router_or_app) -> list[APIRoute]:

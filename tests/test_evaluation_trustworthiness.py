@@ -13,9 +13,7 @@ from app.services.embedding import (
     get_embedding_provider,
 )
 from app.services.embedding_onnx import ONNXEmbeddingService
-from app.services.reranker import FlashRankRerankerService, MockRerankerService
 from app.services.retrieval import HybridRetrievalService
-from app.cli.reindex import reindex_corpus
 
 
 class TestEmbeddingProviderInterface:

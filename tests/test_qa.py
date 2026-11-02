@@ -1,6 +1,5 @@
 """Tests for Phase 3 Question Answering (POST /ask, POST /ask/stream, citations, abstention, error handling)."""
 
-from collections.abc import Generator
 from pathlib import Path
 import pytest
 from fastapi import status
@@ -9,16 +8,12 @@ from sqlalchemy.orm import Session
 from app.main import app
 from app.core.database import get_db
 from app.api.routes.ask import get_qa_service
-from app.schemas.qa import AskRequest, AskResponse, Citation, PassageEvidence
+from app.schemas.qa import AskRequest
 from app.services.embedding import MockEmbeddingService
 from app.services.reranker import MockRerankerService
 from app.services.retrieval import HybridRetrievalService
 from app.services.llm import (
     MockLLMService,
-    LLMAuthenticationError,
-    LLMRateLimitError,
-    LLMTimeoutError,
-    LLMError,
 )
 from app.services.qa import QAService
 from tests.test_retrieval import setup_ingested_database

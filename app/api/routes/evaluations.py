@@ -4,7 +4,6 @@ import json
 import logging
 import re
 from pathlib import Path
-from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.auth import get_current_role

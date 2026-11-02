@@ -112,8 +112,8 @@ def test_real_postgres_migration_upgrade_downgrade_drill():
 
         # Check RLS enabled
         rls_res = conn.execute(text("""
-            SELECT relrowsecurity, relforcerowsecurity 
-            FROM pg_class 
+            SELECT relrowsecurity, relforcerowsecurity
+            FROM pg_class
             WHERE relname = 'documents'
         """)).fetchone()
         assert rls_res is not None

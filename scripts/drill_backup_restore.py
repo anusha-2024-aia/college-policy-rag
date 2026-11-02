@@ -6,7 +6,6 @@ asserting table schemas, exact row count invariants, and query synthesis.
 
 from __future__ import annotations
 
-import os
 import sys
 import time
 import shutil
@@ -24,9 +23,6 @@ from sqlalchemy.orm import sessionmaker
 from app.models.document import Document
 from app.models.chunk import Chunk
 from app.models.chunk_semantic import ChunkSemantic
-from app.models.lineage import DocumentLineage
-from app.models.user import User
-from app.models.index_metadata import EmbeddingIndexMetadata
 
 
 def run_drill() -> dict[str, any]:

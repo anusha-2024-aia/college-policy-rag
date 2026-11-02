@@ -19,7 +19,7 @@ import uuid
 from typing import Any, Optional
 from fastapi import Header, HTTPException, status
 from app.core.config import settings
-from app.core.roles import PERMITTED_ROLES, validate_role, InvalidRoleError
+from app.core.roles import validate_role, InvalidRoleError
 
 logger = logging.getLogger(__name__)
 

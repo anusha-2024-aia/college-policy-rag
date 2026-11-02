@@ -13,7 +13,6 @@ from sqlalchemy.orm import sessionmaker, Session
 from fastapi.testclient import TestClient
 from app.main import app
 from app.models import Base
-from app.core.config import settings
 from app.core.cache import query_cache
 from app.services.embedding import MockEmbeddingService
 from tests.helpers import write_test_pdf

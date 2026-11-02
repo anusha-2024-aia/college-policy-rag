@@ -3,7 +3,7 @@
 from pathlib import Path
 from typing import Any, Optional
 from pydantic import BaseModel, Field, model_validator
-from app.core.roles import PERMITTED_ROLES, validate_role
+from app.core.roles import validate_role
 
 
 class ExpectedSource(BaseModel):

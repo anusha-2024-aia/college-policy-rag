@@ -20,14 +20,13 @@ from app.schemas.retrieval import (
 )
 from app.services.embedding import (
     BaseEmbeddingService,
-    EmbeddingProvider,
     ModelMismatchError,
     get_embedding_service,
 )
 from app.services.embedding_onnx import ONNXEmbeddingService
 from app.services.reranker import BaseRerankerService, get_reranker_service
 from app.core.config import settings
-from app.core.roles import validate_role, build_role_filter, InvalidRoleError
+from app.core.roles import validate_role, build_role_filter
 
 logger = logging.getLogger(__name__)
 

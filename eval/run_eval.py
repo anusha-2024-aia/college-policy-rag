@@ -7,7 +7,6 @@ import logging
 import os
 from pathlib import Path
 import sys
-from typing import Optional
 
 os.environ.setdefault("APP_ENV", "test")
 from pydantic import ValidationError

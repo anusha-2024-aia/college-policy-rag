@@ -1,6 +1,5 @@
 """Tests for Streamlit UI client, backend contract, and response handling (ui/client.py)."""
 
-import json
 import pytest
 import httpx
 from pathlib import Path
@@ -10,8 +9,6 @@ from ui.client import (
     APIValidationError,
     RateLimitError,
     ServiceUnavailableError,
-    GatewayTimeoutError,
-    APIClientError,
     format_conflict_markdown,
     format_citation_header,
     discover_evaluation_reports,
@@ -20,7 +17,7 @@ from ui.client import (
     get_database_document_summary,
     inspect_pdf_bytes,
 )
-from app.schemas.qa import AskRequest, AskResponse, Citation, PassageEvidence, PolicyConflict, RetrievalDiagnostics
+from app.schemas.qa import AskRequest, AskResponse, Citation, PolicyConflict, RetrievalDiagnostics
 
 
 def test_client_url_normalization():
@@ -563,7 +560,6 @@ def test_exact_zip_directory_structure_exists():
 
 def test_standalone_sidebar_cross_navigation_links():
     """Verify that all 7 standalone code.html files link to their sibling page directories."""
-    import re
     targets = {
         1: "../page_1_policy_intelligence_dashboard/code.html",
         2: "../page_2_ask_policy_workspace/code.html",

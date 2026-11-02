@@ -56,7 +56,7 @@ def get_test_session() -> Session:
 
 def init_db(target_engine=None) -> None:
     """Initialize database extensions and seed default data.
-    
+
     In production, database schema, pgvector indexes, and RLS policies are strictly
     managed via Alembic migrations (`alembic upgrade head`). `Base.metadata.create_all`
     is prohibited in production startup to guarantee deterministic migration reliability.

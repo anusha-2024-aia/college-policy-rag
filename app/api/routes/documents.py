@@ -2,7 +2,7 @@
 
 import io
 import logging
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
@@ -12,7 +12,7 @@ from app.core.config import settings
 from app.core.database import get_db
 from app.core.auth import get_current_role
 from app.core.rls import set_session_role
-from app.core.roles import build_role_filter, PERMITTED_ROLES, validate_role, InvalidRoleError
+from app.core.roles import build_role_filter
 from app.services.security_scanner import SecurityScanner
 from app.models.document import Document
 from app.schemas.document_api import (

@@ -1,10 +1,9 @@
 """Regression tests for partial amendments, version graph validation, and targeted conflict detection."""
 
 import datetime
-import pytest
 from app.models.document import Document
 from app.schemas.qa import PassageEvidence
-from app.services.versioning import DocumentVersionService, DocumentVersionStatus
+from app.services.versioning import DocumentVersionService
 from app.services.qa import QAService
 from app.services.llm import MockLLMService
 

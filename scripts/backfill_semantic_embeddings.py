@@ -28,10 +28,9 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import numpy as np
-from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.core.database import SessionLocal, engine
+from app.core.database import SessionLocal
 from app.models.chunk import Chunk
 from app.models.chunk_semantic import ChunkSemantic
 from app.services.embedding_onnx import ONNXEmbeddingService

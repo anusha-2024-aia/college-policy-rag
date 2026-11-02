@@ -1,13 +1,9 @@
 """Tests for Phase 5: Leak Surface Elimination, Route Sweep, Cache Isolation, and Admin Security API."""
 
-import pytest
-from fastapi import status
 from fastapi.testclient import TestClient
 from app.main import app
-from app.core.config import settings
 from app.core.auth import create_access_token
 from app.core.cache import query_cache
-from app.models.audit import AccessAudit
 from eval.route_sweep import run_sweep
 
 client = TestClient(app)

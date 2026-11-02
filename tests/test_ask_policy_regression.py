@@ -45,7 +45,7 @@ def test_ask_request_invalid_role_rejected():
 
 def test_ask_response_schema_has_no_role_field():
     """Verify that AskResponse does NOT include a 'role' field.
-    
+
     This ensures regression coverage for the root cause: the frontend previously
     attempted to read `result.role` from the API response (which was undefined),
     leading to `Role: Abstained` and `authorized for your active role ()`.

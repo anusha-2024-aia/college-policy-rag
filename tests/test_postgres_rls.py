@@ -8,9 +8,7 @@ Tests:
 
 import os
 import pytest
-from pathlib import Path
 from sqlalchemy import create_engine, text
-from app.core.config import settings
 from app.core.rls import evaluate_rls_policy, RLS_SQL_PATH
 
 
@@ -84,6 +82,27 @@ def test_live_postgres_rls_enforcement():
     """Live verification against real PostgreSQL container when running."""
     db_url = os.environ.get("POSTGRES_TEST_DATABASE_URL") or os.environ.get("DATABASE_URL")
     engine = create_engine(db_url)
+
+    # Ensure tables exist and contain test fixtures if empty
+    with engine.begin() as conn:
+        chunk_count = conn.execute(text("SELECT count(*) FROM chunks")).scalar()
+        if chunk_count == 0:
+            conn.execute(
+                text("""
+                INSERT INTO documents (file_name, title, category, publication_date, scope, status, lineage_id, version, allowed_roles)
+                VALUES
+                ('doc_student.pdf', 'Student Policy', 'Academic', '2024-01-01', 'campus', 'Active', 'lin_1', 'v1', '["student", "faculty", "admin"]'::json),
+                ('doc_admin.pdf', 'Admin Policy', 'Governance', '2024-01-01', 'campus', 'Active', 'lin_2', 'v1', '["admin"]'::json)
+            """)
+            )
+            conn.execute(
+                text("""
+                INSERT INTO chunks (file_name, page_number, chunk_index, text, allowed_roles)
+                VALUES
+                ('doc_student.pdf', 1, 0, 'Student rule content', '["student", "faculty", "admin"]'::json),
+                ('doc_admin.pdf', 1, 0, 'Admin confidential content', '["admin"]'::json)
+            """)
+            )
 
     with engine.connect() as conn:
         # Verify app role without setting app.current_role returns 0 rows

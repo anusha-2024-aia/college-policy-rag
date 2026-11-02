@@ -8,7 +8,7 @@ from app.services.embedding import MockEmbeddingService
 from app.services.reranker import FlashRankRerankerService
 from app.services.llm import MockLLMService
 from app.services.qa import QAService
-from app.schemas.qa import AskRequest, AnswerContract, PassageEvidence
+from app.schemas.qa import AskRequest, AnswerContract
 
 
 @pytest.fixture

@@ -19,7 +19,7 @@ from app.schemas.qa import (
 )
 from app.services.retrieval import HybridRetrievalService
 from app.services.llm import BaseLLMService
-from app.services.versioning import DocumentVersionService, DocumentVersionStatus
+from app.services.versioning import DocumentVersionService
 from app.services.temporal import detect_temporal_intent
 from app.services.conflict import detect_deterministic_change_cards
 from app.services.security_scanner import SecurityScanner
@@ -204,7 +204,7 @@ class QAService:
 
         if not candidates:
             # Fallback to non-empty lines
-            lines = [l.strip().lstrip("-").strip() for l in passage_text.split("\n") if len(l.strip()) >= 20]
+            lines = [line_item.strip().lstrip("-").strip() for line_item in passage_text.split("\n") if len(line_item.strip()) >= 20]
             candidates = lines if lines else [passage_text[:max_chars].strip()]
 
         def overlap_score(sentence: str) -> tuple[int, int]:

@@ -1,8 +1,6 @@
 """Tests for Phase 5.1A Strengthened Semantic Retrieval Evaluation (eval/semantic_benchmark.py)."""
 
 import pytest
-import math
-from pathlib import Path
 from eval.semantic_benchmark import (
     compute_cosine_similarity,
     rank_passages,

@@ -14,7 +14,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import StaticPool
 
-from app.models import Base, Document, Chunk, DocumentLineage, ChunkSemantic
+from app.models import Base, Document, Chunk, DocumentLineage
 from app.services.ingestion import IngestionService
 from app.services.chunker import ChunkerService
 from app.services.manifest import ManifestService

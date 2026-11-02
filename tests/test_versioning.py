@@ -13,7 +13,6 @@ from app.models.document import Document
 from app.models.chunk import Chunk
 from app.services.versioning import (
     DocumentVersionService,
-    DocumentVersionStatus,
     MissingSupersedesTargetError,
     CircularVersionError,
     TemporalOrderError,

@@ -253,7 +253,7 @@ def compute_ragas_metrics(
     Never returns 0.00 for unavailable metrics.
     """
     try:
-        import ragas
+        import ragas  # noqa: F401
         from ragas import evaluate
         from ragas.metrics import faithfulness, answer_relevancy
         from datasets import Dataset

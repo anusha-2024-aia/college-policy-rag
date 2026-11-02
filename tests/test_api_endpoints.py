@@ -1,6 +1,5 @@
 """Tests for document catalog, evaluations, and system stats API routes."""
 
-import pytest
 from fastapi.testclient import TestClient
 from app.main import app
 from app.core.auth import create_access_token

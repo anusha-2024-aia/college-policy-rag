@@ -1,12 +1,9 @@
 """Regression tests for evaluation metrics separation, keyword retrieval disjunction, abstention threshold, and version awareness."""
 
-import pytest
 from sqlalchemy.orm import Session
 
 from eval.schemas import (
-    CandidateItem,
     CitationItem,
-    ConfigMetrics,
     ExpectedSource,
     GoldenQuestion,
     QuestionEvalResult,
@@ -14,21 +11,16 @@ from eval.schemas import (
 from eval.metrics import (
     check_stale_policy_error,
     check_missing_policy_conflict,
-    check_abstention,
-    classify_failure,
 )
-from eval.runner import EvaluationRunner
 from app.services.retrieval import (
     HybridRetrievalService,
     build_disjunctive_tsquery,
-    ScoredChunk,
 )
 from app.services.embedding import MockEmbeddingService
 from app.services.reranker import MockRerankerService
 from app.services.llm import MockLLMService
 from app.services.qa import QAService
 from app.schemas.qa import AskRequest, PassageEvidence
-from app.models.document import Document
 from app.services.versioning import DocumentVersionService, DocumentVersionStatus
 from tests.test_retrieval import setup_ingested_database
 

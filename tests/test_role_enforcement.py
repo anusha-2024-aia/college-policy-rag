@@ -24,7 +24,6 @@ Verifies:
 """
 
 from datetime import date
-import base64
 import json
 import time
 import pytest
@@ -47,7 +46,6 @@ from app.core.rls import evaluate_rls_policy, RLS_SQL_PATH
 from app.core.database import Base
 from app.models.document import Document
 from app.models.chunk import Chunk
-from app.models.lineage import DocumentLineage
 from app.schemas.qa import AskRequest, PassageEvidence
 from app.services.embedding import MockEmbeddingService
 from app.services.reranker import MockRerankerService

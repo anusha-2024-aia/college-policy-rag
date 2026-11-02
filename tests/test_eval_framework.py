@@ -1,6 +1,5 @@
 """Tests for Phase 6 Evaluation Framework (eval/schemas.py, eval/metrics.py, eval/runner.py)."""
 
-import json
 from pathlib import Path
 import pytest
 from pydantic import ValidationError
@@ -12,18 +11,14 @@ from eval.schemas import (
     CandidateItem,
     CitationItem,
     QuestionEvalResult,
-    ConfigMetrics,
-    EvaluationSummaryReport,
 )
 from eval.metrics import (
-    matches_expected_source,
     calculate_hit_at_k,
     calculate_reciprocal_rank,
     check_unsupported_answer,
     check_stale_policy_error,
     check_missing_policy_conflict,
     check_information_leak,
-    check_abstention,
     classify_failure,
     compute_ragas_metrics,
 )
