@@ -97,15 +97,26 @@ def is_metric_relevant_to_query(m_id: str, query: Optional[str]) -> bool:
     if m_id in ("condonation_fee", "condonation_floor"):
         return any(k in q for k in ("condon", "fee", "attend"))
     if m_id == "clause_4_2_ese_pass_mark":
-        # Unchanged clause protection: If user specifically asks about the aggregate mark (Clause 4.1),
-        # do NOT emit a change card for Clause 4.2 (minimum ESE mark).
+        # Unchanged clause protection:
+        # If user asks about aggregate mark (Clause 4.1), or mark allocation / practical / CIA (Clause 2),
+        # do NOT emit change card for Clause 4.2 (theory minimum ESE pass mark).
         if ("aggregate" in q or "4.1" in q) and not any(k in q for k in ("4.2", "ese", "end-semester", "end semester")):
             return False
-        return any(k in q for k in ("pass", "mark", "exam", "ese", "4.2", "circular", "amend", "theory", "course"))
+        if any(k in q for k in ("allocation", "continuous", "cia", "practical")) and not any(k in q for k in ("pass", "passing", "4.2")):
+            return False
+        return any(k in q for k in ("pass", "passing", "4.2", "minimum ese", "end-semester mark", "end semester mark"))
     if m_id in ("clause_6_1_re_eval_window", "clause_6_1_re_eval_fee"):
         return any(k in q for k in ("re-eval", "reeval", "eval", "fee", "window", "6.1", "paper", "script", "result"))
     if m_id in ("hostel_curfew", "hostel_visitors"):
-        return any(k in q for k in ("hostel", "curfew", "gate", "visitor", "guest", "time", "hour", "entry", "night"))
+        # Unchanged clause protection:
+        # If user asks about staying overnight, day scholars, deposit, or rules other than curfew/visitor hours,
+        # do NOT emit curfew or visitor change cards.
+        if any(k in q for k in ("overnight", "day scholar", "day-scholar", "deposit", "mess", "cooking")):
+            return False
+        if m_id == "hostel_curfew":
+            return any(k in q for k in ("curfew", "gate", "late entry", "night", "entry time", "return")) or ("time" in q and "hostel" in q)
+        if m_id == "hostel_visitors":
+            return any(k in q for k in ("visitor", "guest", "visiting"))
     return True
 
 

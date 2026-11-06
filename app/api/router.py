@@ -1,7 +1,7 @@
 """Main API router combining all endpoint modules."""
 
 from fastapi import APIRouter
-from app.api.routes import health, ask, documents, evaluations, system, auth, admin_security
+from app.api.routes import health, ask, documents, evaluations, system, auth, admin_security, policies
 
 api_router = APIRouter()
 
@@ -16,6 +16,9 @@ api_router.include_router(health.router)
 
 # Include question answering routes
 api_router.include_router(ask.router)
+
+# Include policy change intelligence & diff routes
+api_router.include_router(policies.router)
 
 # Include document catalog and inspection routes
 api_router.include_router(documents.router)

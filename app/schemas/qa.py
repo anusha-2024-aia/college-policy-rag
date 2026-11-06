@@ -113,6 +113,30 @@ class AnswerContract(BaseModel):
     """Pydantic validated answer contract returned by the LLM."""
 
     answer: str = Field(..., description="Grounded response text")
+    current_rule: Optional[str] = Field(
+        default=None,
+        description="Concise statement of the current governing rule",
+    )
+    effective_date: Optional[str] = Field(
+        default=None,
+        description="Effective date of the current governing rule (YYYY-MM-DD)",
+    )
+    previous_rule: Optional[str] = Field(
+        default=None,
+        description="Previous or superseded rule statement (if conflict or amendment exists)",
+    )
+    previous_source: Optional[str] = Field(
+        default=None,
+        description="Source document and page of previous rule",
+    )
+    supporting_passages: Optional[list[PassageEvidence]] = Field(
+        default=None,
+        description="Supporting passages validating the answer",
+    )
+    uncertainty_note: Optional[str] = Field(
+        default=None,
+        description="Uncertainty note regarding conflicting, pending, or partially amended clauses",
+    )
     authoritative_sources: list[int] = Field(
         default_factory=list,
         description="List of 1-based evidence passage indices for authoritative current rules",
@@ -148,6 +172,30 @@ class AskResponse(BaseModel):
 
     question: str
     answer: str
+    current_rule: Optional[str] = Field(
+        default=None,
+        description="Concise statement of the active rule",
+    )
+    effective_date: Optional[str] = Field(
+        default=None,
+        description="Effective date of the active rule (YYYY-MM-DD)",
+    )
+    previous_rule: Optional[str] = Field(
+        default=None,
+        description="Previous rule statement before amendment or supersession",
+    )
+    previous_source: Optional[str] = Field(
+        default=None,
+        description="Source document of previous rule",
+    )
+    supporting_passages: Optional[list[PassageEvidence]] = Field(
+        default=None,
+        description="Supporting passages supporting the answer",
+    )
+    uncertainty_note: Optional[str] = Field(
+        default=None,
+        description="Uncertainty note regarding policy changes or partial amendments",
+    )
     citations: list[Citation] = Field(default_factory=list, description="Verified citations extracted from answer")
     passages: list[PassageEvidence] = Field(default_factory=list, description="Retrieved passages used as evidence")
     abstained: bool = Field(default=False, description="True if system abstained due to insufficient evidence")
@@ -188,3 +236,39 @@ class AskResponse(BaseModel):
         default=None,
         description="Retrieval timings and candidate counts (if requested)",
     )
+
+
+class ClauseDeltaItem(BaseModel):
+    """Detailed clause-level diff comparison across versions."""
+
+    clause_ref: Optional[str] = Field(default=None, description="Clause reference, e.g. 'Clause 4.2'")
+    topic: str = Field(..., description="Topic or section heading of the clause")
+    status: str = Field(..., description="Classification: 'unchanged', 'changed', 'added', or 'removed'")
+    old_value: Optional[str] = Field(default=None, description="Previous extracted parameter value")
+    new_value: Optional[str] = Field(default=None, description="New extracted parameter value")
+    old_source: Optional[str] = Field(default=None, description="Predecessor document file name")
+    new_source: Optional[str] = Field(default=None, description="Successor document file name")
+    old_page: Optional[int] = Field(default=None, description="Predecessor page number")
+    new_page: Optional[int] = Field(default=None, description="Successor page number")
+    old_text: Optional[str] = Field(default=None, description="Predecessor clause excerpt")
+    new_text: Optional[str] = Field(default=None, description="Successor clause excerpt")
+
+
+class PolicyDiffResponse(BaseModel):
+    """Response payload for GET /policies/{lineage_id}/diff."""
+
+    lineage_id: str = Field(..., description="Unique lineage identifier or topic stem")
+    scope: str = Field(..., description="Supersession scope: 'full' or 'partial'")
+    predecessor_file: str = Field(..., description="Predecessor document filename")
+    predecessor_title: str = Field(..., description="Predecessor document title")
+    predecessor_effective_date: Optional[str] = Field(default=None, description="Predecessor effective date")
+    successor_file: str = Field(..., description="Successor document filename")
+    successor_title: str = Field(..., description="Successor document title")
+    successor_effective_date: Optional[str] = Field(default=None, description="Successor effective date")
+    amended_clauses: list[str] = Field(default_factory=list, description="Explicit clauses amended if scope is partial")
+    change_cards: list[ChangeCard] = Field(default_factory=list, description="Deterministic metric change cards")
+    clause_deltas: list[ClauseDeltaItem] = Field(default_factory=list, description="Clause-level diff records")
+    total_changes: int = Field(default=0, description="Count of changed or amended clauses")
+    total_unchanged: int = Field(default=0, description="Count of verified unchanged clauses")
+    total_added: int = Field(default=0, description="Count of newly added clauses")
+    summary: str = Field(..., description="High-level narrative summary of policy differences")

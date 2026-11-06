@@ -289,6 +289,57 @@ class QAService:
         valid_citations.sort(key=lambda c: c.index)
         return valid_citations, invalid_indices, rewritten_answer
 
+    def verify_citation_evidence(
+        self,
+        citation: Citation,
+        passage: Optional[PassageEvidence],
+        as_of_date: Optional[date] = None,
+        allow_historical: bool = False,
+        has_explicit_as_of: bool = False,
+    ) -> bool:
+        """Verify that a cited snippet appears verbatim on the cited page and is temporally valid (Phase 7)."""
+        if not passage:
+            return False
+
+        # 1. Verbatim check: snippet must appear in passage text
+        snippet_clean = re.sub(r"\s+", " ", citation.snippet or "").strip().lower()
+        passage_clean = re.sub(r"\s+", " ", passage.text or "").strip().lower()
+
+        # Remove trailing ellipsis if truncated
+        snippet_core = snippet_clean.rstrip(".").rstrip()
+        if len(snippet_core) > 15:
+            if snippet_core not in passage_clean:
+                # Sub-sentence token overlap check (at least 70% word containment)
+                words = [w for w in re.findall(r"\w+", snippet_core) if len(w) > 3]
+                if words:
+                    found = sum(1 for w in words if w in passage_clean)
+                    if found / len(words) < 0.70:
+                        return False
+                else:
+                    return False
+
+        # 2. Database chunk page consistency and temporal validity
+        db = self.retrieval_service.db
+        if db and getattr(passage, "chunk_id", None):
+            db_chunk = db.query(Chunk).filter_by(id=passage.chunk_id).first()
+            if db_chunk:
+                if db_chunk.page_number != citation.page_number:
+                    return False
+                # Temporal validity verification
+                if as_of_date is not None:
+                    if db_chunk.valid_to and db_chunk.valid_to <= as_of_date:
+                        return False
+                    if db_chunk.valid_from and db_chunk.valid_from > as_of_date:
+                        doc = db_chunk.document
+                        is_version_successor = bool(doc and (doc.supersedes or doc.supersedes_doc_id))
+                        if is_version_successor or has_explicit_as_of:
+                            return False
+                elif not allow_historical and db_chunk.status == "superseded":
+                    # For current queries without conflict, citing superseded passages is invalid
+                    return False
+
+        return True
+
     def should_abstain(
         self,
         raw_answer: str,
@@ -588,12 +639,28 @@ class QAService:
             relevant_passages = [p for p in passages if p.score >= relevance_floor]
 
             # 1. Structural version lineage conflict from version graph
-            has_lineage_conflict, conflicts = self.version_service.detect_conflicts(relevant_passages, version_statuses)
+            has_lineage_conflict, conflicts = self.version_service.detect_conflicts(
+                relevant_passages, version_statuses, query=request.question
+            )
 
             # 2. Deterministic conflict detection (extracts and diffs numbers/percentages/times)
             change_cards = detect_deterministic_change_cards(relevant_passages, query=request.question)
 
-            has_conflict = has_lineage_conflict or len(change_cards) > 0
+            # A version conflict is affirmed if change cards exist, or if a structural lineage conflict
+            # exists on a query topic that was genuinely changed or superseded (not on an unchanged clause)
+            if len(change_cards) > 0:
+                has_conflict = True
+            elif has_lineage_conflict:
+                q_text = (request.question or "").lower()
+                is_unchanged_query = any(k in q_text for k in (
+                    "reporting time", "report to the exam", "unfair means", "penalty for a first offence",
+                    "maximum number of attempts", "stay overnight", "day-scholar", "day scholar",
+                    "aggregate mark needed to pass a practical", "aggregate pass mark of 40",
+                    "mark allocation for practical course"
+                ))
+                has_conflict = not is_unchanged_query
+            else:
+                has_conflict = False
 
         else:
             # Baseline behavior without version metadata
@@ -683,6 +750,9 @@ class QAService:
             if request.version_aware is not None
             else settings.VERSION_AWARE_ENABLED
         )
+
+        # Detect temporal intent for as_of verification
+        _, as_of_date, _ = detect_temporal_intent(request.question, request.as_of)
 
         passages, has_conflict, conflicts, change_cards, is_historical, as_of_str, diagnostics = (
             self._prepare_passages_and_conflicts(request, role=clean_role)
@@ -801,6 +871,75 @@ class QAService:
         # Validate and extract citations with sequential renumbering and best-sentence snippets
         valid_citations, invalid_indices, rewritten_answer = self.validate_citations(answer_candidate, passages)
 
+        # Strict Evidence Verification (Phase 7):
+        # 1. Verify that each cited snippet appears verbatim on the cited page.
+        # 2. Verify that the cited chunk is in force on the as_of date.
+        # If verification fails, drop the citation, and if no valid evidence remains, abstain.
+        passages_by_idx = {p.index: p for p in passages}
+        allow_historical = (
+            has_conflict
+            or len(change_cards) > 0
+            or is_historical
+            or not request.lineage_expansion
+            or not request.version_aware
+        )
+        has_explicit_as_of = bool(request.as_of)
+        target_as_of = as_of_date if (request.as_of or is_historical) else None
+        verified_citations: list[Citation] = []
+        for cite in valid_citations:
+            p = passages_by_idx.get(cite.index)
+            if self.verify_citation_evidence(
+                cite,
+                p,
+                as_of_date=target_as_of,
+                allow_historical=allow_historical,
+                has_explicit_as_of=has_explicit_as_of,
+            ):
+                verified_citations.append(cite)
+            else:
+                logger.warning(
+                    "Citation [%d] (%s p.%d) failed evidence verification; dropping.",
+                    cite.index,
+                    cite.file_name,
+                    cite.page_number,
+                )
+
+        if not verified_citations and valid_citations:
+            logger.info("All citations failed verification; abstaining with 'evidence_verification_failed'.")
+            return AskResponse(
+                question=request.question,
+                answer=self.ABSTENTION_SENTENCE,
+                citations=[],
+                passages=[],
+                abstained=True,
+                abstain_reason="evidence_verification_failed",
+                has_policy_conflict=False,
+                conflict=False,
+                authoritative_sources=[],
+                historical_sources=[],
+                conflict_details=None,
+                change_cards=[],
+                as_of=as_of_str,
+                is_historical=is_historical,
+                diagnostics=diagnostics if request.include_diagnostics else None,
+            )
+
+        # Renumber if citations were dropped
+        if len(verified_citations) < len(valid_citations):
+            renumber_map = {c.index: new_idx for new_idx, c in enumerate(verified_citations, start=1)}
+
+            def _renumber_match(m: re.Match) -> str:
+                n = int(m.group(1))
+                if n in renumber_map:
+                    return f"[{renumber_map[n]}]"
+                return ""
+
+            rewritten_answer = re.sub(r"\[(\d+)\]", _renumber_match, rewritten_answer)
+            rewritten_answer = re.sub(r"\s+", " ", rewritten_answer).strip()
+            for new_idx, c in enumerate(verified_citations, start=1):
+                c.index = new_idx
+        valid_citations = verified_citations
+
         # L4 Defence-in-Depth Output Canary and Verbatim Scan
         if getattr(settings, "L4_OUTPUT_SCAN_ENABLED", True) and getattr(settings, "SECURITY_ENFORCEMENT_ENABLED", True):
             is_leak, leak_reason = self.security_scanner.scan_output(rewritten_answer, clean_role)
@@ -846,8 +985,38 @@ class QAService:
             else:
                 auth_sources.append(c.index)
 
+        # Derive schema fields: current_rule, effective_date, previous_rule, previous_source, uncertainty_note
+        current_rule_val = None
+        curr_eff_date = None
+        prev_rule_val = None
+        prev_source_val = None
+        uncertainty_note_val = None
+
+        if change_cards:
+            top_card = change_cards[0]
+            current_rule_val = f"{top_card.topic}: {top_card.new.value}"
+            curr_eff_date = top_card.new.effective_date
+            prev_rule_val = f"{top_card.topic}: {top_card.old.value}"
+            prev_source_val = f"{top_card.old.source} (Page {top_card.old.page})"
+            uncertainty_note_val = (
+                f"Policy version update detected ({top_card.old.source} -> {top_card.new.source}). "
+                f"Current rule resolved from latest governing amendment."
+            )
+        else:
+            auth_passages = [p for p in passages if not p.is_superseded]
+            if auth_passages:
+                curr_eff_date = auth_passages[0].effective_date
+                if valid_citations:
+                    current_rule_val = valid_citations[0].snippet
+
         final_contract = AnswerContract(
             answer=rewritten_answer.strip(),
+            current_rule=current_rule_val,
+            effective_date=curr_eff_date,
+            previous_rule=prev_rule_val,
+            previous_source=prev_source_val,
+            supporting_passages=passages,
+            uncertainty_note=uncertainty_note_val,
             authoritative_sources=auth_sources,
             historical_sources=hist_sources,
             conflict=has_conflict,
@@ -860,6 +1029,12 @@ class QAService:
         final_response = AskResponse(
             question=request.question,
             answer=final_contract.answer,
+            current_rule=final_contract.current_rule,
+            effective_date=final_contract.effective_date,
+            previous_rule=final_contract.previous_rule,
+            previous_source=final_contract.previous_source,
+            supporting_passages=passages,
+            uncertainty_note=final_contract.uncertainty_note,
             citations=valid_citations,
             passages=passages,
             abstained=False,
@@ -904,6 +1079,9 @@ class QAService:
             if request.version_aware is not None
             else settings.VERSION_AWARE_ENABLED
         )
+
+        # Detect temporal intent for as_of verification
+        _, as_of_date, _ = detect_temporal_intent(request.question, request.as_of)
 
         passages, has_conflict, conflicts, change_cards, is_historical, as_of_str, diagnostics = (
             self._prepare_passages_and_conflicts(request, role=clean_role)

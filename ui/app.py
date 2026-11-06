@@ -12,9 +12,7 @@ if _project_root not in sys.path:
 while _ui_dir in sys.path:
     sys.path.remove(_ui_dir)
 
-import json
 import os
-from typing import Any
 import streamlit as st
 
 from ui.client import (
@@ -45,8 +43,8 @@ st.set_page_config(
 # Institutional & Synthetic Dataset Disclaimer (Prominent Banner)
 st.markdown(
     """
-    > ⚠️ **Institutional & Synthetic Corpus Notice**: This assistant generates responses strictly based on ingested documents 
-    > and is **not an official or legally binding source of institutional decisions**. All underlying college policy documents 
+    > ⚠️ **Institutional & Synthetic Corpus Notice**: This assistant generates responses strictly based on ingested documents
+    > and is **not an official or legally binding source of institutional decisions**. All underlying college policy documents
     > (e.g. Kestrel Valley Institute of Technology / KVIT) are **synthetic demonstration data** created for benchmarking and portfolio evaluation.
     """
 )
@@ -94,8 +92,9 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 # Main Area: Tabs
-tab_assistant, tab_eval, tab_docs = st.tabs([
+tab_assistant, tab_diff, tab_eval, tab_docs = st.tabs([
     "💬 Policy Assistant",
+    "🔄 Compare Versions",
     "📊 Evaluation Benchmarks",
     "📑 Document Repository",
 ])
@@ -258,7 +257,86 @@ with tab_assistant:
 
 
 # ============================================================================
-# TAB 2: EVALUATION BENCHMARKS
+# TAB 2: POLICY CHANGE INTELLIGENCE & DIFF (PHASE 7)
+# ============================================================================
+with tab_diff:
+    st.header("Policy Change Intelligence & Clause-Level Diff")
+    st.markdown(
+        "Compare policy versions deterministically across lineage DAGs. "
+        "View old values struck through (~~old~~) and new values highlighted (**new**) with verified source citations."
+    )
+
+    lineage_options = {
+        "Attendance and Leave Policy (2023 vs 2025)": "attendance",
+        "Examination and Assessment Rules (2023 vs 2025 Circular)": "exam",
+        "Hostel Rules (2024 vs 2025)": "hostel",
+    }
+
+    col_sel, col_date = st.columns([2, 1])
+    with col_sel:
+        selected_lineage_label = st.selectbox("Select Policy Lineage to Compare", options=list(lineage_options.keys()))
+        selected_lineage_id = lineage_options[selected_lineage_label]
+    with col_date:
+        as_of_input = st.date_input("As-of Historical Date (Optional)", value=None)
+
+    if st.button("🔍 Compare Versions", type="primary", use_container_width=True):
+        try:
+            from app.core.database import SessionLocal
+            from app.services.clause_diff import ClauseDiffService
+
+            with SessionLocal() as db:
+                diff_svc = ClauseDiffService(db)
+                lineage_rec = diff_svc.get_lineage_by_identifier(selected_lineage_id)
+                if not lineage_rec:
+                    st.error(f"Policy lineage '{selected_lineage_id}' not found.")
+                else:
+                    diff_res = diff_svc.diff_lineage(lineage_rec)
+
+                    st.success(f"**{diff_res.summary}**")
+                    m1, m2, m3 = st.columns(3)
+                    m1.metric("Changed Metrics / Clauses", diff_res.total_changes)
+                    m2.metric("Unchanged Invariable Clauses", diff_res.total_unchanged)
+                    m3.metric("Newly Added Provisions", diff_res.total_added)
+
+                    st.markdown("### 📋 ChangeCards: Old vs. New Comparison")
+                    for card in diff_res.change_cards:
+                        with st.container():
+                            st.markdown(f"#### 📌 {card.topic} `({card.scope.upper()})`")
+                            c1, c2 = st.columns(2)
+                            with c1:
+                                st.error(
+                                    f"**Previous Rule:** ~~{card.old.value}~~\n\n"
+                                    f"*Source: {card.old.source} (Page {card.old.page})*"
+                                )
+                            with c2:
+                                st.success(
+                                    f"**Active Amended Rule:** **{card.new.value}**\n\n"
+                                    f"*Source: {card.new.source} (Page {card.new.page})*"
+                                )
+                            st.markdown("---")
+
+                    with st.expander("🔎 View All Clause-Level Deltas & Statuses"):
+                        for delta in diff_res.clause_deltas:
+                            status_badge = (
+                                "🟢 CHANGED"
+                                if delta.status == "changed"
+                                else ("🔵 ADDED" if delta.status == "added" else "⚪ UNCHANGED")
+                            )
+                            st.markdown(f"**{delta.clause_ref or 'General'} - {delta.topic}** [{status_badge}]")
+                            if delta.old_value and delta.new_value:
+                                st.markdown(f"- Previous: ~~{delta.old_value}~~ | Current: **{delta.new_value}**")
+                            elif delta.new_value:
+                                st.markdown(f"- Added: **{delta.new_value}**")
+                            st.caption(
+                                f"Predecessor: {delta.old_source or 'N/A'} | Successor: {delta.new_source or 'N/A'}"
+                            )
+                            st.markdown("")
+        except Exception as exc:
+            st.error(f"Error computing version diff: {exc}")
+
+
+# ============================================================================
+# TAB 3: EVALUATION BENCHMARKS
 # ============================================================================
 with tab_eval:
     st.header("Evaluation Benchmarks & Diagnostics")

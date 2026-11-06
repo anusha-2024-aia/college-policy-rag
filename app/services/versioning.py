@@ -214,12 +214,14 @@ class DocumentVersionService:
         self,
         passages: list[PassageEvidence],
         version_statuses: dict[str, DocumentVersionStatus],
+        query: Optional[str] = None,
     ) -> tuple[bool, list[PolicyConflict]]:
         """Identify policy conflicts when evidence contains both active and superseded documents in the same lineage.
 
         Args:
             passages: Retrieved context passages.
             version_statuses: Version status lookup by document_id or file_name.
+            query: Optional query string to filter out background conflicts on unrelated topics.
 
         Returns:
             Tuple of (has_conflict: bool, list_of_conflicts).
@@ -251,6 +253,23 @@ class DocumentVersionService:
             lid for lid, l_passages in passages_by_lineage.items()
             if (lid == top_lineage_id) or (max((p.score for p in l_passages), default=0.0) >= max(0.05, top_score * 0.7))
         }
+
+        if query:
+            def is_lineage_topically_relevant(lid: str, q_str: str) -> bool:
+                q_l = q_str.lower()
+                lid_l = lid.lower()
+                if "attendance" in lid_l:
+                    return any(k in q_l for k in ("attend", "leave", "absence", "condon", "medical"))
+                if "hostel" in lid_l:
+                    return any(k in q_l for k in ("hostel", "curfew", "room", "mess", "gate", "visitor", "warden", "resident"))
+                if "exam" in lid_l or "assessment" in lid_l:
+                    return any(k in q_l for k in ("exam", "assessment", "mark", "re-eval", "reeval", "ese", "cia", "grade", "circular", "attempt", "hall", "malpractice", "unfair", "paper"))
+                return True
+
+            relevant_lineages = {
+                lid for lid in relevant_lineages
+                if is_lineage_topically_relevant(lid, query)
+            }
 
         conflicts: list[PolicyConflict] = []
 
@@ -312,6 +331,13 @@ class DocumentVersionService:
                             continue
 
                         touches_clause = False
+                        if query:
+                            # If query is about an unchanged clause, do not flag partial conflict unless query relates to amendment topics
+                            q_l = query.lower()
+                            query_touches_amendment = any(k in q_l for k in ("pass", "passing", "4.2", "re-eval", "reeval", "6.1", "circular", "amend"))
+                            if not query_touches_amendment:
+                                continue
+
                         if clause_ids:
                             for c in clause_ids:
                                 if re.search(r"\b(?:clause|section|sec\.|cl\.)?\s*[-:]?\s*" + re.escape(c) + r"\b", base_p.text, re.IGNORECASE):
