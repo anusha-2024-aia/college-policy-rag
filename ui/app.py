@@ -13,6 +13,7 @@ while _ui_dir in sys.path:
     sys.path.remove(_ui_dir)
 
 import os
+import requests
 import streamlit as st
 
 from ui.client import (
@@ -59,6 +60,16 @@ api_base_url = st.sidebar.text_input(
     value=default_api_base_url,
     help="Target FastAPI service address",
 )
+
+# Server health & cold-start status check
+try:
+    health_resp = requests.get(f"{api_base_url.rstrip('/')}/health", timeout=1.5)
+    if health_resp.status_code == 200:
+        st.sidebar.success("● Backend Connected (Online)")
+    else:
+        st.sidebar.warning(f"⚠️ Backend status {health_resp.status_code}")
+except Exception:
+    st.sidebar.info("⏳ **Waking Backend Server...** Free cloud instances sleep after inactivity. Please allow 15–30s on first load.")
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("User Identity & Access")

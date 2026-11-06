@@ -4461,10 +4461,77 @@
     switchPage(page);
   });
 
+  // 13. Free-Host Cold-Start Detection & Recovery
+  let healthPollInterval = null;
+
+  async function checkColdStartHealth() {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+      const res = await fetch('/health', { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        dismissColdStartBanner(true);
+        return;
+      }
+    } catch (e) {
+      // Backend asleep or connecting
+    }
+    showColdStartBanner();
+    if (!healthPollInterval) {
+      healthPollInterval = setInterval(async () => {
+        try {
+          const res = await fetch('/health');
+          if (res.ok) {
+            clearInterval(healthPollInterval);
+            healthPollInterval = null;
+            dismissColdStartBanner(false);
+          }
+        } catch (_) {}
+      }, 3000);
+    }
+  }
+
+  function showColdStartBanner() {
+    let banner = document.getElementById('cold-start-toast');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'cold-start-toast';
+      banner.className = 'fixed top-4 right-4 z-50 flex items-center gap-3 bg-amber-500/15 border border-amber-500/40 text-amber-200 px-4 py-3 rounded-xl shadow-2xl backdrop-blur-md transition-all duration-300';
+      banner.innerHTML = `
+        <div class="animate-spin w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full flex-shrink-0"></div>
+        <div>
+          <div class="text-xs font-semibold text-amber-200">Waking Server Instance...</div>
+          <div class="text-[11px] text-amber-300/80">Free hosting instances spin down when inactive. Reconnecting in a few seconds...</div>
+        </div>
+      `;
+      document.body.appendChild(banner);
+    }
+  }
+
+  function dismissColdStartBanner(instant = false) {
+    const banner = document.getElementById('cold-start-toast');
+    if (!banner) return;
+    if (instant) {
+      banner.remove();
+      return;
+    }
+    banner.className = 'fixed top-4 right-4 z-50 flex items-center gap-3 bg-emerald-500/15 border border-emerald-500/40 text-emerald-200 px-4 py-3 rounded-xl shadow-2xl backdrop-blur-md transition-all duration-300';
+    banner.innerHTML = `
+      <span class="text-emerald-400 text-sm">✓</span>
+      <div class="text-xs font-semibold text-emerald-200">Backend Server Online</div>
+    `;
+    setTimeout(() => {
+      banner.style.opacity = '0';
+      setTimeout(() => banner.remove(), 400);
+    }, 1800);
+  }
+
   // Initialize on load
   document.addEventListener('DOMContentLoaded', () => {
     const initialPage = HASH_TO_PAGE[window.location.hash] || 1;
     switchPage(initialPage);
+    checkColdStartHealth();
     console.log("LexisPolicy AI Studio initialized successfully with 7 reactive layouts.");
   });
 </script>

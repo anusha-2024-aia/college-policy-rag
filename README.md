@@ -1,68 +1,41 @@
 # LexisPolicy AI: Version-Aware + Role-Governed Policy RAG
 
+> **Enterprise Retrieval-Augmented Generation system designed for complex institutional policies, featuring version-aware DAG lineage tracking, partial amendment resolution, deterministic ChangeCards, and 4-layer defence-in-depth access governance with 0 leaks across 60 adversarial queries.**
+
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16%20%2B%20pgvector-336791.svg)](https://github.com/pgvector/pgvector)
-[![Pytest](https://img.shields.io/badge/tests-338%20passed%20(100%25)-brightgreen.svg)](tests/)
-[![CI Pipeline](https://github.com/anusha-2024-aia/college-policy-rag/actions/workflows/ci.yml/badge.svg)](https://github.com/anusha-2024-aia/college-policy-rag/actions/workflows/ci.yml)
-[![Security](https://img.shields.io/badge/leak%20rate-0.00%25%20(L1--L4)-success.svg)](eval/)
-[![Accuracy](https://img.shields.io/badge/Hit%405-1.0000%20(100%25)-success.svg)](eval/results/)
-
-An enterprise-grade Retrieval-Augmented Generation (RAG) platform designed for complex institutional guidelines, university regulations, and compliance contracts. Solves the two hardest problems in document AI: **stale policy contradictions** through directed version lineage graphs and **confidential data leakage** through 4-layer defence-in-depth access governance.
-
----
-
-## Key Differentiators
-
-```
-                +-------------------------------------------------------------+
-                |                       LexisPolicy AI                        |
-                +-------------------------------------------------------------+
-                               |                              |
-                               v                              v
-            +------------------------------------+  +------------------------------------+
-            | 1. Version-Aware Policy Engine    |  | 2. 4-Layer Defence-in-Depth RBAC   |
-            | - Lineage DAG & cycle detection    |  | - Layer 1: SQL Pre-Filter           |
-            | - Clause-level partial amendments  |  | - Layer 2: Postgres Transaction RLS |
-            | - Reciprocal clause enrichment     |  | - Layer 3: Runtime Assertion        |
-            | - Deterministic ChangeCards        |  | - Layer 4: Output Canary Scanner    |
-            | - Time-travel historical queries   |  | - 0.00% information leak rate       |
-            +------------------------------------+  +------------------------------------+
-```
-
-### 1. Version-Aware Policy Intelligence & Conflict Detection
-Standard RAG retrieves superseded documents alongside active regulations, causing the LLM to output obsolete rules (**90.0% stale error rate** on vanilla vector RAG). LexisPolicy AI:
-- Models document evolution as Directed Acyclic Graphs (DAGs) with cycle and temporal contradiction detection.
-- Tracks **partial amendment circulars** down to individual clause references (e.g., *Circular KVIT/ACAD/2025/014* amending Clause 4.2 without altering Clause 4.1).
-- Reciprocally enriches retrieval: querying an amendment pulls the base regulation; querying an amended base clause pulls the modifying circular.
-- Emits deterministic `ChangeCard` diffs and synthesizes **current-first answers** citing active policies in `[1]` while clearly documenting superseded historical rules in `[2]`.
-
-### 2. Four-Layer Defence-in-Depth Access Governance
-Replaces easily bypassed system prompts with cryptographically enforced security:
-- **Layer 1 (SQL Pre-Filter)**: Evaluates role permissions inside the database query before retrieval or ranking occurs.
-- **Layer 2 (Postgres RLS)**: Enforces database-level Row-Level Security using transaction-scoped `SET LOCAL app.current_role = :role`.
-- **Layer 3 (Runtime Invariant Assertion)**: Aborts generation immediately if any candidate passage fails authorized role containment.
-- **Layer 4 (Output Canary Scan)**: Scans generated text for synthetic cryptographic canaries (`KVIT-FAC-CNRY-7731`) and confidential patterns before returning data.
-- **Adversarial Security**: **0 leaks out of 60 evaluations (0.00%)** across 30 attack vectors; disabling security yielded **17 of 30 leaks** (negative control).
+[![Pytest](https://img.shields.io/badge/tests-350%20passed%20(100%25)-brightgreen.svg)](tests/)
+[![CI Pipeline](https://github.com/anusha-2024-aia/Document_RAG_Project/actions/workflows/ci.yml/badge.svg)](https://github.com/anusha-2024-aia/Document_RAG_Project/actions/workflows/ci.yml)
+[![Security](https://img.shields.io/badge/leak%20rate-0.00%25%20(0%2F60%20evals)-success.svg)](eval/)
+[![Accuracy](https://img.shields.io/badge/Hit%405-97.33%25%20(Real%20Benchmark)-success.svg)](eval/results/real/)
+[![Claims Ledger](https://img.shields.io/badge/claims%20ledger-verified-blueviolet.svg)](docs/CLAIMS.md)
 
 ---
 
-## Multi-Configuration Benchmark Results (Measured)
+## Live Interactive Studio & Demo Script
 
-Evaluated across all 100 questions from the verified golden dataset (`eval/golden.jsonl`):
+- **LexisPolicy AI Studio (Primary UI)**: [http://127.0.0.1:8000/ui](http://127.0.0.1:8000/ui) *(Mounts 7 responsive views: Dashboard, Ask Policy, Compare Versions, Document Library, Evaluations, Health, and Architecture)*
+- **Streamlit Studio (Alternative)**: `streamlit run ui/app.py --server.port 8501`
+- **Interactive Swagger API Docs**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **5-Minute Recruiter Demo Script**: See [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) for the exact click path covering attendance version updates, partial amendments, unchanged clause verification, adversarial jailbreak defense, and administrative role boundaries.
+- **Architectural Q&A Guide**: See [`docs/INTERVIEW_NOTES.md`](docs/INTERVIEW_NOTES.md) for a 2-minute pipeline walkthrough and answers to the 10 hardest design questions.
 
-| Configuration | Hit Rate@5 | MRR | Stale Policy Error % | Missing Conflict % | Information Leak Rate % | Correct Abstention % | Avg Latency |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| `vector_only` | 0.2267 | 0.1287 | 90.00% | 100.00% | 0.00% | 96.00% | 15.0ms |
-| `keyword_only` | 0.9867 | 0.8222 | 8.33% | 100.00% | 0.00% | 84.00% | 9.6ms |
-| `hybrid` (RRF) | 0.7333 | 0.4267 | 66.67% | 100.00% | 0.00% | 88.00% | 24.1ms |
-| `hybrid_plus_reranking` | 0.9867 | 0.9333 | 0.00% | 100.00% | 0.00% | 100.00% | 38.1ms |
-| **`hybrid_plus_reranking_plus_version_awareness` (Production)** | **1.0000** | **0.9467** | **0.00%** | **0.00%** | **0.00%** | **100.00%** | **42.2ms** |
-| `no_lineage_expansion` (Ablation) | 0.9867 | 0.9400 | 0.00% | 0.00% | 0.00% | 100.00% | 44.9ms |
-| `security_ablated` (Ablation) | 1.0000 | 0.9356 | 0.00% | 0.00% | **10.00%** | 60.00% | 52.4ms |
+---
 
-> [!TIP]
-> Full evaluation results are exported to [`eval/results/eval_report_20261025_182748.md`](file:///c:/Users/Lenovo/OneDrive/Desktop/Document_RAG_Project/eval/results/eval_report_20261025_182748.md).
+## What Makes This Different?
+
+Most document RAG systems rely on naive vector similarity coupled with post-generation prompt instructions ("only answer if authorized"). This fails catastrophically in institutional domains due to **stale policy contradictions** and **prompt injection leaks**.
+
+| Capability | Vanilla Vector RAG | Metadata Filtering RAG | **LexisPolicy AI** |
+| :--- | :---: | :---: | :---: |
+| **Access Control Enforcement** | Prompt instruction (Vulnerable to injection) | Python post-filtering (Retrieval starvation) | **Pre-retrieval SQL (L1) + Postgres RLS (L2) + Runtime Assertion (L3)** |
+| **Confidential Leak Rate** | $>50\%$ under adversarial prompts | $>20\%$ (Cache / exception leaks) | **0.00% (0 leaks across 60 adversarial evaluations)** |
+| **Policy Supersession** | Falsely cites obsolete rules (90% error) | Binary file-level flag (All or nothing) | **Directed Lineage DAG with transitive cycle detection** |
+| **Partial Amendments** | Breaks unaffected policy clauses | Cannot resolve sub-document edits | **Clause-level resolution: amends modified clauses, retains base context** |
+| **Unchanged Clause Precision** | Emits false conflict warnings | Inaccurate clause boundaries | **0.00% false-flag rate on unchanged clauses (0/5)** |
+| **Evidence Grounding** | Hallucinated or misattributed pages | Unverified bracket indices | **Verbatim page matching & temporal in-force verification** |
+| **Conflict Presentation** | Unstructured narrative text | Plain text list | **Deterministic `ChangeCards` with struck-through & highlighted diffs** |
 
 ---
 
@@ -70,103 +43,108 @@ Evaluated across all 100 questions from the verified golden dataset (`eval/golde
 
 ```mermaid
 flowchart TD
-    Client["Client / User / Studio UI"] -->|HTTP POST /ask with Bearer JWT| APIGateway["FastAPI Gateway"]
+    Client["Client / Web Studio UI"] -->|HTTP POST /ask with Bearer JWT| APIGateway["FastAPI Gateway"]
 
-    subgraph AuthLayer ["Cryptographic Authentication & Role Binding"]
-        APIGateway --> TokenVerify["JWT Cryptographic Verifier (HS256)"]
-        TokenVerify --> ExtractRole["Verified Role: student | faculty | admin"]
+    subgraph AuthLayer ["1. Cryptographic Authentication & Role Binding"]
+        APIGateway --> TokenVerify["JWT Verifier (Pinned HS256, 15m TTL)"]
+        TokenVerify --> ExtractRole["Verified Server-Side Role: student | faculty | admin"]
     end
 
-    subgraph RetrievalEngine ["Layered Hybrid Retrieval Pipeline"]
-        ExtractRole --> PreFilter["L1 SQL Access Pre-Filter (JSONB / SQLite)"]
-        ExtractRole --> RLS["L2 PostgreSQL RLS (SET LOCAL app.current_role)"]
-        
-        PreFilter & RLS --> VecSearch["Dense Vector Search (Cosine Sim)"]
+    subgraph PreRetrievalSecurity ["2. Pre-Retrieval 4-Layer Security Boundary"]
+        ExtractRole --> PreFilter["Layer 1: SQL Access Pre-Filter (allowed_roles JSONB)"]
+        ExtractRole --> RLS["Layer 2: PostgreSQL RLS (SET LOCAL app.current_role)"]
+        note1["Role filter is evaluated BEFORE search<br/>Unauthorized chunks never loaded into memory"] -.-> PreFilter
+    end
+
+    subgraph HybridEngine ["3. Layered Hybrid Retrieval Pipeline"]
+        PreFilter & RLS --> VecSearch["Dense Vector Search (Cosine Sim on ONNX/MiniLM)"]
         PreFilter & RLS --> KwSearch["Sparse Lexical Search (BM25 Normalized)"]
         
         VecSearch & KwSearch --> RRF["Reciprocal Rank Fusion (k=60)"]
-        RRF --> Reranker["Cross-Encoder Reranker (Score Floor 0.10)"]
+        RRF --> Reranker["Cross-Encoder Reranker (ms-marco-TinyBERT-L-2-v2)"]
+        Reranker --> FloorCheck{"Top Score >= 0.10?"}
+        FloorCheck -- No --> EarlyAbstain["Abstain (insufficient_evidence)"]
     end
 
-    subgraph VersionEngine ["Version Lineage & Temporal Reasoning"]
-        Reranker --> LineageExp["Sibling Lineage & Partial Amendment Expansion"]
-        LineageExp --> Temporal["Time-Travel Engine (as_of Date Evaluation)"]
-        Temporal --> ConflictDet["Deterministic ChangeCard & Conflict Detector"]
+    subgraph VersionEngine ["4. Version Lineage DAG & Temporal Reasoning Engine"]
+        FloorCheck -- Yes --> LineageExp["Lineage DAG Expansion (Fetch Successor / Predecessor)"]
+        LineageExp --> PartialAmend["Partial Amendment Resolver (Clause 4.2 vs Base)"]
+        PartialAmend --> TempVerify["Temporal In-Force Verification (as_of Date Evaluation)"]
+        TempVerify --> ConflictDetect["Deterministic Metric & ChangeCard Generator"]
     end
 
-    subgraph GenerationGovernance ["Defence-in-Depth Generation & Guardrails"]
-        ConflictDet --> L3Assert["L3 Runtime Security Invariant Assertion"]
-        L3Assert --> ContextBuilder["Structured Evidence Prompt Context"]
-        ContextBuilder --> LLM["LLM Generation (Gemini 2.5 Flash / Mock)"]
-        LLM --> CitationVal["Citation Bracket Validator ([old_N] -> [new_N])"]
-        CitationVal --> L4Scan["L4 Output Canary & Confidential Pattern Scanner"]
+    subgraph PostGenGovernance ["5. Defence-in-Depth Generation & Guardrails"]
+        ConflictDetect --> L3Assert["Layer 3: Runtime Invariant Assertion (Zero-Leak Gate)"]
+        L3Assert --> ContextPrompt["Current-First Context Assembly ([1] Active, [2] Historical)"]
+        ContextPrompt --> LLM["LLM Synthesis (Gemini 2.5 Flash / Local ONNX / Mock)"]
+        LLM --> EvidenceVerif["Verbatim Evidence Verification (Page check & citation pruning)"]
+        EvidenceVerif --> L4Scan["Layer 4: Cryptographic Canary & Output Scanner"]
     end
 
-    L4Scan -->|Verified Answer + Citations + ChangeCards| Client
+    L4Scan -->|Verified Answer + ChangeCards + Citations| Client
 ```
 
 ---
 
-## Repository Structure
+## Measured Benchmark Results
 
-```
-Document_RAG_Project/
-├── .github/
-│   └── workflows/
-│       └── ci.yml                  # Automated CI/CD pipeline (Tests, Security Audit, Benchmark, Docker)
-├── app/
-│   ├── main.py                     # FastAPI entrypoint, routes mounting & static studio
-│   ├── core/
-│   │   ├── config.py               # Pydantic Settings & environment variables
-│   │   ├── database.py             # Dual engine (PostgreSQL/SQLite) & session management
-│   │   ├── auth.py                 # JWT token issuance, verification, and role extraction
-│   │   ├── rls.py                  # PostgreSQL Layer 2 transaction-scoped RLS bindings
-│   │   └── cache.py                # Role-scoped LRU query and candidate cache
-│   ├── api/
-│   │   ├── router.py               # Master API router aggregating route modules
-│   │   └── routes/
-│   │       ├── ask.py              # POST /ask and POST /ask/stream endpoints
-│   │       ├── documents.py        # Document library and version lineage endpoints
-│   │       ├── evaluations.py      # Benchmark reports and evaluation summaries
-│   │       ├── admin_security.py   # Admin audit logs and canary inspection
-│   │       └── health.py           # System health and runtime metrics
-│   ├── models/                     # SQLAlchemy models: Document, Chunk, SemanticChunk
-│   ├── schemas/                    # Pydantic request/response schemas & ChangeCards
-│   └── services/
-│       ├── ingestion.py            # PDF parsing, token-aware chunking & idempotent hashing
-│       ├── retrieval.py            # Hybrid vector + BM25 keyword + RRF fusion pipeline
-│       ├── versioning.py           # Directed lineage DAGs & partial amendment resolution
-│       ├── conflict.py             # Deterministic metric regex & ChangeCard generator
-│       ├── reranker.py             # Cross-encoder rerankers (FlashRank / Cohere / Mock)
-│       └── llm.py                  # LLM integration (Google Gemini / OpenAI / Mock)
-├── tests/                          # 289 automated tests (100% passing)
-│   ├── test_demo_and_ci.py         # Phase 9 demonstration and CI/CD validation suite
-│   ├── test_evaluation_benchmark.py# Phase 7 benchmark invariant test suite
-│   ├── test_phase6_suite.py        # Phase 6 adversarial security & unchanged clause suite
-│   ├── test_stage3_verification_fixes.py # Targeted verification regressions
-│   ├── test_rbac.py                # SQL pre-filtering and L1-L3 security invariants
-│   ├── test_versioning.py          # Lineage DAG and partial amendment suite
-│   └── conftest.py                 # Pytest fixtures and database isolation
-├── scripts/
-│   ├── demo_walkthrough.py         # 6-Scenario live interactive executive demonstration
-│   └── setup_postgres_rls.sql      # Production PostgreSQL RLS migration script
-├── eval/
-│   ├── golden.jsonl                # 100 verified questions (55 normal, 15 stale, 15 unanswerable, 15 restricted)
-│   ├── adversarial_queries.jsonl   # 30 adversarial prompt injection and jailbreak queries
-│   ├── canaries.json               # Synthetic cryptographic canary register
-│   ├── run_eval.py                 # Benchmark execution runner across 7 configurations
-│   └── run_phase6_tests.py         # Adversarial evaluation test runner
-├── ui/                             # LexisPolicy AI Studio (7 layout views + Streamlit)
-│   ├── web/                        # Modern responsive HTML/CSS/JS Studio
-│   └── app.py                      # Streamlit interactive application fallback
-├── docs/                           # Architectural guides, manifests, and acceptance reports
-│   └── portfolio_architecture_guide.md # Technical deep dive and mathematical formulations
-├── docker-compose.yml              # Multi-container orchestration (Backend + Frontend + pgvector)
-├── Dockerfile.backend              # Hardened production FastAPI backend container
-├── Dockerfile.frontend             # Hardened production Streamlit frontend container
-├── pyproject.toml                  # Python package configuration
-└── README.md                       # Master portfolio documentation
-```
+All metrics are reproduced from [`eval/results/real/eval_results_20261101_111402.json`](eval/results/real/eval_results_20261101_111402.json) (100 verified questions, dataset SHA256: `d22559b1...`) and registered in [`docs/CLAIMS.md`](docs/CLAIMS.md).
+
+### 1. Multi-Configuration Retrieval Benchmark (100 Questions)
+
+| Configuration | Hit Rate@1 | Hit Rate@3 | Hit Rate@5 | MRR | Missing Conflict % | Info Leak Rate % | Mean Latency | p95 Latency |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| `vector_only` | 77.33% | 97.33% | 98.67% | 0.8678 | 100.00% | 0.00% | 22.27 ms | 37.98 ms |
+| `keyword_only` (BM25) | 69.33% | 97.33% | 100.00% | 0.8349 | 100.00% | 0.00% | 8.85 ms | 11.10 ms |
+| `hybrid` (RRF $k=60$) | 78.67% | 98.67% | 100.00% | 0.8856 | 100.00% | 0.00% | 27.34 ms | 31.51 ms |
+| `hybrid_plus_reranking` | 82.67% | 97.33% | 100.00% | 0.9067 | 100.00% | 0.00% | 111.00 ms | 166.26 ms |
+| **`hybrid_plus_reranking_plus_version_awareness` (Production)** | **86.67%** | **96.00%** | **97.33%** | **0.9144** | **8.33%** | **0.00%** | **128.72 ms** | **185.55 ms** |
+| `security_ablated` (Ablation without RBAC) | 78.67% | 94.67% | 97.33% | 0.8733 | 100.00% | **43.00%** | 133.74 ms | 200.49 ms |
+
+### 2. Adversarial Security Verification (Phase 6 Suite)
+
+Evaluated via `python -m eval.run_phase6_tests` across 30 prompt injection and canary attack vectors:
+
+- **Protected Adversarial Leaks**: **`0 / 60` (0.00% information leak rate)** across student and faculty roles.
+- **Negative Control Leaks**: **`16 / 30` (53.33% leak rate)** when L1-L4 security enforcement is deliberately ablated.
+- **Token Attacks**: **100% rejected** (signature tampering, `alg=none`, expired token, wrong audience).
+- **Route Sweep Security**: **0 leaks** across 20 sensitive API endpoints under unprivileged roles.
+- **Role-Scoped Cache Isolation**: Verified zero cache cross-talk between administrative and student queries.
+- **Unchanged Clause Precision**: **0.00% false-flag rate (0/5)** on unchanged clause queries in `eval/golden_extended.jsonl`.
+
+---
+
+## Engineering Failure Log & Disclosures
+
+Building LexisPolicy AI involved real engineering bottlenecks and failure modes that were systematically diagnosed and resolved:
+
+1. **Cross-Topic Lineage Crosstalk**:
+   - *Failure*: When a student asked about exam hall reporting time, the retrieval context included an older attendance document, causing the conflict engine to emit an irrelevant attendance conflict card.
+   - *Fix*: Scoped conflict evaluation to user-query topical tokens and narrowed metric regex triggers, reducing unchanged clause false conflicts to **0.00% (0/5)**.
+2. **PostgreSQL RLS Connection Pool Contamination**:
+   - *Failure*: Setting session-level `app.current_role` leaked role permissions across pooled connections under high concurrency.
+   - *Fix*: Enforced `SET LOCAL app.current_role = :role` inside explicit database transactions, guaranteeing automatic setting expiration upon commit or rollback.
+3. **Retrieval Starvation Under Post-Filtering**:
+   - *Failure*: Vanilla post-retrieval role filtering dropped all top-$k$ candidates on sensitive queries, causing false abstentions even when public documents existed further down the candidate list.
+   - *Fix*: Shifted role filtering entirely to **Layer 1 SQL pre-filtering** and **Layer 2 PostgreSQL RLS**, ensuring only authorized chunks enter candidate retrieval.
+4. **LLM Citation Fabrication**:
+   - *Failure*: LLMs occasionally generated bracket citations (`[1]`) referencing non-existent page numbers or citing superseded regulations.
+   - *Fix*: Implemented strict **Verbatim Evidence Verification** before answer delivery; fabricated or out-of-force citations are automatically dropped, and answers without valid evidence cleanly abstain.
+5. **Corpus Size & Chance Baseline Disclosure**:
+   - *Disclosure*: The KVIT evaluation corpus contains **16 documents and 51 chunks**. The chance baseline for Recall@5 on this corpus is $5 / 51 = 9.80\%$. High recall is substantially easier to achieve at this corpus size. The true engineering contribution of this project is **not high recall on 51 chunks**, but the **version DAG engine and 4-layer security architecture**.
+
+---
+
+## Security Model & Honest Boundaries
+
+### What the System Guarantees
+- **Zero Confidential Leaks Across Tested Prompts**: Cryptographically prevents confidential documents from reaching unauthorized roles across tested prompt injections, jailbreaks, and canary extraction attempts.
+- **Database-Level Isolation**: Even if application-level SQL filtering is bypassed, PostgreSQL Row-Level Security independently drops unauthorized rows.
+- **Cryptographic Role Binding**: User roles are derived exclusively from verified HS256 JWT tokens; request bodies cannot assert or modify roles.
+
+### Honest Limitations
+- **Inference & Side-Channel Leaks**: If an unclassified public document mentions that *"The Provost met with Executive Band 5 officers"*, a student can infer the existence of Band 5 even though the confidential salary document is blocked. Access control enforces document boundaries, not human logical deduction.
+- **Denial of Service**: The system does not prevent intentional computational exhaustion attacks (e.g. submitting high-volume parallel cross-encoder requests) without external API rate-limiting proxies (e.g. Cloudflare or Nginx).
 
 ---
 
@@ -174,220 +152,78 @@ Document_RAG_Project/
 
 ### 1. Prerequisites
 - **Python 3.11+**
-- **Docker** (optional, for local PostgreSQL + pgvector) OR built-in **SQLite** (automatic test/offline mode).
+- **Git**
+- **Docker** (optional, for PostgreSQL + pgvector)
 
-### 2. Environment Setup
-```powershell
+### 2. Clone & Setup
+```bash
 # Clone the repository
-git clone https://github.com/your-username/Document_RAG_Project.git
+git clone https://github.com/anusha-2024-aia/Document_RAG_Project.git
 cd Document_RAG_Project
 
 # Create and activate virtual environment
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1   # On Windows
-source .venv/bin/activate       # On Linux/macOS
+# On Windows:
+.\.venv\Scripts\Activate.ps1
+# On Linux/macOS:
+source .venv/bin/activate
 
 # Install dependencies
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 3. Configuration
-Copy the template configuration:
-```powershell
-Copy-Item .env.example .env    # On Windows
-cp .env.example .env           # On Linux/macOS
+### 3. Environment Configuration
+```bash
+# Windows
+Copy-Item .env.example .env
+# Linux / macOS
+cp .env.example .env
 ```
-Configure your keys in `.env` (the system defaults to deterministic offline mocks if keys are omitted):
-- `DATABASE_URL`: PostgreSQL connection string with pgvector (or leave default for local testing).
-- `GEMINI_API_KEY`: Google AI Studio API key (free-tier capable).
-- `APP_ENV`: `development`, `test`, or `production`.
+*(The system runs fully offline out-of-the-box using built-in SQLite and deterministic mock embedding services if API keys are omitted).*
 
-### 4. Running the Database (Optional Docker)
-```powershell
-docker compose up -d
+### 4. Single-Command Launch (Docker)
+```bash
+docker compose up --build
 ```
 
-### 5. Ingesting Policy Documents
-Run idempotent document ingestion from the manifest:
-```powershell
-python -m app.cli.ingest --mock-embeddings
-```
-
-### 6. Starting the Application
-```powershell
+### 5. Local Development Launch
+```bash
+# Start FastAPI backend & Studio UI
 python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
-Once started, open:
-- **Interactive UI Studio**: [http://127.0.0.1:8000/ui](http://127.0.0.1:8000/ui)
+Navigate to:
+- **LexisPolicy AI Studio**: [http://127.0.0.1:8000/ui](http://127.0.0.1:8000/ui)
 - **Interactive Swagger Docs**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-- **ReDoc API Documentation**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
-- **Streamlit Interface (Fallback)**: `streamlit run ui/app.py --server.port 8501`
 
 ---
 
-## Running the Automated Test Suite
+## Running Automated Verification & Tests
 
-Run the full pytest suite (289 tests across security, versioning, retrieval, API, and CI):
-```powershell
+Every command below reproduces the exact figures recorded in [`docs/CLAIMS.md`](docs/CLAIMS.md):
+
+```bash
+# 1. Run full test suite (350 tests, 100% passing)
 pytest -q
-```
-*Output:*
-```text
-........................................................................ [ 24%]
-........................................................................ [ 49%]
-........................................................................ [ 74%]
-........................................................................ [ 99%]
-.                                                                        [100%]
-289 passed in 26.88s
-```
 
-### Live Executive Walkthrough Script (Phase 9 Showcase)
-Execute all 6 core system differentiator scenarios with rich console output:
-```powershell
+# 2. Run Phase 6 adversarial security verification (0 leaks across 60 evals)
+python -m eval.run_phase6_tests
+
+# 3. Run Phase 7 change intelligence and evidence verification tests (14 passed)
+pytest tests/test_policy_change_intelligence.py -v
+
+# 4. Run CI smoke evaluation (20 queries, Hit@5 = 1.000, 0 leaks)
+python -m eval.smoke
+
+# 5. Run live executive demonstration script (6 scenarios in 2 seconds)
 python scripts/demo_walkthrough.py
 ```
-*Demonstrates:*
-1. **Scenario 1 (Version Conflict & ChangeCards)**: Attendance 75% (2025) vs 80% (2023) with structured diff.
-2. **Scenario 2 (Partial Amendment Resolution)**: Clause 4.2 passing mark reduced from 24 to 21 with base context.
-3. **Scenario 3 (Unchanged Clause Precision)**: Clause 4.1 aggregate pass mark (40/100) confirmed without false conflict.
-4. **Scenario 4 (4-Layer Adversarial Defense)**: Student prompt injection blocked with zero leaks and synthetic canary verification.
-5. **Scenario 5 (Authorized Administrative Query)**: Admin query for confidential salary bands returning verified citations.
-6. **Scenario 6 (Temporal Time-Travel Retrieval)**: Querying historical rule as of 2024-06-01 returns the active rule on that date.
-
-### Running Adversarial Security Verification (Phase 6)
-```powershell
-python -m eval.run_phase6_tests
-```
-*Output:*
-```text
-================================================================================
- PHASE 6 COMPREHENSIVE TEST SUITE - AUDIT REPORT
-================================================================================
- Protected Adversarial Leaks:  0 / 60 (0.00% leak rate)
- Negative Control Leaks:       17 / 30 (56.67% leak rate)
- Token Attacks Passed:         True
- Role-Scoped Cache Isolated:   True
- Authorized Queries Answered:  5 / 5 (100.00%)
- Unchanged Clause Conflicts:   0 / 2 (0.00% false conflicts)
-================================================================================
-```
-
-### Running Evaluation & Multi-Configuration Benchmark (Phase 7)
-```powershell
-python -m eval.run_eval --configs all --mock-embeddings --mock-reranker --force-mock-llm
-```
 
 ---
 
-## REST API Usage Examples
+## Synthetic Data Notice
 
-### 1. Generating an Access Token (`POST /auth/token`)
-```bash
-curl -X POST "http://127.0.0.1:8000/auth/token" \
-  -H "Content-Type: application/json" \
-  -d '{"role": "student"}'
-```
-*Response:*
-```json
-{
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "token_type": "bearer",
-  "role": "student",
-  "expires_in": 3600
-}
-```
-
-### 2. Asking a Policy Question (`POST /ask`)
-```bash
-curl -X POST "http://127.0.0.1:8000/ask" \
-  -H "Authorization: Bearer <TOKEN>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "question": "What is the minimum attendance I need in each course to write the end-semester exam?",
-    "version_aware": true,
-    "top_k": 20,
-    "top_n": 5
-  }'
-```
-*Response:*
-```json
-{
-  "question": "What is the minimum attendance I need in each course to write the end-semester exam?",
-  "answer": "Under the current policy (effective 2025-07-01), A student must have a minimum attendance of 75% in each course to be eligible to appear for the end-semester examination [1]. However, this supersedes the previous policy (effective 2023-08-01), which stated that A student must have a minimum attendance of 80% in each course [2].",
-  "citations": [
-    {
-      "index": 1,
-      "file_name": "attendance_leave_policy_2025.pdf",
-      "page_number": 1,
-      "snippet": "A student must have a minimum attendance of 75% in each course to be eligible to appear for the end-semester examination."
-    },
-    {
-      "index": 2,
-      "file_name": "attendance_leave_policy_2023.pdf",
-      "page_number": 1,
-      "snippet": "A student must have a minimum attendance of 80% in each course to be eligible to appear for the end-semester examination."
-    }
-  ],
-  "abstained": false,
-  "has_policy_conflict": true,
-  "change_cards": [
-    {
-      "topic": "Minimum course attendance for end-semester examination eligibility",
-      "old": {
-        "value": "80%",
-        "source": "attendance_leave_policy_2023.pdf",
-        "page": 1,
-        "effective_date": "2023-08-01"
-      },
-      "new": {
-        "value": "75%",
-        "source": "attendance_leave_policy_2025.pdf",
-        "page": 1,
-        "effective_date": "2025-07-01"
-      },
-      "scope": "full"
-    }
-  ]
-}
-```
-
-### 3. Server-Sent Events Token Streaming (`POST /ask/stream`)
-```bash
-curl -N -X POST "http://127.0.0.1:8000/ask/stream" \
-  -H "Authorization: Bearer <TOKEN>" \
-  -H "Content-Type: application/json" \
-  -d '{"question": "How many credits can I register for in a semester?"}'
-```
-*Stream Events:*
-```text
-event: metadata
-data: {"passages": [...], "diagnostics": {...}}
-
-event: token
-data: {"token": "A "}
-
-event: token
-data: {"token": "student "}
-
-event: token
-data: {"token": "must "}
-
-event: citations
-data: {"citations": [{"index": 1, "file_name": "academic_regulations_2024.pdf", "page_number": 1}], "abstained": false}
-
-event: done
-data: {}
-```
-
----
-
-## Technical Documentation & In-Depth Reports
-
-For technical architecture details, code walkthroughs, and audit reports:
-- [Technical Architecture Guide (`docs/portfolio_architecture_guide.md`)](docs/portfolio_architecture_guide.md): In-depth breakdown of the 4-layer defence-in-depth security model, lineage DAG algorithms, mathematical formulas (RRF $k=60$, BM25 length norm), and evaluation taxonomy.
-- [Phase 6 Adversarial Test Report (`eval/results/phase6_test_report.json`)](eval/results/phase6_test_report.json): Automated audit logs of 30 attack vectors across roles.
-- [Phase 7 Multi-Configuration Benchmark (`eval/results/eval_report_20261025_182748.md`)](eval/results/eval_report_20261025_182748.md): Complete comparative evaluation across all 7 configurations on 100 verified questions.
+All documents, regulations, committee summaries, and salary figures in the KVIT dataset are **entirely synthetic**, created specifically for benchmarking, version tracking research, and security stress-testing.
 
 ---
 
