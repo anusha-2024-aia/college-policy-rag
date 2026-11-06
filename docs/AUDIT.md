@@ -169,15 +169,16 @@ collected 289 items
 
 | Phase | Description | Status | Evidence / Code References |
 | :--- | :--- | :---: | :--- |
-| **Phase 0** | Read-Only Audit (README vs. Real Code) | **DONE** | [`docs/AUDIT.md`](./AUDIT.md) completed with line citations and execution counts. |
-| **Phase 1** | Real Embeddings & Trustworthy Benchmark | **PARTIAL** | Real ONNX model (`app/services/embedding_onnx.py`) and FlashRank (`app/services/reranker.py`) exist, but `EmbeddingProvider` unified interface with `is_mock` is missing; model mismatch query check missing; `python -m app.cli.reindex` missing; benchmark ran with `--mock-*` and saved to `eval/results/` instead of `eval/results/mock/`. |
-| **Phase 2** | Auth Hardening & PostgreSQL RLS Proof | **PARTIAL** | `/auth/demo-login` allows arbitrary role selection without password; no `users` table; missing token returns `"student"` instead of `HTTP 401`; `?role=` query param leaks in `/documents`; RLS script exists (`setup_postgres_rls.sql`) but has no real PostgreSQL test suite. |
-| **Phase 3** | Credibility Bugs (Library, Snippets, UI) | **PARTIAL** | Hidden document counts implemented; citation snippet extraction cleans headers (`app/services/qa.py#L400-L450`); sequential `[1], [2]` citations implemented; but `/evaluations/reports` has no auth, and "How it works" / system pages contain development artifacts. |
-| **Phase 4** | Stronger Evaluation (Extended Golden, Denominators) | **PARTIAL** | 100 golden questions verified (`eval/golden.jsonl`); 7 configurations benchmarked; but extended golden set (`eval/golden_extended.jsonl`), bootstrap 95% CI, failure taxonomy markdown (`FAILURES.md`), and chance baseline warnings are missing. |
-| **Phase 5** | Database Reliability (Alembic, Migrations, Backup) | **NOT STARTED** | No Alembic migrations (`alembic/`); tables created with `Base.metadata.create_all`; no backup/restore scripts (`scripts/backup.sh`); no `docs/OPERATIONS.md`. |
-| **Phase 6** | CI & Security Scanning | **PARTIAL** | `.github/workflows/ci.yml` exists with 5 jobs, but runs on Ubuntu without a real PostgreSQL/pgvector service container; no `ruff`, `pip-audit`, or `gitleaks` steps. |
-| **Phase 7** | Policy Change Intelligence (Clause-Level Diff) | **PARTIAL** | Deterministic ChangeCard regex generator (`app/services/conflict.py`) and partial amendment DAGs (`app/services/versioning.py`) implemented; but dedicated endpoint `GET /policies/{lineage_id}/diff` and interactive comparison UI views are not yet exposed. |
-| **Phase 8** | Recruiter-Ready Presentation & Claims Ledger | **PARTIAL** | Portfolio guide (`docs/portfolio_architecture_guide.md`) and showcase script (`scripts/demo_walkthrough.py`) exist; but `docs/CLAIMS.md`, `docs/INTERVIEW_NOTES.md`, and `docs/DEMO_SCRIPT.md` are not yet created. |
+| **Phase 0** | Read-Only Audit (README vs. Real Code) | **DONE** | [`docs/AUDIT.md`](./AUDIT.md) completed with line citations and execution counts. Commit: `10329c6`. |
+| **Phase 1** | Real Embeddings & Trustworthy Benchmark | **DONE** | Unified `EmbeddingProvider` interface with `is_mock`, real ONNX embeddings, FlashRank reranking, reindex CLI, and `eval/results/real/`. Commit: `1268280`. |
+| **Phase 2** | Auth Hardening & PostgreSQL RLS Proof | **DONE** | Pinned HS256 JWT, server-side users table, transaction-scoped `SET LOCAL app.current_role` RLS, and Layer 1-3 invariants. Commit: `dabdc9a`. |
+| **Phase 3** | Credibility Bugs (Library, Snippets, UI) | **DONE** | Role-governed catalog with hidden document counts, clean sequential citations `[1], [2]`, and authenticated evaluation reports. Commit: `9bfcbe6`. |
+| **Phase 4** | Stronger Evaluation (Extended Golden, Denominators) | **DONE** | 100 golden questions, 30 adversarial queries, bootstrap 95% CIs, and full 7-configuration ablation matrix. Commit: `2fa3318`. |
+| **Phase 5** | Database Reliability (Alembic, Migrations, Backup) | **DONE** | 3-tier database architecture, Alembic revisions, backup/restore CLI drills, and `docs/OPERATIONS.md`. Commit: `6f122a7`. |
+| **Phase 6** | CI & Security Scanning | **DONE** | GitHub Actions CI/CD with PostgreSQL/pgvector service containers, ruff, pip-audit, and 0 leaks across 60 adversarial evals. Commit: `0b61f86`. |
+| **Phase 7** | Policy Change Intelligence (Clause-Level Diff) | **DONE** | `GET /policies/{lineage_id}/diff`, partial amendment DAG resolution, verbatim evidence verification, and 0.00% unchanged false-flag rate. Commit: `4ca948e`. |
+| **Phase 8** | Recruiter-Ready Presentation & Claims Ledger | **DONE** | [`docs/CLAIMS.md`](./CLAIMS.md), [`docs/DEMO_SCRIPT.md`](./DEMO_SCRIPT.md), [`docs/INTERVIEW_NOTES.md`](./INTERVIEW_NOTES.md), [`docs/REPO_METADATA.md`](./REPO_METADATA.md), README rewrite, and cold-start handling. Commit: `cff32fb`. |
+| **Phase 9** | Interactive Showcase, CI/CD Pipeline & Docker Hardening | **DONE** | [`scripts/demo_walkthrough.py`](../scripts/demo_walkthrough.py) (6 live scenarios), [`.github/workflows/ci.yml`](../.github/workflows/ci.yml), `Dockerfile.backend`, `Dockerfile.frontend`, `docker-compose.yml`, and [`tests/test_demo_and_ci.py`](../tests/test_demo_and_ci.py) (12 passed). |
 
 ---
 
