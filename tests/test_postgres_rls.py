@@ -17,6 +17,8 @@ def is_postgres_available() -> bool:
     db_url = os.environ.get("POSTGRES_TEST_DATABASE_URL") or os.environ.get("DATABASE_URL", "")
     if not db_url.startswith("postgresql"):
         return False
+    if db_url.startswith("postgresql+asyncpg://"):
+        db_url = db_url.replace("postgresql+asyncpg://", "postgresql+psycopg2://", 1)
     try:
         engine = create_engine(db_url, connect_args={"connect_timeout": 2})
         with engine.connect() as conn:
@@ -81,6 +83,8 @@ def test_rls_policy_simulation_role_filtering():
 def test_live_postgres_rls_enforcement():
     """Live verification against real PostgreSQL container when running."""
     db_url = os.environ.get("POSTGRES_TEST_DATABASE_URL") or os.environ.get("DATABASE_URL")
+    if db_url and db_url.startswith("postgresql+asyncpg://"):
+        db_url = db_url.replace("postgresql+asyncpg://", "postgresql+psycopg2://", 1)
     engine = create_engine(db_url)
 
     # Ensure tables exist and contain test fixtures if empty
@@ -89,18 +93,21 @@ def test_live_postgres_rls_enforcement():
         if chunk_count == 0:
             conn.execute(
                 text("""
-                INSERT INTO documents (file_name, title, category, publication_date, scope, status, lineage_id, version, allowed_roles)
+                INSERT INTO documents (id, file_name, file_hash, title, effective_date, allowed_roles, status, total_pages, total_chunks, created_at, updated_at)
                 VALUES
-                ('doc_student.pdf', 'Student Policy', 'Academic', '2024-01-01', 'campus', 'Active', 'lin_1', 'v1', '["student", "faculty", "admin"]'::json),
-                ('doc_admin.pdf', 'Admin Policy', 'Governance', '2024-01-01', 'campus', 'Active', 'lin_2', 'v1', '["admin"]'::json)
+                ('doc-student-id', 'doc_student.pdf', 'hash1', 'Student Policy', '2024-01-01', '["student", "faculty", "admin"]'::json, 'current', 1, 1, NOW(), NOW()),
+                ('doc-admin-id', 'doc_admin.pdf', 'hash2', 'Admin Policy', '2024-01-01', '["admin"]'::json, 'current', 1, 1, NOW(), NOW())
+                ON CONFLICT (file_name) DO NOTHING;
             """)
             )
+            dummy_vec = '[' + ','.join(['0'] * 1536) + ']'
             conn.execute(
-                text("""
-                INSERT INTO chunks (file_name, page_number, chunk_index, text, allowed_roles)
+                text(f"""
+                INSERT INTO chunks (id, document_id, chunk_index, page_number, text, token_count, status, allowed_roles, embedding, created_at)
                 VALUES
-                ('doc_student.pdf', 1, 0, 'Student rule content', '["student", "faculty", "admin"]'::json),
-                ('doc_admin.pdf', 1, 0, 'Admin confidential content', '["admin"]'::json)
+                ('chk-student-id', 'doc-student-id', 0, 1, 'Student rule content', 10, 'current', '["student", "faculty", "admin"]'::json, '{dummy_vec}'::vector, NOW()),
+                ('chk-admin-id', 'doc-admin-id', 0, 1, 'Admin confidential content', 10, 'current', '["admin"]'::json, '{dummy_vec}'::vector, NOW())
+                ON CONFLICT (id) DO NOTHING;
             """)
             )
 

@@ -27,6 +27,8 @@ def is_postgres_available() -> bool:
     db_url = os.environ.get("POSTGRES_TEST_DATABASE_URL") or os.environ.get("DATABASE_URL", "")
     if not db_url.startswith("postgresql"):
         return False
+    if db_url.startswith("postgresql+asyncpg://"):
+        db_url = db_url.replace("postgresql+asyncpg://", "postgresql+psycopg2://", 1)
     try:
         engine = create_engine(db_url, connect_args={"connect_timeout": 2})
         with engine.connect() as conn:
@@ -99,6 +101,8 @@ def test_production_startup_prohibits_runtime_create_all():
 def test_real_postgres_migration_upgrade_downgrade_drill():
     """Execute live migration drill on reachable PostgreSQL database."""
     pg_url = os.environ.get("POSTGRES_TEST_DATABASE_URL") or os.environ.get("DATABASE_URL")
+    if pg_url and pg_url.startswith("postgresql+asyncpg://"):
+        pg_url = pg_url.replace("postgresql+asyncpg://", "postgresql+psycopg2://", 1)
     cfg = Config("alembic.ini")
     cfg.set_main_option("sqlalchemy.url", pg_url)
 
