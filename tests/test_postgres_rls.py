@@ -91,6 +91,8 @@ def test_live_postgres_rls_enforcement():
     db_url = os.environ.get("POSTGRES_TEST_DATABASE_URL") or os.environ.get("DATABASE_URL")
     if db_url and db_url.startswith("postgresql+asyncpg://"):
         db_url = db_url.replace("postgresql+asyncpg://", "postgresql+psycopg2://", 1)
+    elif db_url and db_url.startswith("postgresql://"):
+        db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
     engine = create_engine(db_url)
 
     # Ensure tables exist and contain test fixtures idempotently

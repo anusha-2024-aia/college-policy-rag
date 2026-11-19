@@ -109,6 +109,8 @@ def test_real_postgres_migration_upgrade_downgrade_drill():
     pg_url = os.environ.get("POSTGRES_TEST_DATABASE_URL") or os.environ.get("DATABASE_URL")
     if pg_url and pg_url.startswith("postgresql+asyncpg://"):
         pg_url = pg_url.replace("postgresql+asyncpg://", "postgresql+psycopg2://", 1)
+    elif pg_url and pg_url.startswith("postgresql://"):
+        pg_url = pg_url.replace("postgresql://", "postgresql+psycopg2://", 1)
     cfg = Config("alembic.ini")
     cfg.set_main_option("sqlalchemy.url", pg_url)
 

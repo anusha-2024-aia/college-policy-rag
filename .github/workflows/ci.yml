@@ -98,17 +98,21 @@ jobs:
           POSTGRES_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/document_rag
           APP_ENV: test
         run: |
-          pytest -v --tb=short -rs 2>&1 | tee /tmp/pytest_run.log
+          pytest -v --tb=short -rs --color=no 2>&1 | tee /tmp/pytest_run.log
           PYTEST_STATUS=${PIPESTATUS[0]}
           if [ $PYTEST_STATUS -ne 0 ]; then
             echo "::error::Pytest failed with exit code $PYTEST_STATUS"
-            grep -E '^FAILED ' /tmp/pytest_run.log | head -n 5 | while IFS= read -r line; do
-              echo "::error::[FAILED TEST] $line"
-            done
-            grep -E '^[A-Za-z0-9_]+Error:|^AssertionError:|^E   assert' /tmp/pytest_run.log | head -n 3 | while IFS= read -r line; do
-              echo "::error::[DETAIL] $line"
-            done
-            tail -n 2 /tmp/pytest_run.log | while IFS= read -r line; do
+            python -c "
+          import re
+          with open('/tmp/pytest_run.log', encoding='utf-8', errors='ignore') as f:
+              text = f.read()
+          clean = re.sub(r'\x1b\[[0-9;]*[mK]', '', text)
+          for f in re.findall(r'^FAILED (.+)$', clean, re.M)[:4]:
+              print(f'::error::[FAILED] {f}')
+          for e in re.findall(r'^(?:E\s+.+|[A-Za-z0-9_]+Error: .+|AssertionError: .+)$', clean, re.M)[:4]:
+              print(f'::error::[DETAIL] {e}')
+          "
+            tail -n 1 /tmp/pytest_run.log | while IFS= read -r line; do
               echo "::error::[SUMMARY] $line"
             done
             exit $PYTEST_STATUS
