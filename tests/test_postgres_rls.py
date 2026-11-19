@@ -87,44 +87,50 @@ def test_live_postgres_rls_enforcement():
         db_url = db_url.replace("postgresql+asyncpg://", "postgresql+psycopg2://", 1)
     engine = create_engine(db_url)
 
-    # Ensure tables exist and contain test fixtures if empty
+    # Ensure tables exist and contain test fixtures idempotently
     with engine.begin() as conn:
-        chunk_count = conn.execute(text("SELECT count(*) FROM chunks")).scalar()
-        if chunk_count == 0:
-            conn.execute(
-                text("""
-                INSERT INTO documents (id, file_name, file_hash, title, effective_date, allowed_roles, status, total_pages, total_chunks, created_at, updated_at)
-                VALUES
-                ('doc-student-id', 'doc_student.pdf', 'hash1', 'Student Policy', '2024-01-01', '["student", "faculty", "admin"]'::json, 'current', 1, 1, NOW(), NOW()),
-                ('doc-admin-id', 'doc_admin.pdf', 'hash2', 'Admin Policy', '2024-01-01', '["admin"]'::json, 'current', 1, 1, NOW(), NOW())
-                ON CONFLICT (file_name) DO NOTHING;
-            """)
-            )
-            dummy_vec = '[' + ','.join(['0'] * 1536) + ']'
-            conn.execute(
-                text(f"""
-                INSERT INTO chunks (id, document_id, chunk_index, page_number, text, token_count, status, allowed_roles, embedding, created_at)
-                VALUES
-                ('chk-student-id', 'doc-student-id', 0, 1, 'Student rule content', 10, 'current', '["student", "faculty", "admin"]'::json, '{dummy_vec}'::vector, NOW()),
-                ('chk-admin-id', 'doc-admin-id', 0, 1, 'Admin confidential content', 10, 'current', '["admin"]'::json, '{dummy_vec}'::vector, NOW())
-                ON CONFLICT (id) DO NOTHING;
-            """)
-            )
+        conn.execute(text("DELETE FROM chunks WHERE id IN ('chk-student-id', 'chk-admin-id');"))
+        conn.execute(text("DELETE FROM documents WHERE id IN ('doc-student-id', 'doc-admin-id');"))
+        conn.execute(
+            text("""
+            INSERT INTO documents (id, file_name, file_hash, title, effective_date, allowed_roles, status, total_pages, total_chunks, created_at, updated_at)
+            VALUES
+            ('doc-student-id', 'doc_student_rls.pdf', 'hash1', 'Student Policy', '2024-01-01', '["student", "faculty", "admin"]'::json, 'current', 1, 1, NOW(), NOW()),
+            ('doc-admin-id', 'doc_admin_rls.pdf', 'hash2', 'Admin Policy', '2024-01-01', '["admin"]'::json, 'current', 1, 1, NOW(), NOW());
+        """)
+        )
+        # Unit vectors with norm 1.0 (non-zero magnitude to avoid division-by-zero in HNSW cosine ops)
+        dummy_vec_student = '[' + ','.join(['1.0' if i == 0 else '0.0' for i in range(1536)]) + ']'
+        dummy_vec_admin = '[' + ','.join(['1.0' if i == 1 else '0.0' for i in range(1536)]) + ']'
+        conn.execute(
+            text(f"""
+            INSERT INTO chunks (id, document_id, chunk_index, page_number, text, token_count, status, allowed_roles, embedding, created_at)
+            VALUES
+            ('chk-student-id', 'doc-student-id', 0, 1, 'Student rule content', 10, 'current', '["student", "faculty", "admin"]'::json, '{dummy_vec_student}'::vector, NOW()),
+            ('chk-admin-id', 'doc-admin-id', 0, 1, 'Admin confidential content', 10, 'current', '["admin"]'::json, '{dummy_vec_admin}'::vector, NOW());
+        """)
+        )
 
-    with engine.connect() as conn:
-        # Verify app role without setting app.current_role returns 0 rows
-        conn.execute(text("SET ROLE kvit_app_user"))
-        conn.execute(text("SELECT set_config('app.current_role', '', true)"))
-        count_unset = conn.execute(text("SELECT count(*) FROM chunks")).scalar()
-        assert count_unset == 0, f"Expected 0 chunks visible when app.current_role is unset, got {count_unset}"
+    try:
+        with engine.connect() as conn:
+            # Verify app role without setting app.current_role returns 0 rows
+            conn.execute(text("SET ROLE kvit_app_user"))
+            conn.execute(text("SELECT set_config('app.current_role', '', false)"))
+            count_unset = conn.execute(text("SELECT count(*) FROM chunks")).scalar()
+            assert count_unset == 0, f"Expected 0 chunks visible when app.current_role is unset, got {count_unset}"
 
-        # Verify setting student role reveals only student chunks
-        conn.execute(text("SELECT set_config('app.current_role', 'student', true)"))
-        student_chunks = conn.execute(text("SELECT count(*) FROM chunks")).scalar()
-        assert student_chunks > 0
+            # Verify setting student role reveals only student chunks
+            conn.execute(text("SELECT set_config('app.current_role', 'student', false)"))
+            student_chunks = conn.execute(text("SELECT count(*) FROM chunks")).scalar()
+            assert student_chunks > 0
 
-        # Verify admin sees more or all chunks
-        conn.execute(text("SELECT set_config('app.current_role', 'admin', true)"))
-        admin_chunks = conn.execute(text("SELECT count(*) FROM chunks")).scalar()
-        assert admin_chunks >= student_chunks
+            # Verify admin sees more or all chunks
+            conn.execute(text("SELECT set_config('app.current_role', 'admin', false)"))
+            admin_chunks = conn.execute(text("SELECT count(*) FROM chunks")).scalar()
+            assert admin_chunks >= student_chunks
+
+            # Reset role back
+            conn.execute(text("RESET ROLE"))
+    finally:
+        engine.dispose()
 

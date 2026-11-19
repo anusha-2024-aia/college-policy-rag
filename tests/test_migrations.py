@@ -110,29 +110,40 @@ def test_real_postgres_migration_upgrade_downgrade_drill():
     command.upgrade(cfg, "head")
 
     engine = create_engine(pg_url)
-    with engine.connect() as conn:
-        res = conn.execute(text("SELECT to_regclass('public.documents')")).scalar()
-        assert res is not None, "documents table must exist after upgrade"
+    try:
+        with engine.connect() as conn:
+            res = conn.execute(text("SELECT to_regclass('public.documents')")).scalar()
+            assert res is not None, "documents table must exist after upgrade"
 
-        # Check RLS enabled
-        rls_res = conn.execute(text("""
-            SELECT relrowsecurity, relforcerowsecurity
-            FROM pg_class
-            WHERE relname = 'documents'
-        """)).fetchone()
-        assert rls_res is not None
-        assert rls_res[0] is True, "documents table must have ROW LEVEL SECURITY enabled"
-        assert rls_res[1] is True, "documents table must FORCE ROW LEVEL SECURITY"
+            # Check RLS enabled
+            rls_res = conn.execute(text("""
+                SELECT relrowsecurity, relforcerowsecurity
+                FROM pg_class
+                WHERE relname = 'documents'
+            """)).fetchone()
+            assert rls_res is not None
+            assert rls_res[0] is True, "documents table must have ROW LEVEL SECURITY enabled"
+            assert rls_res[1] is True, "documents table must FORCE ROW LEVEL SECURITY"
+    finally:
+        engine.dispose()
 
     # 2. Downgrade one step (to base)
     command.downgrade(cfg, "base")
-    with engine.connect() as conn:
-        res = conn.execute(text("SELECT to_regclass('public.documents')")).scalar()
-        assert res is None, "documents table must be dropped after downgrade to base"
+    engine = create_engine(pg_url)
+    try:
+        with engine.connect() as conn:
+            res = conn.execute(text("SELECT to_regclass('public.documents')")).scalar()
+            assert res is None, "documents table must be dropped after downgrade to base"
+    finally:
+        engine.dispose()
 
     # 3. Upgrade back to head
     command.upgrade(cfg, "head")
-    with engine.connect() as conn:
-        res = conn.execute(text("SELECT to_regclass('public.documents')")).scalar()
-        assert res is not None, "documents table must be re-created after re-upgrade"
+    engine = create_engine(pg_url)
+    try:
+        with engine.connect() as conn:
+            res = conn.execute(text("SELECT to_regclass('public.documents')")).scalar()
+            assert res is not None, "documents table must be re-created after re-upgrade"
+    finally:
+        engine.dispose()
 
