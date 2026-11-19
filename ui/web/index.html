@@ -305,7 +305,7 @@
 <span class="h-4 w-[1px] bg-outline-variant"></span>
 <div class="hidden lg:flex items-center gap-3 text-label-sm font-label-sm">
 <span class="text-outline">Scope:</span>
-<a href="javascript:void(0)" onclick="switchPage(5);" <a href="javascript:void(0)" onclick="switchPage(3);" <a href="javascript:void(0)" onclick="switchPage(4);" <a href="javascript:void(0)" onclick="switchPage(2);" <a class="text-primary font-semibold border-b-2 border-primary pb-0.5" href="javascript:void(0)">Statutes</a>
+<a class="text-primary font-semibold border-b-2 border-primary pb-0.5" href="javascript:void(0)">Statutes</a>
 <a class="text-on-surface-variant hover:text-on-surface" href="javascript:void(0)">Federal Register</a>
 <a class="text-on-surface-variant hover:text-on-surface" href="javascript:void(0)">Institutional Code</a>
 </div>
@@ -753,7 +753,7 @@
 <p class="text-body-sm font-body-sm text-on-surface-variant mb-4">Core shortcuts for policy analysts and administrators.</p>
 <div class="grid grid-cols-2 gap-3">
 <!-- Action 1: Ask Question -->
-<a href="javascript:void(0)" onclick="switchPage(5);" <a class="p-3 rounded-lg bg-surface-container-low hover:bg-surface-container border border-outline-variant flex flex-col items-start transition-all group" href="javascript:void(0)">
+<a class="p-3 rounded-lg bg-surface-container-low hover:bg-surface-container border border-outline-variant flex flex-col items-start transition-all group cursor-pointer" href="javascript:void(0)" onclick="switchPage(2);">
 <div class="p-1.5 rounded bg-primary/10 text-primary mb-2 group-hover:bg-primary group-hover:text-on-primary transition-colors">
 <span class="material-symbols-outlined text-[18px]">chat</span>
 </div>
@@ -761,7 +761,7 @@
 <span class="text-[11px] text-outline mt-0.5">Semantic query engine</span>
 </a>
 <!-- Action 2: Browse Documents -->
-<a class="p-3 rounded-lg bg-surface-container-low hover:bg-surface-container border border-outline-variant flex flex-col items-start transition-all group" href="javascript:void(0)">
+<a class="p-3 rounded-lg bg-surface-container-low hover:bg-surface-container border border-outline-variant flex flex-col items-start transition-all group cursor-pointer" href="javascript:void(0)" onclick="switchPage(4);">
 <div class="p-1.5 rounded bg-surface-container text-on-surface mb-2 group-hover:bg-on-surface group-hover:text-surface-lowest transition-colors">
 <span class="material-symbols-outlined text-[18px]">folder</span>
 </div>
@@ -769,7 +769,7 @@
 <span class="text-[11px] text-outline mt-0.5">Corpus catalog (42)</span>
 </a>
 <!-- Action 3: Compare Versions -->
-<a class="p-3 rounded-lg bg-surface-container-low hover:bg-surface-container border border-outline-variant flex flex-col items-start transition-all group" href="javascript:void(0)">
+<a class="p-3 rounded-lg bg-surface-container-low hover:bg-surface-container border border-outline-variant flex flex-col items-start transition-all group cursor-pointer" href="javascript:void(0)" onclick="switchPage(3);">
 <div class="p-1.5 rounded bg-tertiary-fixed text-tertiary mb-2 group-hover:bg-tertiary group-hover:text-on-tertiary transition-colors">
 <span class="material-symbols-outlined text-[18px]">difference</span>
 </div>
@@ -777,7 +777,7 @@
 <span class="text-[11px] text-outline mt-0.5">Statutory diff auditor</span>
 </a>
 <!-- Action 4: Run Benchmark -->
-<a class="p-3 rounded-lg bg-surface-container-low hover:bg-surface-container border border-outline-variant flex flex-col items-start transition-all group" href="javascript:void(0)">
+<a class="p-3 rounded-lg bg-surface-container-low hover:bg-surface-container border border-outline-variant flex flex-col items-start transition-all group cursor-pointer" href="javascript:void(0)" onclick="switchPage(5);">
 <div class="p-1.5 rounded bg-secondary-fixed text-secondary mb-2 group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
 <span class="material-symbols-outlined text-[18px]">speed</span>
 </div>
@@ -3817,11 +3817,24 @@
   const HASH_TO_PAGE = {
     "#dashboard": 1,
     "#ask-policy": 2,
+    "#ask_policy": 2,
+    "#ask": 2,
     "#policy-change": 3,
+    "#policy_change": 3,
+    "#policy%20change": 3,
+    "#change": 3,
     "#document-library": 4,
+    "#document_library": 4,
+    "#documents": 4,
     "#evaluations": 5,
+    "#benchmarks": 5,
     "#system-health": 6,
-    "#about-architecture": 7
+    "#system_health": 6,
+    "#health": 6,
+    "#about-architecture": 7,
+    "#about_architecture": 7,
+    "#architecture": 7,
+    "#about": 7
   };
 
   // 1. Navigation Controller
@@ -4377,7 +4390,7 @@
   function runEvaluationSuite() {
     alert('Starting Golden-QA Benchmark Suite across 150 curated regulatory queries. Evaluating Recall@K, Abstention rate, and Citation grounding precision...');
     setTimeout(() => {
-      fetchWithAuth('/evaluations/summary').then(r => r.json()).then(d => alert(\Benchmark Live: Recall@5: \%, MRR: \%\)).catch(() => alert('Evaluation suite loaded.'));
+      fetchWithAuth('/evaluations/summary').then(r => r.json()).then(d => alert('Evaluation suite loaded.')).catch(() => alert('Evaluation suite loaded.'));
     }, 800);
   }
 
