@@ -102,8 +102,14 @@ jobs:
           PYTEST_STATUS=${PIPESTATUS[0]}
           if [ $PYTEST_STATUS -ne 0 ]; then
             echo "::error::Pytest failed with exit code $PYTEST_STATUS"
-            tail -n 120 /tmp/pytest_run.log | while IFS= read -r line; do
-              echo "::error::[pytest] $line"
+            grep -E '^FAILED ' /tmp/pytest_run.log | head -n 5 | while IFS= read -r line; do
+              echo "::error::[FAILED TEST] $line"
+            done
+            grep -E '^[A-Za-z0-9_]+Error:|^AssertionError:|^E   assert' /tmp/pytest_run.log | head -n 3 | while IFS= read -r line; do
+              echo "::error::[DETAIL] $line"
+            done
+            tail -n 2 /tmp/pytest_run.log | while IFS= read -r line; do
+              echo "::error::[SUMMARY] $line"
             done
             exit $PYTEST_STATUS
           fi
