@@ -29,13 +29,19 @@ def is_postgres_available() -> bool:
         return False
     if db_url.startswith("postgresql+asyncpg://"):
         db_url = db_url.replace("postgresql+asyncpg://", "postgresql+psycopg2://", 1)
+    elif db_url.startswith("postgresql://"):
+        db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+    engine = None
     try:
-        engine = create_engine(db_url, connect_args={"connect_timeout": 2})
+        engine = create_engine(db_url, connect_args={"connect_timeout": 3})
         with engine.connect() as conn:
             res = conn.execute(text("SELECT 1")).scalar()
             return res == 1
     except Exception:
         return False
+    finally:
+        if engine:
+            engine.dispose()
 
 
 def test_alembic_config_and_script_directory():

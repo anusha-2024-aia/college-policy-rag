@@ -114,9 +114,10 @@ jobs:
           POSTGRES_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/document_rag
           APP_ENV: test
         run: |
-          pytest tests/test_migrations.py tests/test_postgres_rls.py -v | tee /tmp/db_test_results.txt
-          if grep -i "skipped" /tmp/db_test_results.txt; then
-            echo "ERROR: PostgreSQL migration or RLS tests were skipped due to missing database!"
+          pytest tests/test_migrations.py tests/test_postgres_rls.py -v -rs 2>&1 | tee /tmp/db_test_results.txt
+          cat /tmp/db_test_results.txt
+          if grep -E '(SKIPPED| [0-9]+ skipped)' /tmp/db_test_results.txt; then
+            echo "::error::PostgreSQL migration or RLS tests were skipped due to missing database!"
             exit 1
           fi
           echo "Verified: Live PostgreSQL tests executed and passed with 0 skips."
