@@ -89,9 +89,9 @@ class TestModelMismatchFailLoud:
             assert "mock-sha256" in str(exc_info.value)
         finally:
             # Restore state to prevent test contamination
-            if orig_model is not None and meta is not None:
-                meta.model_id = orig_model
-                meta.dim = orig_dim
+            if meta is not None:
+                meta.model_id = orig_model or "mock-sha256"
+                meta.dim = orig_dim or 1536
                 db.commit()
 
 

@@ -35,6 +35,7 @@ data/backup_*.json
 
 # Databases & local state
 *.db
+!data/test_kvit.db
 *.sqlite
 *.sqlite3
 pgvector_data/

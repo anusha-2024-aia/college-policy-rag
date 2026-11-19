@@ -24,9 +24,9 @@ def reset_query_cache():
     query_cache.clear()
 
 
-@pytest.fixture(scope="session", autouse=True)
-def ensure_test_corpus_mock_indexed():
-    """Ensure data/test_kvit.db index metadata matches mock-sha256 for unit test suite."""
+@pytest.fixture(autouse=True)
+def reset_test_corpus_embedding_metadata():
+    """Ensure embedding_index_metadata always defaults to mock-sha256 before each test."""
     from app.core.database import get_test_session
     from app.models.index_metadata import EmbeddingIndexMetadata
     db = get_test_session()
@@ -36,7 +36,17 @@ def ensure_test_corpus_mock_indexed():
         meta.dim = 1536
         meta.normalized = True
         meta.is_mock = True
-        db.commit()
+    else:
+        meta = EmbeddingIndexMetadata(
+            id="default",
+            model_id="mock-sha256",
+            dim=1536,
+            normalized=True,
+            is_mock=True,
+            chunk_count=51,
+        )
+        db.add(meta)
+    db.commit()
     db.close()
 
 
