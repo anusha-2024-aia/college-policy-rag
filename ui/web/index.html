@@ -3558,7 +3558,7 @@
   window.currentRole = localStorage.getItem('kvit_role') || 'admin';
   window.currentUser = localStorage.getItem('kvit_username') || 'admin';
   window.authToken = localStorage.getItem('kvit_token') || '';
-  window.backendBaseUrl = 'http://127.0.0.1:8000';
+  window.backendBaseUrl = (window.location.origin && window.location.origin.startsWith('http')) ? window.location.origin : 'http://127.0.0.1:8080';
 
   function escapeHTML(str) {
     if (!str) return '';
@@ -3792,7 +3792,7 @@
     }
   }
 
-  window.backendBaseUrl = 'http://127.0.0.1:8000';
+  window.backendBaseUrl = (window.location.origin && window.location.origin.startsWith('http')) ? window.location.origin : 'http://127.0.0.1:8080';
   
   const PAGE_TITLES = {
     1: "Policy Intelligence Dashboard - LexisPolicy AI",
@@ -4529,6 +4529,10 @@
 
   // Initialize on load
   document.addEventListener('DOMContentLoaded', () => {
+    const cfgUrlInput = document.getElementById('cfg-backend-url');
+    if (cfgUrlInput && window.backendBaseUrl) {
+      cfgUrlInput.value = window.backendBaseUrl;
+    }
     const initialPage = HASH_TO_PAGE[window.location.hash] || 1;
     switchPage(initialPage);
     checkColdStartHealth();
