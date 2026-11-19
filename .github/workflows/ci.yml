@@ -102,7 +102,7 @@ jobs:
           PYTEST_STATUS=${PIPESTATUS[0]}
           if [ $PYTEST_STATUS -ne 0 ]; then
             echo "::error::Pytest failed with exit code $PYTEST_STATUS"
-            tail -n 40 /tmp/pytest_run.log | while IFS= read -r line; do
+            tail -n 120 /tmp/pytest_run.log | while IFS= read -r line; do
               echo "::error::[pytest] $line"
             done
             exit $PYTEST_STATUS

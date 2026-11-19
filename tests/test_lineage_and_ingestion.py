@@ -12,6 +12,7 @@ Covers:
 """
 
 from pathlib import Path
+import pytest
 from sqlalchemy.orm import Session
 from app.models.document import Document
 from app.models.chunk import Chunk
@@ -96,9 +97,10 @@ def test_lineage_and_partial_supersession(test_db: Session):
     """Verify partial scope supersedes ONLY amended clauses while unchanged clauses remain current."""
     manifest_path = Path("docs/documents_manifest.csv")
     register_path = Path("docs/supersession_register.csv")
+    sample_pdf = Path("data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/academic_regulations_2024.pdf")
 
-    if not manifest_path.exists() or not register_path.exists():
-        return
+    if not manifest_path.exists() or not register_path.exists() or not sample_pdf.exists():
+        pytest.skip("Raw KVIT policy PDFs not present in environment")
 
     chunker = ChunkerService(chunk_size_tokens=500, chunk_overlap_tokens=80)
     mock_embed = MockEmbeddingService(dimension=1536)
@@ -166,9 +168,10 @@ def test_full_supersession_attendance_and_hostel(test_db: Session):
     """Verify full scope supersedes ALL chunks of the predecessor document."""
     manifest_path = Path("docs/documents_manifest.csv")
     register_path = Path("docs/supersession_register.csv")
+    sample_pdf = Path("data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/academic_regulations_2024.pdf")
 
-    if not manifest_path.exists() or not register_path.exists():
-        return
+    if not manifest_path.exists() or not register_path.exists() or not sample_pdf.exists():
+        pytest.skip("Raw KVIT policy PDFs not present in environment")
 
     chunker = ChunkerService(chunk_size_tokens=500, chunk_overlap_tokens=80)
     mock_embed = MockEmbeddingService(dimension=1536)
@@ -206,8 +209,9 @@ def test_full_supersession_attendance_and_hostel(test_db: Session):
 def test_denormalized_allowed_roles_on_all_chunks(test_db: Session):
     """Verify every chunk inherits and denormalizes parent document allowed_roles."""
     manifest_path = Path("docs/documents_manifest.csv")
-    if not manifest_path.exists():
-        return
+    sample_pdf = Path("data/raw_pdfs/kvit_rag_dataset/kvit_rag_dataset/data/raw/academic_regulations_2024.pdf")
+    if not manifest_path.exists() or not sample_pdf.exists():
+        pytest.skip("Raw KVIT policy PDFs not present in environment")
 
     chunker = ChunkerService()
     mock_embed = MockEmbeddingService(dimension=1536)
