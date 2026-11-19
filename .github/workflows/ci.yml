@@ -98,7 +98,16 @@ jobs:
           POSTGRES_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/document_rag
           APP_ENV: test
         run: |
-          pytest -v --tb=short -rs
+          pytest -v --tb=short -rs 2>&1 | tee /tmp/pytest_run.log
+          PYTEST_STATUS=${PIPESTATUS[0]}
+          if [ $PYTEST_STATUS -ne 0 ]; then
+            echo "::error::Pytest failed! Summary of failures:"
+            grep -E '(FAILED|ERROR) tests/' /tmp/pytest_run.log | head -n 30 | while read line; do
+              echo "::error::$line"
+            done
+            tail -n 80 /tmp/pytest_run.log
+            exit $PYTEST_STATUS
+          fi
 
       - name: Verify Zero Skipped Tests for Missing Database
         env:
