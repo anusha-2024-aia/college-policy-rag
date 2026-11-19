@@ -282,7 +282,7 @@ def get_embedding_provider(
     """
     requested = (model_id or settings.EMBEDDING_PROVIDER or "").lower()
 
-    if force_mock or requested in ("mock", "mock-sha256"):
+    if force_mock or requested in ("mock", "mock-sha256") or (settings.APP_ENV == "test" and model_id is None):
         logger.info("Using deterministic MockEmbeddingService (dimension=%d)", settings.EMBEDDING_DIMENSION)
         return MockEmbeddingService(dimension=settings.EMBEDDING_DIMENSION, model_id="mock-sha256")
 
