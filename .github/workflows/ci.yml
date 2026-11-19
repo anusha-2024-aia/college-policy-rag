@@ -101,11 +101,10 @@ jobs:
           pytest -v --tb=short -rs 2>&1 | tee /tmp/pytest_run.log
           PYTEST_STATUS=${PIPESTATUS[0]}
           if [ $PYTEST_STATUS -ne 0 ]; then
-            echo "::error::Pytest failed! Summary of failures:"
-            grep -E '(FAILED|ERROR) tests/' /tmp/pytest_run.log | head -n 30 | while read line; do
-              echo "::error::$line"
+            echo "::error::Pytest failed with exit code $PYTEST_STATUS"
+            tail -n 40 /tmp/pytest_run.log | while IFS= read -r line; do
+              echo "::error::[pytest] $line"
             done
-            tail -n 80 /tmp/pytest_run.log
             exit $PYTEST_STATUS
           fi
 
